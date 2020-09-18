@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30104.148
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScsmClient", "ScsmClient\ScsmClient.csproj", "{5A3E2987-8407-4D66-8AAF-FE1C209290DB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScsmClientTestCmd", "ScsmClientTestCmd\ScsmClientTestCmd.csproj", "{280C4F70-B5F8-4E8D-BDC8-4DA72B555686}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5A3E2987-8407-4D66-8AAF-FE1C209290DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A3E2987-8407-4D66-8AAF-FE1C209290DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A3E2987-8407-4D66-8AAF-FE1C209290DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A3E2987-8407-4D66-8AAF-FE1C209290DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{280C4F70-B5F8-4E8D-BDC8-4DA72B555686}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{280C4F70-B5F8-4E8D-BDC8-4DA72B555686}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{280C4F70-B5F8-4E8D-BDC8-4DA72B555686}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{280C4F70-B5F8-4E8D-BDC8-4DA72B555686}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6301900E-25BB-45D5-8FE4-2A6E811DA573}
+	EndGlobalSection
+EndGlobal
