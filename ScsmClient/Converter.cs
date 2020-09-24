@@ -1,9 +1,9 @@
 ﻿using System;
-using BaseIT.SCSM.Client.JsonConverters;
 using Newtonsoft.Json.Converters;
 using Reflectensions.JsonConverters;
+using ScsmClient.JsonConverters;
 
-namespace BaseIT.SCSM.Client
+namespace ScsmClient
 {
     internal static class Converter
     {

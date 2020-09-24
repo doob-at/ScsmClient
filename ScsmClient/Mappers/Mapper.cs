@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
-using BaseIT.SCSM.Client.Model;
+﻿using AutoMapper;
 using Microsoft.EnterpriseManagement.Common;
+using ScsmClient.Model;
 
-namespace BaseIT.SCSM.Client.Mappers
+namespace ScsmClient.Mappers
 {
     public static class ObjectMapper
     {

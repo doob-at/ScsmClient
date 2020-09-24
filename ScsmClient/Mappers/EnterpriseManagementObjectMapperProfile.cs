@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using AutoMapper;
-using BaseIT.SCSM.Client.Model;
 using Microsoft.EnterpriseManagement.Common;
 using Microsoft.EnterpriseManagement.Configuration;
+using ScsmClient.Model;
 
-namespace BaseIT.SCSM.Client.Mappers
+namespace ScsmClient.Mappers
 {
     public class EnterpriseManagementObjectMapperProfile : Profile
     {

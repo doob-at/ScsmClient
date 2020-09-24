@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.EnterpriseManagement;
 using Newtonsoft.Json;
 using Reflectensions.ExtensionMethods;
 
-namespace BaseIT.SCSM.Client.JsonConverters
+namespace ScsmClient.JsonConverters
 {
     public class ManagementGroupConverter: JsonConverter
     {

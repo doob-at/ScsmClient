@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BaseIT.SCSM.Client.Mappers;
-using BaseIT.SCSM.Client.Model;
-using Microsoft.EnterpriseManagement.Common;
+﻿using Microsoft.EnterpriseManagement.Common;
+using ScsmClient.Mappers;
+using ScsmClient.Model;
 
-namespace BaseIT.SCSM.Client.ExtensionMethods
+namespace ScsmClient.ExtensionMethods
 {
     public static class EnterpriseManagementObjectExtensions
     {

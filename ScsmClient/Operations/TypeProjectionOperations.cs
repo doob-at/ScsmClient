@@ -4,7 +4,7 @@ using System.Linq;
 using Microsoft.EnterpriseManagement.Common;
 using Microsoft.EnterpriseManagement.Configuration;
 
-namespace BaseIT.SCSM.Client.Operations
+namespace ScsmClient.Operations
 {
     public class TypeProjectionOperations: BaseOperation
     {
@@ -44,9 +44,15 @@ namespace BaseIT.SCSM.Client.Operations
             return GetTypeProjection(new Guid(typeProjectionId));
         }
 
-        public IList<ManagementPackTypeProjection> GetTypeProjections(ManagementPackTypeProjectionCriteria criteria)
+        public IList<ManagementPackTypeProjection> GetTypeProjections(ManagementPackTypeProjectionCriteria criteria = null)
         {
-            return _client.ManagementGroup.EntityTypes.GetTypeProjections(criteria);
+            return criteria == null ? _client.ManagementGroup.EntityTypes.GetTypeProjections() :_client.ManagementGroup.EntityTypes.GetTypeProjections(criteria);
+        }
+
+        public IList<ManagementPackTypeProjection> GetTypeProjections(string criteria)
+        {
+            var crit = _client.Criteria().BuildManagementPackTypeProjectionCriteria(criteria);
+            return _client.ManagementGroup.EntityTypes.GetTypeProjections(crit);
         }
     }
 }

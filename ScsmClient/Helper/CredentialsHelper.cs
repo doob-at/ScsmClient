@@ -3,7 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Security;
 
-namespace BaseIT.SCSM.Client.Helper
+namespace ScsmClient.Helper
 {
     public static class CredentialsHelper
     {

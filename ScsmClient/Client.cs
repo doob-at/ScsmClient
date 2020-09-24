@@ -1,9 +1,9 @@
 ﻿using System.Net;
-using BaseIT.SCSM.Client.Helper;
-using BaseIT.SCSM.Client.Operations;
 using Microsoft.EnterpriseManagement;
+using ScsmClient.Helper;
+using ScsmClient.Operations;
 
-namespace BaseIT.SCSM.Client
+namespace ScsmClient
 {
     public class SCSMClient
     {
@@ -38,6 +38,7 @@ namespace BaseIT.SCSM.Client
                 settings.Domain = Credential.Domain;
                 settings.Password = Credential.SecurePassword;
             }
+            
 
             ManagementGroup = new EnterpriseManagementGroup(settings);
         }
@@ -62,6 +63,12 @@ namespace BaseIT.SCSM.Client
         public TypeProjectionOperations TypeProjection()
         {
             return _typeProjectionOperations = _typeProjectionOperations ?? new TypeProjectionOperations(this);
+        }
+
+        private ClassOperations _classOperations;
+        public ClassOperations Class()
+        {
+            return _classOperations = _classOperations ?? new ClassOperations(this);
         }
     }
 }

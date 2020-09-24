@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using Microsoft.EnterpriseManagement.Configuration;
 using Reflectensions.HelperClasses;
 
-namespace BaseIT.SCSM.Client.Operations
+namespace ScsmClient.Operations
 {
     public class ManagementPackOperations: BaseOperation
     {
@@ -60,6 +61,12 @@ namespace BaseIT.SCSM.Client.Operations
         public ManagementPack GetManagementPack(string name, string version)
         {
             return GetManagementPack(name, null, version);
+
+        }
+
+        public IList<ManagementPack> GetManagementPacks()
+        {
+            return _client.ManagementGroup.ManagementPacks.GetManagementPacks();
 
         }
     }

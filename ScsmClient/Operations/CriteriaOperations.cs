@@ -1,7 +1,9 @@
 ﻿using Microsoft.EnterpriseManagement.Common;
 using Microsoft.EnterpriseManagement.Configuration;
+using ScsmClient.CriteriaParser;
+using ScsmClient.CriteriaParser.Syntax;
 
-namespace BaseIT.SCSM.Client.Operations
+namespace ScsmClient.Operations
 {
     public class CriteriaOperations: BaseOperation
     {
@@ -13,11 +15,24 @@ namespace BaseIT.SCSM.Client.Operations
         {
             return new ObjectProjectionCriteria(criteria, typeProjection, _client.ManagementGroup);
         }
-
+        
         public ManagementPackTypeProjectionCriteria BuildManagementPackTypeProjectionCriteria(string criteria)
         {
-            
             return new ManagementPackTypeProjectionCriteria(criteria);
+        }
+
+        public ManagementPackClassCriteria BuildManagementPackClassCriteria(string criteria)
+        {
+            return new ManagementPackClassCriteria(criteria);
+        }
+
+        public string CreateCriteriaXmlFromFilterString(string filter, ManagementPackTypeProjection typeProjection)
+        {
+            var rels = typeProjection.GetManagementPack().GetRelationships();
+            var syntaxTree = SyntaxTree.Parse(filter);
+            var compilation = new Compilation(syntaxTree);
+            var result = compilation.Evaluate();
+            return result.Value;
         }
     }
 }

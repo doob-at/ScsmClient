@@ -1,4 +1,4 @@
-﻿namespace BaseIT.SCSM.Client.Operations
+﻿namespace ScsmClient.Operations
 {
     public abstract class BaseOperation
     {
