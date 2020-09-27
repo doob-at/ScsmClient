@@ -17,5 +17,6 @@ namespace ScsmClient.Model
         public virtual Guid? LastModifiedBy { get; set; }
         public DateTime LastModified { get; set; }
         public Dictionary<string, object> Values { get; set; }
+        public Dictionary<string, List<EnterpriseManagementObjectDto>> RelatedObjects { get; set; } = new Dictionary<string, List<EnterpriseManagementObjectDto>>();
     }
 }

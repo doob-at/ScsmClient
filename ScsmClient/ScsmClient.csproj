@@ -1,21 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net472</TargetFramework>
+    <TargetFrameworks>net462;net472;net48</TargetFrameworks>
+    <Version>0.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="10.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="Reflectensions" Version="4.3.0" />
-    <PackageReference Include="Reflectensions.Json" Version="4.3.0" />
+    <PackageReference Include="Reflectensions" Version="4.4.0" />
+    <PackageReference Include="Reflectensions.Json" Version="4.4.0" />
     <PackageReference Include="System.Collections.Immutable" Version="1.7.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Microsoft.EnterpriseManagement.Core">
+    <Reference Include="Microsoft.EnterpriseManagement.Core" PrivateAssets="All">
       <HintPath>..\LocalReferences\Microsoft.EnterpriseManagement.Core.dll</HintPath>
-      <Private>true</Private>
+      <Private>false</Private>
     </Reference>
   </ItemGroup>
 

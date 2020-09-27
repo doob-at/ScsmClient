@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Microsoft.EnterpriseManagement.Common;
 using Microsoft.EnterpriseManagement.Configuration;
+using ScsmClient.ExtensionMethods;
+using ScsmClient.Model;
 
 namespace ScsmClient.Operations
 {
@@ -53,6 +56,38 @@ namespace ScsmClient.Operations
         {
             var crit = _client.Criteria().BuildManagementPackTypeProjectionCriteria(criteria);
             return _client.ManagementGroup.EntityTypes.GetTypeProjections(crit);
+        }
+
+
+
+        public IEnumerable<EnterpriseManagementObjectDto> GetObjectProjectionObjects(string typeProjectionName,
+            string criteria, int? maxResult = null, CancellationToken cancellationToken = default)
+        {
+            var tp = GetTypeProjectionByClassName(typeProjectionName);
+            var crit = _client.Criteria().BuildObjectProjectionCriteria(criteria, tp);
+
+            var critOptions = new ObjectQueryOptions();
+            critOptions.DefaultPropertyRetrievalBehavior = ObjectPropertyRetrievalBehavior.All;
+            critOptions.ObjectRetrievalMode = ObjectRetrievalOptions.NonBuffered;
+            critOptions.MaxResultCount = maxResult ?? Int32.MaxValue;
+            
+            
+            
+            
+            var reader = GetObjectProjectionReader(crit, critOptions);
+            var count = 0;
+            foreach (var enterpriseManagementObjectProjection in reader)
+            {
+                if (count == critOptions.MaxResultCount)
+                    break;
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    break;
+                }
+                yield return enterpriseManagementObjectProjection.ToDto();
+            }
+
+            //return reader.Take(critOptions.MaxResultCount).Select(obj => obj.ToDto()).ToList();
         }
     }
 }

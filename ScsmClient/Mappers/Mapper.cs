@@ -4,7 +4,7 @@ using ScsmClient.Model;
 
 namespace ScsmClient.Mappers
 {
-    public static class ObjectMapper
+    internal static class ObjectMapper
     {
         static ObjectMapper()
         {
@@ -21,6 +21,13 @@ namespace ScsmClient.Mappers
             return enterpriseManagementObject == null
                 ? null
                 : Mapper.Map<EnterpriseManagementObjectDto>(enterpriseManagementObject);
+        }
+
+        public static EnterpriseManagementObjectDto ToDto(IComposableProjection composableProjection)
+        {
+            return composableProjection == null
+                ? null
+                : Mapper.Map<EnterpriseManagementObjectDto>(composableProjection);
         }
     }
 }
