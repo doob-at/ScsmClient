@@ -10,14 +10,10 @@
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="Reflectensions" Version="4.4.0" />
     <PackageReference Include="Reflectensions.Json" Version="4.4.0" />
+    <PackageReference Include="SCSM-Microsoft.EnterpriseManagement.Core" Version="10.19.1035" />
     <PackageReference Include="System.Collections.Immutable" Version="1.7.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="Microsoft.EnterpriseManagement.Core" PrivateAssets="All">
-      <HintPath>..\LocalReferences\Microsoft.EnterpriseManagement.Core.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
+  
 
 </Project>

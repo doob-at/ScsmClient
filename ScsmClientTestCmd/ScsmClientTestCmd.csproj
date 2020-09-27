@@ -51,7 +51,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ScsmClient\ScsmClient.csproj">
+    <ProjectReference Include="..\source\ScsmClient\ScsmClient.csproj">
       <Project>{5a3e2987-8407-4d66-8aaf-fe1c209290db}</Project>
       <Name>ScsmClient</Name>
     </ProjectReference>
