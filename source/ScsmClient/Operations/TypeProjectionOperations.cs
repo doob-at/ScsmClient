@@ -60,7 +60,7 @@ namespace ScsmClient.Operations
 
 
 
-        public IEnumerable<EnterpriseManagementObjectDto> GetObjectProjectionObjects(string typeProjectionName,
+        public IEnumerable<EnterpriseManagementObjectProjectionDto> GetObjectProjectionObjects(string typeProjectionName,
             string criteria, int? maxResult = null, CancellationToken cancellationToken = default)
         {
             var tp = GetTypeProjectionByClassName(typeProjectionName);
@@ -87,7 +87,6 @@ namespace ScsmClient.Operations
                 yield return enterpriseManagementObjectProjection.ToDto();
             }
 
-            //return reader.Take(critOptions.MaxResultCount).Select(obj => obj.ToDto()).ToList();
         }
     }
 }

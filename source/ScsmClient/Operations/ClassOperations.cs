@@ -23,5 +23,11 @@ namespace ScsmClient.Operations
             return _client.ManagementGroup.EntityTypes.GetClasses(criteria).FirstOrDefault();
         }
 
+        public ManagementPackClass GetClassByName(string className)
+        {
+            var crit = new ManagementPackClassCriteria($"Name='{className}'");
+            return _client.ManagementGroup.EntityTypes.GetClasses(crit).FirstOrDefault();
+        }
+
     }
 }

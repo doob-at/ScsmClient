@@ -11,6 +11,12 @@ namespace ScsmClient.Operations
         {
         }
 
+        public EnterpriseManagementObjectCriteria BuildObjectCriteria(string criteria, ManagementPackClass managementPackClass)
+        {
+            return new EnterpriseManagementObjectCriteria(criteria, managementPackClass, _client.ManagementGroup);
+           
+        }
+
         public ObjectProjectionCriteria BuildObjectProjectionCriteria(string criteria, ManagementPackTypeProjection typeProjection)
         {
             return new ObjectProjectionCriteria(criteria, typeProjection, _client.ManagementGroup);

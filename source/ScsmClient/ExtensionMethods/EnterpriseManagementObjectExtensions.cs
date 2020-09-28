@@ -13,9 +13,14 @@ namespace ScsmClient.ExtensionMethods
         //    return ObjectMapper.ToDto(enterpriseManagementObject);
         //}
 
-        public static EnterpriseManagementObjectDto ToDto(this IComposableProjection composableProjection)
+        public static EnterpriseManagementObjectProjectionDto ToDto(this IComposableProjection composableProjection)
         {
             return ObjectMapper.ToDto(composableProjection);
+        }
+
+        public static EnterpriseManagementObjectDto ToDto(this EnterpriseManagementObject enterpriseManagementObject)
+        {
+            return ObjectMapper.ToDto(enterpriseManagementObject);
         }
     }
 }

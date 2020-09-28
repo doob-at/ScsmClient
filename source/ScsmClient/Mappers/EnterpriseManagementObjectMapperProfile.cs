@@ -33,7 +33,7 @@ namespace ScsmClient.Mappers
                 });
 
 
-            CreateMap<IComposableProjection, EnterpriseManagementObjectDto>()
+            CreateMap<IComposableProjection, EnterpriseManagementObjectProjectionDto>()
                 
                 .ForMember(dto => dto.Values, expression =>
                 {
