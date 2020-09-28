@@ -6,28 +6,36 @@ namespace ScsmClient.Mappers
 {
     internal static class ObjectMapper
     {
+        private static IMapper EnterpriseManagementObjectMapper { get; }
+        private static IMapper EnterpriseManagementObjectProjectionMapper { get; }
+
         static ObjectMapper()
         {
-            Mapper = new MapperConfiguration(cfg =>
+            EnterpriseManagementObjectMapper = new MapperConfiguration(cfg =>
             {
                 cfg.AddProfile<EnterpriseManagementObjectMapperProfile>();
             }).CreateMapper();
+
+            EnterpriseManagementObjectProjectionMapper = new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile<EnterpriseManagementObjectProjectionMapperProfile>();
+            }).CreateMapper();
         }
 
-        private static IMapper Mapper { get; }
+        
 
         public static EnterpriseManagementObjectDto ToObjectDto(EnterpriseManagementObject enterpriseManagementObject)
         {
             return enterpriseManagementObject == null
                 ? null
-                : Mapper.Map<EnterpriseManagementObjectDto>(enterpriseManagementObject);
+                : EnterpriseManagementObjectMapper.Map<EnterpriseManagementObjectDto>(enterpriseManagementObject);
         }
 
-        public static EnterpriseManagementObjectProjectionDto ToObjectProjectionDto(IComposableProjection composableProjection)
+        public static EnterpriseManagementObjectProjectionDto ToObjectProjectionDto(EnterpriseManagementObjectProjection composableProjection)
         {
             return composableProjection == null
                 ? null
-                : Mapper.Map<EnterpriseManagementObjectProjectionDto>(composableProjection);
+                : EnterpriseManagementObjectProjectionMapper.Map<EnterpriseManagementObjectProjectionDto>(composableProjection);
         }
     }
 }

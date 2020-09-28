@@ -16,7 +16,7 @@ namespace ScsmClientTestCmd
         static void Main(string[] args)
         {
 
-
+            
             var creds = new NetworkCredential("LANFL\\administrator", "ABC12abc");
             var scsmClient = new SCSMClient("192.168.75.20", creds);
 
@@ -25,6 +25,7 @@ namespace ScsmClientTestCmd
             var crit = scsmClient.Criteria().BuildObjectCriteria("zOKZ = '' and zOKZ like '%Test%'", cl);
 
             var obs = scsmClient.Object().GetObject("zOrganisationseinheit", "zOKZ like '%Test%'").ToList();
+            Main1(args);
 
         }
 
@@ -54,30 +55,37 @@ namespace ScsmClientTestCmd
 </Criteria>
 ";
             var creds = new NetworkCredential("LANFL\\administrator", "ABC12abc");
-            var scsmClient = new SCSMClient("10.0.0.211", creds);
+            var scsmClient = new SCSMClient("192.168.75.20", creds);
+
+
+            var res = scsmClient.TypeProjection()
+                .GetObjectProjectionObjects("zTP_zBenutzer_zAccount", criteriaString).ToList();
+
+
+
 
 
             var tps = scsmClient.TypeProjection().GetTypeProjections("Name like 'z%'");
 
             var tp = scsmClient.TypeProjection().GetTypeProjectionByClassName("zTP_zBenutzer_zAccount");
 
-            var mps = scsmClient.ManagementPack().GetManagementPacks().OrderBy(m => m.Name).ToList();
-            //var criteriaxml = scsmClient.Criteria().CreateCriteriaXmlFromFilterString("zFirstName like \"%Harald\"", tp);
-            var crit = scsmClient.Criteria().BuildManagementPackClassCriteria("Name='zBenutzer'");
+            //var mps = scsmClient.ManagementPack().GetManagementPacks().OrderBy(m => m.Name).ToList();
+            ////var criteriaxml = scsmClient.Criteria().CreateCriteriaXmlFromFilterString("zFirstName like \"%Harald\"", tp);
+            //var crit = scsmClient.Criteria().BuildManagementPackClassCriteria("Name='zBenutzer'");
 
 
-            var c = scsmClient.Class().GetClass(crit);
+            //var c = scsmClient.Class().GetClass(crit);
 
-            var criteria = scsmClient.Criteria().BuildObjectProjectionCriteria(criteriaString, tp);
+            //var criteria = scsmClient.Criteria().BuildObjectProjectionCriteria(criteriaString, tp);
 
-            var critOptions = new ObjectQueryOptions();
-            critOptions.DefaultPropertyRetrievalBehavior = ObjectPropertyRetrievalBehavior.All;
-            critOptions.ObjectRetrievalMode = ObjectRetrievalOptions.NonBuffered;
-            critOptions.MaxResultCount = 1;
+            //var critOptions = new ObjectQueryOptions();
+            //critOptions.DefaultPropertyRetrievalBehavior = ObjectPropertyRetrievalBehavior.All;
+            //critOptions.ObjectRetrievalMode = ObjectRetrievalOptions.NonBuffered;
+            //critOptions.MaxResultCount = 1;
 
-            var reader = scsmClient.TypeProjection().GetObjectProjectionReader(criteria, critOptions);
+            //var reader = scsmClient.TypeProjection().GetObjectProjectionReader(criteria, critOptions);
 
-            var result = reader.Take(critOptions.MaxResultCount).Select(obj => obj.Object.ToObjectDto()).ToList();
+            //var result = reader.Take(critOptions.MaxResultCount).Select(obj => obj.Object.ToObjectDto()).ToList();
 
         }
     }

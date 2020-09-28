@@ -32,30 +32,38 @@ namespace ScsmClient.Mappers
                     });
                 });
 
+        }
+    }
 
+    internal class EnterpriseManagementObjectProjectionMapperProfile : Profile
+    {
+
+        public EnterpriseManagementObjectProjectionMapperProfile()
+        {
+            
             CreateMap<EnterpriseManagementObject, EnterpriseManagementObjectProjectionDto>()
+                 .ForMember(dto => dto.Values, expression =>
+                 {
+                     expression.MapFrom((src, dto) =>
+                     {
 
-                .ForMember(dto => dto.Values, expression =>
-                {
-                    expression.MapFrom((src, dto) =>
-                    {
-                        return src.Values.ToDictionary(
-                            v => v.Type.Name,
-                            v =>
-                            {
-                                if (v.Value is ManagementPackEnumeration en)
-                                {
-                                    return en.DisplayName;
-                                }
+                         return src.Values.ToDictionary(
+                             v => v.Type.Name,
+                             v =>
+                             {
+                                 if (v.Value is ManagementPackEnumeration en)
+                                 {
+                                     return en.DisplayName;
+                                 }
 
-                                return v.Value;
-                            });
-                    });
-                });
+                                 return v.Value;
+                             });
+                     });
+                 });
 
 
             CreateMap<IComposableProjection, EnterpriseManagementObjectProjectionDto>()
-                
+
                 .ForMember(dto => dto.Values, expression =>
                 {
                     expression.MapFrom((src, dto) =>
@@ -91,7 +99,7 @@ namespace ScsmClient.Mappers
                         return related;
                     });
                 })
-                .IncludeMembers(o=> o, s => s.Object);
+                .IncludeMembers(o => o, s => s.Object);
 
         }
     }

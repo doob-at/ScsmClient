@@ -21,6 +21,6 @@ namespace ScsmClient.Model
 
     public class EnterpriseManagementObjectProjectionDto: EnterpriseManagementObjectDto
     {
-        public Dictionary<string, List<EnterpriseManagementObjectDto>> RelatedObjects { get; set; } = new Dictionary<string, List<EnterpriseManagementObjectDto>>();
+        public Dictionary<string, List<EnterpriseManagementObjectProjectionDto>> RelatedObjects { get; set; } = new Dictionary<string, List<EnterpriseManagementObjectProjectionDto>>();
     }
 }
