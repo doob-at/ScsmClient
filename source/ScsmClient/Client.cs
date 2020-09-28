@@ -70,5 +70,11 @@ namespace ScsmClient
         {
             return _classOperations = _classOperations ?? new ClassOperations(this);
         }
+
+        private ObjectOperations _objectOperations;
+        public ObjectOperations Object()
+        {
+            return _objectOperations = _objectOperations ?? new ObjectOperations(this);
+        }
     }
 }
