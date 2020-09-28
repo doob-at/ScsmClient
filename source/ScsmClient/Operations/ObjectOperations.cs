@@ -40,7 +40,7 @@ namespace ScsmClient.Operations
             {
                 if (count == critOptions.MaxResultCount)
                     break;
-                yield return enterpriseManagementObject.ToDto();
+                yield return enterpriseManagementObject.ToObjectDto();
             }
 
         }

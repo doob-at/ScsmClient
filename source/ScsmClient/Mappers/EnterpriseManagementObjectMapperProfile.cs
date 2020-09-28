@@ -33,6 +33,27 @@ namespace ScsmClient.Mappers
                 });
 
 
+            CreateMap<EnterpriseManagementObject, EnterpriseManagementObjectProjectionDto>()
+
+                .ForMember(dto => dto.Values, expression =>
+                {
+                    expression.MapFrom((src, dto) =>
+                    {
+                        return src.Values.ToDictionary(
+                            v => v.Type.Name,
+                            v =>
+                            {
+                                if (v.Value is ManagementPackEnumeration en)
+                                {
+                                    return en.DisplayName;
+                                }
+
+                                return v.Value;
+                            });
+                    });
+                });
+
+
             CreateMap<IComposableProjection, EnterpriseManagementObjectProjectionDto>()
                 
                 .ForMember(dto => dto.Values, expression =>

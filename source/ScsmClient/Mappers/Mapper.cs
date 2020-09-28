@@ -16,14 +16,14 @@ namespace ScsmClient.Mappers
 
         private static IMapper Mapper { get; }
 
-        public static EnterpriseManagementObjectDto ToDto(EnterpriseManagementObject enterpriseManagementObject)
+        public static EnterpriseManagementObjectDto ToObjectDto(EnterpriseManagementObject enterpriseManagementObject)
         {
             return enterpriseManagementObject == null
                 ? null
                 : Mapper.Map<EnterpriseManagementObjectDto>(enterpriseManagementObject);
         }
 
-        public static EnterpriseManagementObjectProjectionDto ToDto(IComposableProjection composableProjection)
+        public static EnterpriseManagementObjectProjectionDto ToObjectProjectionDto(IComposableProjection composableProjection)
         {
             return composableProjection == null
                 ? null

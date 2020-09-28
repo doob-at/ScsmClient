@@ -23,6 +23,9 @@ namespace ScsmClientTestCmd
 
             var cl = scsmClient.Class().GetClassByName("zOrganisationseinheit");
             var crit = scsmClient.Criteria().BuildObjectCriteria("zOKZ = '' and zOKZ like '%Test%'", cl);
+
+            var obs = scsmClient.Object().GetObject("zOrganisationseinheit", "zOKZ like '%Test%'").ToList();
+
         }
 
         static void Main1(string[] args)
@@ -74,7 +77,7 @@ namespace ScsmClientTestCmd
 
             var reader = scsmClient.TypeProjection().GetObjectProjectionReader(criteria, critOptions);
 
-            var result = reader.Take(critOptions.MaxResultCount).Select(obj => obj.Object.ToDto()).ToList();
+            var result = reader.Take(critOptions.MaxResultCount).Select(obj => obj.Object.ToObjectDto()).ToList();
 
         }
     }

@@ -84,7 +84,7 @@ namespace ScsmClient.Operations
                 {
                     break;
                 }
-                yield return enterpriseManagementObjectProjection.ToDto();
+                yield return enterpriseManagementObjectProjection.ToObjectProjectionDto();
             }
 
         }
