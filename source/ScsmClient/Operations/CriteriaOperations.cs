@@ -1,4 +1,6 @@
-﻿using Microsoft.EnterpriseManagement.Common;
+﻿using System.Xml;
+using System.Xml.Linq;
+using Microsoft.EnterpriseManagement.Common;
 using Microsoft.EnterpriseManagement.Configuration;
 using ScsmClient.CriteriaParser;
 using ScsmClient.CriteriaParser.Syntax;
@@ -13,8 +15,7 @@ namespace ScsmClient.Operations
 
         public EnterpriseManagementObjectCriteria BuildObjectCriteria(string criteria, ManagementPackClass managementPackClass)
         {
-            return new EnterpriseManagementObjectCriteria(criteria, managementPackClass, _client.ManagementGroup);
-           
+            return new EnterpriseManagementObjectCriteria(criteria, managementPackClass);
         }
 
         public ObjectProjectionCriteria BuildObjectProjectionCriteria(string criteria, ManagementPackTypeProjection typeProjection)

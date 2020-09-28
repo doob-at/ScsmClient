@@ -12,7 +12,20 @@ namespace ScsmClientTestCmd
 {
     class Program
     {
+
         static void Main(string[] args)
+        {
+
+
+            var creds = new NetworkCredential("LANFL\\administrator", "ABC12abc");
+            var scsmClient = new SCSMClient("192.168.75.20", creds);
+
+
+            var cl = scsmClient.Class().GetClassByName("zOrganisationseinheit");
+            var crit = scsmClient.Criteria().BuildObjectCriteria("zOKZ = '' and zOKZ like '%Test%'", cl);
+        }
+
+        static void Main1(string[] args)
         {
 
             var criteriaString = @"
