@@ -11,7 +11,7 @@ namespace ScsmClient
         public string ServerName { get; }
         public NetworkCredential Credential { get; }
 
-        public bool IsConnected => ManagementGroup?.IsConnected ?? false;
+        public bool IsConnected => _enterpriseManagementGroup?.IsConnected ?? false;
 
         private EnterpriseManagementGroup _enterpriseManagementGroup;
 
