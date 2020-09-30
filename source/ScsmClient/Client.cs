@@ -13,7 +13,23 @@ namespace ScsmClient
 
         public bool IsConnected => ManagementGroup?.IsConnected ?? false;
 
-        public EnterpriseManagementGroup ManagementGroup { get; private set; }
+        private EnterpriseManagementGroup _enterpriseManagementGroup;
+
+        public EnterpriseManagementGroup ManagementGroup
+        {
+            get
+            {
+
+                if (!IsConnected)
+                {
+                    _enterpriseManagementGroup?.Reconnect();
+                }
+
+                return _enterpriseManagementGroup;
+            }
+            private set => _enterpriseManagementGroup = value;
+        }
+
         public SCSMClient(string serverName)
         {
             ServerName = serverName;
