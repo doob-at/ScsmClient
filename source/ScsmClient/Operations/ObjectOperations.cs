@@ -16,20 +16,14 @@ namespace ScsmClient.Operations
         public ObjectOperations(SCSMClient client) : base(client)
         {
         }
-
-
-        private ObjectQueryOptions buildObjectQueryOptions(int? maxResults = null)
+        
+        public EnterpriseManagementObjectDto GetObjectById(Guid id)
         {
             var critOptions = new ObjectQueryOptions();
             critOptions.DefaultPropertyRetrievalBehavior = ObjectPropertyRetrievalBehavior.All;
             critOptions.ObjectRetrievalMode = ObjectRetrievalOptions.NonBuffered;
-            critOptions.MaxResultCount = maxResults ?? Int32.MaxValue;
-            return critOptions;
-        }
 
-        public EnterpriseManagementObjectDto GetObjectById(Guid id)
-        {
-            return _client.ManagementGroup.EntityObjects.GetObject<EnterpriseManagementObject>(id, buildObjectQueryOptions(1)).ToObjectDto();
+            return _client.ManagementGroup.EntityObjects.GetObject<EnterpriseManagementObject>(id, critOptions).ToObjectDto();
         }
 
         public IEnumerable<EnterpriseManagementObjectDto> GetObject(string className, string criteria, int? maxResult = null)
