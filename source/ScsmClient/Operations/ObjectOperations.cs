@@ -17,6 +17,21 @@ namespace ScsmClient.Operations
         {
         }
 
+
+        private ObjectQueryOptions buildObjectQueryOptions(int? maxResults = null)
+        {
+            var critOptions = new ObjectQueryOptions();
+            critOptions.DefaultPropertyRetrievalBehavior = ObjectPropertyRetrievalBehavior.All;
+            critOptions.ObjectRetrievalMode = ObjectRetrievalOptions.NonBuffered;
+            critOptions.MaxResultCount = maxResults ?? Int32.MaxValue;
+            return critOptions;
+        }
+
+        public EnterpriseManagementObjectDto GetObjectById(Guid id)
+        {
+            return _client.ManagementGroup.EntityObjects.GetObject<EnterpriseManagementObject>(id, buildObjectQueryOptions(1)).ToObjectDto();
+        }
+
         public IEnumerable<EnterpriseManagementObjectDto> GetObject(string className, string criteria, int? maxResult = null)
         {
 
@@ -44,7 +59,7 @@ namespace ScsmClient.Operations
         }
 
 
-        public void CreateObject(string className, Dictionary<string, object> properties)
+        public EnterpriseManagementObjectDto CreateObject(string className, Dictionary<string, object> properties)
         {
             var objectClass = _client.Class().GetClassByName(className);
             
@@ -56,17 +71,17 @@ namespace ScsmClient.Operations
             }
 
             obj.Commit();
-            
+            return GetObjectById(obj.Id);
         }
 
-        public void CreateObjectFromTemplate(string templateName, Dictionary<string, object> properties)
+        public EnterpriseManagementObjectDto CreateObjectFromTemplate(string templateName, Dictionary<string, object> properties)
         {
 
             var template =_client.Template().GetObjectTemplateByName(templateName);
-            CreateObjectFromTemplate(template, properties);
+            return CreateObjectFromTemplate(template, properties);
         }
 
-        public void CreateObjectFromTemplate(ManagementPackObjectTemplate template, Dictionary<string, object> properties)
+        public EnterpriseManagementObjectDto CreateObjectFromTemplate(ManagementPackObjectTemplate template, Dictionary<string, object> properties)
         {
 
             var obj = new CreatableEnterpriseManagementObject(_client.ManagementGroup, template);
@@ -77,6 +92,9 @@ namespace ScsmClient.Operations
             }
 
             obj.Commit();
+
+
+            return GetObjectById(obj.Id);
 
         }
 
