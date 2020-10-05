@@ -24,8 +24,6 @@ namespace ScsmClient.Operations
             var crit = _client.Criteria().BuildObjectCriteria(criteria, objectClass);
 
 
-           
-
             var critOptions = new ObjectQueryOptions();
             critOptions.DefaultPropertyRetrievalBehavior = ObjectPropertyRetrievalBehavior.All;
             critOptions.ObjectRetrievalMode = ObjectRetrievalOptions.NonBuffered;
@@ -45,9 +43,41 @@ namespace ScsmClient.Operations
 
         }
 
-        public ManagementPackClass GetClass(ManagementPackClassCriteria criteria)
+
+        public void CreateObject(string className, Dictionary<string, object> properties)
         {
-            return _client.ManagementGroup.EntityTypes.GetClasses(criteria).FirstOrDefault();
+            var objectClass = _client.Class().GetClassByName(className);
+            
+            var obj = new CreatableEnterpriseManagementObject(_client.ManagementGroup, objectClass);
+
+            foreach (var kv in properties)
+            {
+                obj[objectClass, kv.Key].Value = kv.Value;
+            }
+
+            obj.Commit();
+            
+        }
+
+        public void CreateObjectFromTemplate(string templateName, Dictionary<string, object> properties)
+        {
+
+            var template =_client.Template().GetObjectTemplateByName(templateName);
+            CreateObjectFromTemplate(template, properties);
+        }
+
+        public void CreateObjectFromTemplate(ManagementPackObjectTemplate template, Dictionary<string, object> properties)
+        {
+
+            var obj = new CreatableEnterpriseManagementObject(_client.ManagementGroup, template);
+            var objectClass = template.TypeConstraint.GetElement();
+            foreach (var kv in properties)
+            {
+                obj[objectClass, kv.Key].Value = kv.Value;
+            }
+
+            obj.Commit();
+
         }
 
     }

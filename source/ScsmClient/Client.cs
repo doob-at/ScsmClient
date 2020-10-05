@@ -70,27 +70,23 @@ namespace ScsmClient
 
         private CriteriaOperations _criteriaOperations;
 
-        public CriteriaOperations Criteria()
-        {
-            return _criteriaOperations = _criteriaOperations ?? new CriteriaOperations(this);
-        }
+        public CriteriaOperations Criteria() => _criteriaOperations = _criteriaOperations ?? new CriteriaOperations(this);
+        
 
         private TypeProjectionOperations _typeProjectionOperations;
-        public TypeProjectionOperations TypeProjection()
-        {
-            return _typeProjectionOperations = _typeProjectionOperations ?? new TypeProjectionOperations(this);
-        }
+        public TypeProjectionOperations TypeProjection() => _typeProjectionOperations = _typeProjectionOperations ?? new TypeProjectionOperations(this);
+        
 
         private ClassOperations _classOperations;
-        public ClassOperations Class()
-        {
-            return _classOperations = _classOperations ?? new ClassOperations(this);
-        }
+        public ClassOperations Class() => _classOperations = _classOperations ?? new ClassOperations(this);
+        
 
         private ObjectOperations _objectOperations;
-        public ObjectOperations Object()
-        {
-            return _objectOperations = _objectOperations ?? new ObjectOperations(this);
-        }
+        public ObjectOperations Object() => _objectOperations = _objectOperations ?? new ObjectOperations(this);
+        
+
+        private TemplateOperations _templateOperations;
+        public TemplateOperations Template() => _templateOperations = _templateOperations ?? new TemplateOperations(this);
+        
     }
 }
