@@ -87,6 +87,12 @@ namespace ScsmClient
 
         private TemplateOperations _templateOperations;
         public TemplateOperations Template() => _templateOperations = _templateOperations ?? new TemplateOperations(this);
-        
+
+        private EnumerationOperations _enumerationOperations;
+        public EnumerationOperations Enumeration() => _enumerationOperations = _enumerationOperations ?? new EnumerationOperations(this);
+
+        private IncidentOperations _incidentOperations;
+        public IncidentOperations Incident() => _incidentOperations = _incidentOperations ?? new IncidentOperations(this);
+
     }
 }

@@ -26,7 +26,7 @@ namespace ScsmClient.Operations
         public ManagementPackObjectTemplate GetObjectTemplateByName(string templateName)
         {
 
-            var crit = new ManagementPackObjectTemplateCriteria($"Name='{templateName}'");
+            var crit = new ManagementPackObjectTemplateCriteria($"DisplayName='{templateName}'");
             return _client.ManagementGroup.Templates.GetObjectTemplates(crit).FirstOrDefault();
         }
 

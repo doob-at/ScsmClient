@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.EnterpriseManagement.Configuration;
 using Reflectensions.HelperClasses;
 
@@ -61,6 +62,13 @@ namespace ScsmClient.Operations
         public ManagementPack GetManagementPack(string name, string version)
         {
             return GetManagementPack(name, null, version);
+
+        }
+
+        public ManagementPack GetManagementPackByName(string name)
+        {
+            var crit = new ManagementPackCriteria($"Name='{name}'");
+            return _client.ManagementGroup.ManagementPacks.GetManagementPacks(crit).FirstOrDefault();
 
         }
 

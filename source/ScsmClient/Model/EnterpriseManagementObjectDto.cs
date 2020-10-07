@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Expandable;
 
 namespace ScsmClient.Model
 {

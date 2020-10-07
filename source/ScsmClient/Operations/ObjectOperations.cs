@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EnterpriseManagement.Common;
 using Microsoft.EnterpriseManagement.Configuration;
+using Reflectensions.ExtensionMethods;
+using ScsmClient.Attributes;
 using ScsmClient.ExtensionMethods;
 using ScsmClient.Model;
 
@@ -26,7 +29,7 @@ namespace ScsmClient.Operations
             return _client.ManagementGroup.EntityObjects.GetObject<EnterpriseManagementObject>(id, critOptions).ToObjectDto();
         }
 
-        public IEnumerable<EnterpriseManagementObjectDto> GetObject(string className, string criteria, int? maxResult = null)
+        public IEnumerable<EnterpriseManagementObjectDto> GetObjects(string className, string criteria, int? maxResult = null)
         {
 
             var objectClass = _client.Class().GetClassByName(className);
@@ -52,20 +55,75 @@ namespace ScsmClient.Operations
 
         }
 
+        public EnterpriseManagementObjectDto CreateObject(Guid id, Dictionary<string, object> properties)
+        {
+            var objectClass = _client.Class().GetClassById(id);
+            return CreateObject(objectClass, properties);
+        }
 
         public EnterpriseManagementObjectDto CreateObject(string className, Dictionary<string, object> properties)
         {
             var objectClass = _client.Class().GetClassByName(className);
-            
+            return CreateObject(objectClass, properties);
+        }
+
+        public EnterpriseManagementObjectDto CreateObject(ManagementPackClass objectClass, Dictionary<string, object> properties)
+        {
             var obj = new CreatableEnterpriseManagementObject(_client.ManagementGroup, objectClass);
+            var objectProperties = objectClass.GetProperties(BaseClassTraversalDepth.Recursive);
+
 
             foreach (var kv in properties)
             {
-                obj[objectClass, kv.Key].Value = kv.Value;
+                var prop = objectProperties.FirstOrDefault(p => p.Name.Equals(kv.Key, StringComparison.Ordinal)) ??
+                           objectProperties.FirstOrDefault(p => p.Name.Equals(kv.Key, StringComparison.OrdinalIgnoreCase));
+                if (prop != null)
+                {
+                    var val = NormalizeValue(kv, prop);
+                    obj[objectClass, kv.Key].Value = val;
+                }
             }
 
             obj.Commit();
             return GetObjectById(obj.Id);
+        }
+
+        private object NormalizeValue(KeyValuePair<string, object> keyValue, ManagementPackProperty property)
+        {
+            
+
+            if (property.Type == ManagementPackEntityPropertyTypes.@enum)
+            {
+                return NormalizeEnum(keyValue.Value, property.EnumType.GetElement());
+            }
+
+            return keyValue.Value;
+        }
+
+        private object NormalizeEnum(object enumValue, ManagementPackEnumeration managementPackEnumeration)
+        {
+            if (enumValue is Guid guid)
+            {
+                return _client.Enumeration().GetEnumerationChildById(managementPackEnumeration, guid);
+            }
+            else if (enumValue is string str)
+            {
+                if (str.IsGuid())
+                {
+                    return NormalizeEnum(str.ToGuid(), managementPackEnumeration);
+                }
+                return _client.Enumeration().GetEnumerationChildByName(managementPackEnumeration, str);
+            }
+            else if (enumValue is Enum enu)
+            {
+                if (enu.HasId())
+                {
+                    return NormalizeEnum(enu.Id(), managementPackEnumeration);
+                }
+               
+            }
+
+            return enumValue;
         }
 
         public EnterpriseManagementObjectDto CreateObjectFromTemplate(string templateName, Dictionary<string, object> properties)
@@ -78,17 +136,31 @@ namespace ScsmClient.Operations
         public EnterpriseManagementObjectDto CreateObjectFromTemplate(ManagementPackObjectTemplate template, Dictionary<string, object> properties)
         {
 
-            var obj = new CreatableEnterpriseManagementObject(_client.ManagementGroup, template);
-            var objectClass = template.TypeConstraint.GetElement();
-            foreach (var kv in properties)
+            var obj = new EnterpriseManagementObjectProjection(_client.ManagementGroup, template);
+
+            var elem = template.TypeID.GetElement();
+            if (elem is ManagementPackTypeProjection managementPackTypeProjection)
             {
-                obj[objectClass, kv.Key].Value = kv.Value;
+                var objectProperties = managementPackTypeProjection.TargetType.GetProperties(BaseClassTraversalDepth.Recursive);
+                foreach (var kv in properties)
+                {
+                    var prop = objectProperties.FirstOrDefault(p => p.Name.Equals(kv.Key, StringComparison.Ordinal)) ??
+                               objectProperties.FirstOrDefault(p => p.Name.Equals(kv.Key, StringComparison.OrdinalIgnoreCase));
+
+                    var val = NormalizeValue(kv, prop);
+                    obj.Object[managementPackTypeProjection.TargetType, kv.Key].Value = val;
+                }
+
+                obj.Commit();
+
+
+                return GetObjectById(obj.Object.Id);
             }
-
-            obj.Commit();
-
-
-            return GetObjectById(obj.Id);
+            else
+            {
+                throw new Exception($"Template '{template.DisplayName}' is invalid!");
+            }
+            
 
         }
 

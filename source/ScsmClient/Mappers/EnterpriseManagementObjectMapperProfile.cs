@@ -53,7 +53,7 @@ namespace ScsmClient.Mappers
                              {
                                  if (v.Value is ManagementPackEnumeration en)
                                  {
-                                     return en.DisplayName;
+                                     return en.DisplayName; 
                                  }
 
                                  return v.Value;
