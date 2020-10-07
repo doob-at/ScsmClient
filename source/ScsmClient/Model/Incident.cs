@@ -7,11 +7,21 @@ using Expandable;
 
 namespace ScsmClient.Model
 {
-    public class IncidentDto: ExpandableObject
+    public class Incident: ExpandableObject
     {
         public string Title { get; set; }
         public string DisplayName { get; set; }
         public string Urgency { get; set; }
         public string Impact { get; set; }
+
+        public Incident(): base()
+        {
+            
+        }
+
+        public Incident(Dictionary<string, object> dictionary): base(dictionary)
+        {
+            
+        }
     }
 }

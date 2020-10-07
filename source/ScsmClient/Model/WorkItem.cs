@@ -7,7 +7,7 @@ using Expandable;
 
 namespace ScsmClient.Model
 {
-    public class WorkItemDto: ExpandableObject
+    public class WorkItem: ExpandableObject
     {
         public string Title { get; set; }
         public string Description { get; set; }
@@ -32,7 +32,15 @@ namespace ScsmClient.Model
         public DateTime? FirstAssignedDate { get; set; }
         public DateTime? FirstResponseDate { get; set; }
 
+        public WorkItem() : base()
+        {
 
+        }
+
+        public WorkItem(Dictionary<string, object> dictionary) : base(dictionary)
+        {
+
+        }
 
     }
 }

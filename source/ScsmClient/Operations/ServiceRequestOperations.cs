@@ -17,13 +17,13 @@ namespace ScsmClient.Operations
         {
         }
 
-        public EnterpriseManagementObjectDto Create(ServiceRequestDto serviceRequest)
+        public EnterpriseManagementObjectDto Create(ServiceRequest serviceRequest)
         {
             return _client.Object().CreateObject(WellKnown.ServiceRequest.ClassId, serviceRequest.AsDictionary());
         }
 
         
-        public EnterpriseManagementObjectDto CreateFromTemplate(string templateName, ServiceRequestDto serviceRequest)
+        public EnterpriseManagementObjectDto CreateFromTemplate(string templateName, ServiceRequest serviceRequest)
         {
 
          

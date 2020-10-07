@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ScsmClient.Model
 {
-    public class ServiceRequestDto: WorkItemDto
+    public class ServiceRequest: WorkItem
     {
         public string Status { get; set; }
         public string TemplateId { get; set; }
@@ -20,5 +20,14 @@ namespace ScsmClient.Model
         public string Area { get; set; }
         public string SupportGroup { get; set; }
 
+        public ServiceRequest() : base()
+        {
+
+        }
+
+        public ServiceRequest(Dictionary<string, object> dictionary) : base(dictionary)
+        {
+
+        }
     }
 }
