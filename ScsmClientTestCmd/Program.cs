@@ -11,6 +11,7 @@ using Reflectensions;
 using ScsmClient;
 using ScsmClient.ExtensionMethods;
 using ScsmClient.Model;
+using ScsmClient.SharedModels;
 
 namespace ScsmClientTestCmd
 {

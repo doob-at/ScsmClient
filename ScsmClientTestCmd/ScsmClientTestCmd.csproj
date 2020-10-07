@@ -70,6 +70,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ScsmClient.SharedModels\ScsmClient.SharedModels.csproj">
+      <Project>{40202038-de19-49b5-be4a-df598a9cc6e5}</Project>
+      <Name>ScsmClient.SharedModels</Name>
+    </ProjectReference>
     <ProjectReference Include="..\source\ScsmClient\ScsmClient.csproj">
       <Project>{5a3e2987-8407-4d66-8aaf-fe1c209290db}</Project>
       <Name>ScsmClient</Name>

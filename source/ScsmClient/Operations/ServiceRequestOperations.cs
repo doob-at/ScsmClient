@@ -8,6 +8,7 @@ using Expandable.ExtensionMethods;
 using Microsoft.EnterpriseManagement.Configuration;
 using ScsmClient.ExtensionMethods;
 using ScsmClient.Model;
+using ScsmClient.SharedModels;
 
 namespace ScsmClient.Operations
 {

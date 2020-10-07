@@ -72,7 +72,7 @@ class Build : NukeBuild
         .Executes(() =>
         {
 
-            var proj = Solution.Projects.FirstOrDefault(p => p.Name == "ScsmClient");
+            var proj = Solution.Projects.Where(p => !p.Name.Contains("Test"));
 
             //NuGetTasks.NuGetPack(c => c
             //    .SetTargetPath(proj)
@@ -84,7 +84,6 @@ class Build : NukeBuild
             //);
 
             DotNetPack(s => s
-                .SetProject(proj)
                 .SetVersion(GitVersion.NuGetVersionV2)
                 .SetConfiguration("release")
                 .SetAssemblyVersion(GitVersion.AssemblySemVer)
@@ -92,6 +91,7 @@ class Build : NukeBuild
                 .SetInformationalVersion(GitVersion.InformationalVersion)
                 .EnableNoRestore()
                 .SetOutputDirectory(OutputDirectory)
+                .CombineWith(proj, (settings, project) => settings.SetProject(project))
             );
         });
 }

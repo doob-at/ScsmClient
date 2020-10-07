@@ -9,14 +9,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScsmClientTestCmd", "ScsmCl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "build\_build.csproj", "{D512CDC4-BE3F-40E1-BBE8-662C8DF77A99}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScsmClient.SharedModels", "ScsmClient.SharedModels\ScsmClient.SharedModels.csproj", "{40202038-DE19-49B5-BE4A-DF598A9CC6E5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{D512CDC4-BE3F-40E1-BBE8-662C8DF77A99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D512CDC4-BE3F-40E1-BBE8-662C8DF77A99}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5A3E2987-8407-4D66-8AAF-FE1C209290DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5A3E2987-8407-4D66-8AAF-FE1C209290DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5A3E2987-8407-4D66-8AAF-FE1C209290DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -25,6 +25,12 @@ Global
 		{280C4F70-B5F8-4E8D-BDC8-4DA72B555686}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{280C4F70-B5F8-4E8D-BDC8-4DA72B555686}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{280C4F70-B5F8-4E8D-BDC8-4DA72B555686}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D512CDC4-BE3F-40E1-BBE8-662C8DF77A99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D512CDC4-BE3F-40E1-BBE8-662C8DF77A99}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40202038-DE19-49B5-BE4A-DF598A9CC6E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40202038-DE19-49B5-BE4A-DF598A9CC6E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40202038-DE19-49B5-BE4A-DF598A9CC6E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40202038-DE19-49B5-BE4A-DF598A9CC6E5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
