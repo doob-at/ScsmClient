@@ -17,12 +17,12 @@ namespace ScsmClient.Operations
         {
         }
 
-        public EnterpriseManagementObjectDto Create(IncidentDto incident)
+        public EnterpriseManagementObjectDto Create(Incident incident)
         {
             return _client.Object().CreateObject(WellKnown.Incident.ClassId, incident.AsDictionary());
         }
         
-        public EnterpriseManagementObjectDto CreateFromTemplate(string templateName, IncidentDto incident)
+        public EnterpriseManagementObjectDto CreateFromTemplate(string templateName, Incident incident)
         {
             var template = _client.Template().GetObjectTemplateByName(templateName);
 

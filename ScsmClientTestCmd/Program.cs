@@ -52,7 +52,7 @@ namespace ScsmClientTestCmd
             var tt = tid.TargetType;
             var type = temp.GetType();
 
-            var inc = new IncidentDto();
+            var inc = new Incident();
             inc.Title = "Test Incident 123";
             inc.Impact = WellKnown.Incident.Impact.High;
             inc["Description"] = "TestDescription";
@@ -64,8 +64,8 @@ namespace ScsmClientTestCmd
 
             var isEqual = json == jsondic;
 
-            var inc2 = Json.Converter.ToObject<IncidentDto>(json);
-            var in3 = Json.Converter.ToObject<IncidentDto>(jsondic);
+            var inc2 = Json.Converter.ToObject<Incident>(json);
+            var in3 = Json.Converter.ToObject<Incident>(jsondic);
 
 
 
