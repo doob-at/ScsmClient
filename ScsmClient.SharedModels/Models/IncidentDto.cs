@@ -1,21 +1,21 @@
 ﻿using System.Collections.Generic;
 using Expandable;
 
-namespace ScsmClient.SharedModels
+namespace ScsmClient.SharedModels.Models
 {
-    public class Incident: ExpandableObject
+    public class IncidentDto: ExpandableObject
     {
         public string Title { get; set; }
         public string DisplayName { get; set; }
         public string Urgency { get; set; }
         public string Impact { get; set; }
 
-        public Incident(): base()
+        public IncidentDto(): base()
         {
             
         }
 
-        public Incident(Dictionary<string, object> dictionary): base(dictionary)
+        public IncidentDto(Dictionary<string, object> dictionary): base(dictionary)
         {
             
         }

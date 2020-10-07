@@ -72,7 +72,10 @@ class Build : NukeBuild
         .Executes(() =>
         {
 
-            var proj = Solution.Projects.Where(p => !p.Name.Contains("Test"));
+            var proj = Solution.Projects
+                .Where(p => !p.Name.Contains("Test"))
+                .Where(p => p.Name != "build")
+                .Where(p => p.Name != "_build");
 
             //NuGetTasks.NuGetPack(c => c
             //    .SetTargetPath(proj)

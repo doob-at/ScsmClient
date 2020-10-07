@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using Expandable;
 
-namespace ScsmClient.SharedModels
+namespace ScsmClient.SharedModels.Models
 {
-    public class WorkItem: ExpandableObject
+    public class WorkItemDto: ExpandableObject
     {
         public string Title { get; set; }
         public string Description { get; set; }
@@ -29,12 +29,12 @@ namespace ScsmClient.SharedModels
         public DateTime? FirstAssignedDate { get; set; }
         public DateTime? FirstResponseDate { get; set; }
 
-        public WorkItem() : base()
+        public WorkItemDto() : base()
         {
 
         }
 
-        public WorkItem(Dictionary<string, object> dictionary) : base(dictionary)
+        public WorkItemDto(Dictionary<string, object> dictionary) : base(dictionary)
         {
 
         }

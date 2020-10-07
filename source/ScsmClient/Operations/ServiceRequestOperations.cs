@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 using Expandable.ExtensionMethods;
 using Microsoft.EnterpriseManagement.Configuration;
 using ScsmClient.ExtensionMethods;
-using ScsmClient.Model;
 using ScsmClient.SharedModels;
+using ScsmClient.SharedModels.Models;
 
 namespace ScsmClient.Operations
 {
@@ -18,13 +18,13 @@ namespace ScsmClient.Operations
         {
         }
 
-        public EnterpriseManagementObjectDto Create(ServiceRequest serviceRequest)
+        public EnterpriseManagementObjectDto Create(ServiceRequestDto serviceRequest)
         {
             return _client.Object().CreateObject(WellKnown.ServiceRequest.ClassId, serviceRequest.AsDictionary());
         }
 
         
-        public EnterpriseManagementObjectDto CreateFromTemplate(string templateName, ServiceRequest serviceRequest)
+        public EnterpriseManagementObjectDto CreateFromTemplate(string templateName, ServiceRequestDto serviceRequest)
         {
 
          

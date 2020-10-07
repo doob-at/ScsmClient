@@ -10,7 +10,7 @@ using Microsoft.EnterpriseManagement.Configuration;
 using Reflectensions.ExtensionMethods;
 using ScsmClient.Attributes;
 using ScsmClient.ExtensionMethods;
-using ScsmClient.Model;
+using ScsmClient.SharedModels.Models;
 
 namespace ScsmClient.Operations
 {

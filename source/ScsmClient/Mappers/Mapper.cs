@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EnterpriseManagement.Common;
-using ScsmClient.Model;
+using ScsmClient.SharedModels.Models;
 
 namespace ScsmClient.Mappers
 {

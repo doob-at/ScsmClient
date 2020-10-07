@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Expandable;
 
-namespace ScsmClient.Model
+namespace ScsmClient.SharedModels.Models
 {
     public class EnterpriseManagementObjectDto
     {

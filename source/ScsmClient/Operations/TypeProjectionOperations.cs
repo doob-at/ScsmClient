@@ -5,7 +5,7 @@ using System.Threading;
 using Microsoft.EnterpriseManagement.Common;
 using Microsoft.EnterpriseManagement.Configuration;
 using ScsmClient.ExtensionMethods;
-using ScsmClient.Model;
+using ScsmClient.SharedModels.Models;
 
 namespace ScsmClient.Operations
 {

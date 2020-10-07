@@ -2,7 +2,7 @@
 using Microsoft.EnterpriseManagement.Common;
 using Microsoft.EnterpriseManagement.Configuration;
 using ScsmClient.Mappers;
-using ScsmClient.Model;
+using ScsmClient.SharedModels.Models;
 
 namespace ScsmClient.ExtensionMethods
 {

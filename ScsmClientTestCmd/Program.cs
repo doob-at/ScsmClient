@@ -10,8 +10,8 @@ using Microsoft.EnterpriseManagement.Configuration;
 using Reflectensions;
 using ScsmClient;
 using ScsmClient.ExtensionMethods;
-using ScsmClient.Model;
 using ScsmClient.SharedModels;
+using ScsmClient.SharedModels.Models;
 
 namespace ScsmClientTestCmd
 {
@@ -53,7 +53,7 @@ namespace ScsmClientTestCmd
             var tt = tid.TargetType;
             var type = temp.GetType();
 
-            var inc = new Incident();
+            var inc = new IncidentDto();
             inc.Title = "Test Incident 123";
             inc.Impact = WellKnown.Incident.Impact.High;
             inc["Description"] = "TestDescription";
@@ -65,8 +65,8 @@ namespace ScsmClientTestCmd
 
             var isEqual = json == jsondic;
 
-            var inc2 = Json.Converter.ToObject<Incident>(json);
-            var in3 = Json.Converter.ToObject<Incident>(jsondic);
+            var inc2 = Json.Converter.ToObject<IncidentDto>(json);
+            var in3 = Json.Converter.ToObject<IncidentDto>(jsondic);
 
 
 

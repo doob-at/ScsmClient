@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ScsmClient.SharedModels
+namespace ScsmClient.SharedModels.Models
 {
-    public class ServiceRequest: WorkItem
+    public class ServiceRequestDto: WorkItemDto
     {
         public string Status { get; set; }
         public string TemplateId { get; set; }
@@ -17,12 +17,12 @@ namespace ScsmClient.SharedModels
         public string Area { get; set; }
         public string SupportGroup { get; set; }
 
-        public ServiceRequest() : base()
+        public ServiceRequestDto() : base()
         {
 
         }
 
-        public ServiceRequest(Dictionary<string, object> dictionary) : base(dictionary)
+        public ServiceRequestDto(Dictionary<string, object> dictionary) : base(dictionary)
         {
 
         }
