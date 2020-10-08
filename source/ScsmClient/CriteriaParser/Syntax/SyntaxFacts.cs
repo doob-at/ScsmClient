@@ -32,7 +32,9 @@ namespace ScsmClient.CriteriaParser.Syntax
                 //    return 4;
 
                 case SyntaxKind.GreaterToken:
-                case SyntaxKind.LowerToken:
+                case SyntaxKind.LessToken:
+                case SyntaxKind.GreaterOrEqualsToken:
+                case SyntaxKind.LessOrEqualsToken:
                 case SyntaxKind.EqualsEqualsToken:
                 case SyntaxKind.BangEqualsToken:
                 case SyntaxKind.LikeToken:

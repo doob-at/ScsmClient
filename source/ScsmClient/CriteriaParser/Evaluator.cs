@@ -142,8 +142,12 @@ namespace ScsmClient.CriteriaParser
                     return Expression(SimpleExpression(left, "NotLike", right));
                 case BoundBinaryOperatorKind.Greater:
                     return Expression(SimpleExpression(left, "Greater", right));
-                case BoundBinaryOperatorKind.Lower:
+                case BoundBinaryOperatorKind.Less:
                     return Expression(SimpleExpression(left, "Less", right));
+                case BoundBinaryOperatorKind.GreaterOrEquals:
+                    return Expression(SimpleExpression(left, "GreaterEqual", right));
+                case BoundBinaryOperatorKind.LessOrEquals:
+                    return Expression(SimpleExpression(left, "LessEqual", right));
                 default:
                     throw new Exception($"Unexpected binary operator {b.Op}");
             }

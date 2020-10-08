@@ -92,7 +92,23 @@ namespace ScsmClient.CriteriaParser.Syntax
                         }
                         else if (ContinueWith("lt"))
                         {
-                            _kind = SyntaxKind.LowerToken;
+                            _kind = SyntaxKind.LessToken;
+                        }
+                        else if (ContinueWith("ge"))
+                        {
+                            _kind = SyntaxKind.GreaterOrEqualsToken;
+                        }
+                        else if (ContinueWith("le"))
+                        {
+                            _kind = SyntaxKind.LessOrEqualsToken;
+                        }
+                        else if (ContinueWith("like"))
+                        {
+                            _kind = SyntaxKind.LikeToken;
+                        }
+                        else if (ContinueWith("notlike"))
+                        {
+                            _kind = SyntaxKind.BangLikeToken;
                         }
                         else
                         {
@@ -165,13 +181,29 @@ namespace ScsmClient.CriteriaParser.Syntax
                 case '>':
                     {
                         _position++;
-                        _kind = SyntaxKind.GreaterToken;
+                        if (ContinueWith("="))
+                        {
+                            _kind = SyntaxKind.GreaterOrEqualsToken;
+                        }
+                        else
+                        {
+                            _kind = SyntaxKind.GreaterToken;
+                        }
+                        
                         break;
                     }
                 case '<':
                     {
                         _position++;
-                        _kind = SyntaxKind.LowerToken;
+                        if (ContinueWith("="))
+                        {
+                            _kind = SyntaxKind.LessOrEqualsToken;
+                        }
+                        else
+                        {
+                            _kind = SyntaxKind.LessToken;
+                        }
+
                         break;
                     }
                 case '\'':

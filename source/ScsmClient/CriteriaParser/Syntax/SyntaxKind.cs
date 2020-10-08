@@ -26,7 +26,9 @@ namespace ScsmClient.CriteriaParser.Syntax
         LikeToken,
         BangLikeToken,
         GreaterToken,
-        LowerToken,
+        LessToken,
+        GreaterOrEqualsToken,
+        LessOrEqualsToken,
 
         // Keywords
         FalseKeyword,

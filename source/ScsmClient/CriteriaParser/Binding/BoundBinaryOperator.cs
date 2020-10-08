@@ -60,10 +60,11 @@ namespace ScsmClient.CriteriaParser.Binding
             new BoundBinaryOperator(SyntaxKind.BangEqualsToken, BoundBinaryOperatorKind.NotEquals, typeof(string)),
 
 
-            new BoundBinaryOperator(SyntaxKind.GreaterToken, BoundBinaryOperatorKind.Greater, typeof(bool)),
             new BoundBinaryOperator(SyntaxKind.GreaterToken, BoundBinaryOperatorKind.Greater, typeof(string)),
+            new BoundBinaryOperator(SyntaxKind.GreaterOrEqualsToken, BoundBinaryOperatorKind.GreaterOrEquals, typeof(string)),
 
-            new BoundBinaryOperator(SyntaxKind.LowerToken, BoundBinaryOperatorKind.Lower, typeof(string)),
+            new BoundBinaryOperator(SyntaxKind.LessToken, BoundBinaryOperatorKind.Less, typeof(string)),
+            new BoundBinaryOperator(SyntaxKind.LessOrEqualsToken, BoundBinaryOperatorKind.LessOrEquals, typeof(string)),
 
         };
 
