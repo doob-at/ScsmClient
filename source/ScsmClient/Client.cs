@@ -97,5 +97,8 @@ namespace ScsmClient
         private ServiceRequestOperations _serviceRequestOperations;
         public ServiceRequestOperations ServiceRequest() => _serviceRequestOperations = _serviceRequestOperations ?? new ServiceRequestOperations(this);
 
+        private ChangeRequestOperations _changeRequestOperations;
+        public ChangeRequestOperations ChangeRequest() => _changeRequestOperations = _changeRequestOperations ?? new ChangeRequestOperations(this);
+
     }
 }

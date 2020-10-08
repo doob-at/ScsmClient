@@ -101,6 +101,13 @@ namespace ScsmClient
             }
 
         }
+
+        public static class ChangeRequest
+        {
+            public static Guid ClassId => new Guid("e6c9cf6e-d7fe-1b5d-216c-c3f5d2c7670c");
+
+            public static Guid ProjectionType => new Guid("674194d8-0246-7b90-d871-e1ea015b2ea7");
+        }
     }
 
 
