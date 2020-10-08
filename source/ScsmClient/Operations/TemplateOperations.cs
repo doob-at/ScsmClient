@@ -13,15 +13,6 @@ namespace ScsmClient.Operations
         {
         }
 
-        public ManagementPackClass GetClass(string className, ManagementPack managementPack)
-        {
-            return _client.ManagementGroup.EntityTypes.GetClass(className, managementPack);
-        }
-
-        public ManagementPackClass GetClass(ManagementPackClassCriteria criteria)
-        {
-            return _client.ManagementGroup.EntityTypes.GetClasses(criteria).FirstOrDefault();
-        }
 
         public ManagementPackObjectTemplate GetObjectTemplateByName(string templateName)
         {

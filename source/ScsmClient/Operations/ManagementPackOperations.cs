@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EnterpriseManagement.Configuration;
+using Reflectensions.ExtensionMethods;
 using Reflectensions.HelperClasses;
 
 namespace ScsmClient.Operations
@@ -31,37 +32,37 @@ namespace ScsmClient.Operations
             return _client.ManagementGroup.ManagementPacks.GetManagementPack(systemManagementPack);
         }
 
-        public ManagementPack GetManagementPack(Guid managementPackId)
+        public ManagementPack GetManagementPackById(Guid id)
         {
-            return mpCache.GetOrAdd(managementPackId,
-                guid => _client.ManagementGroup.ManagementPacks.GetManagementPack(managementPackId));
+            return mpCache.GetOrAdd(id,
+                guid => _client.ManagementGroup.ManagementPacks.GetManagementPack(id));
 
         }
 
-        public ManagementPack GetManagementPack(string id)
+        public ManagementPack GetManagementPackById(string id)
         {
-            return GetManagementPack(new Guid(id));
+            return GetManagementPackById(id.ToGuid());
         }
 
-        public ManagementPack GetManagementPack(string name, string keyToken, Version version)
+        public ManagementPack GetManagementPackByName(string name, string keyToken, Version version)
         {
             return _client.ManagementGroup.ManagementPacks.GetManagementPack(name, keyToken, version);
         }
 
-        public ManagementPack GetManagementPack(string name, string keyToken, string version)
+        public ManagementPack GetManagementPackByName(string name, string keyToken, string version)
         {
             var ver = Version.Parse(version);
             return _client.ManagementGroup.ManagementPacks.GetManagementPack(name, keyToken, ver);
         }
 
-        public ManagementPack GetManagementPack(string name, Version version)
+        public ManagementPack GetManagementPackByName(string name, Version version)
         {
-            return GetManagementPack(name, null, version);
+            return GetManagementPackByName(name, null, version);
         }
 
-        public ManagementPack GetManagementPack(string name, string version)
+        public ManagementPack GetManagementPackByName(string name, string version)
         {
-            return GetManagementPack(name, null, version);
+            return GetManagementPackByName(name, null, version);
 
         }
 

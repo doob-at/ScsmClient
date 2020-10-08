@@ -11,6 +11,8 @@ namespace ScsmClient.CriteriaParser.Binding
         Equals,
         NotEquals,
         Like,
-        NotLike
+        NotLike,
+        Greater,
+        Lower
     }
 }

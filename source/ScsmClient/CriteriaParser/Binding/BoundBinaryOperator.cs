@@ -44,14 +44,6 @@ namespace ScsmClient.CriteriaParser.Binding
             new BoundBinaryOperator(SyntaxKind.BangEqualsToken, BoundBinaryOperatorKind.NotEquals, typeof(string),  typeof(int), typeof(string)),
             new BoundBinaryOperator(SyntaxKind.BangEqualsToken, BoundBinaryOperatorKind.NotEquals, typeof(string),  typeof(bool), typeof(string)),
             new BoundBinaryOperator(SyntaxKind.BangEqualsToken, BoundBinaryOperatorKind.NotEquals, typeof(string), typeof(NullValue), typeof(string)),
-
-            //new BoundBinaryOperator(SyntaxKind.PlusToken, BoundBinaryOperatorKind.Addition, typeof(int)),
-            //new BoundBinaryOperator(SyntaxKind.MinusToken, BoundBinaryOperatorKind.Subtraction, typeof(int)),
-            //new BoundBinaryOperator(SyntaxKind.StarToken, BoundBinaryOperatorKind.Multiplication, typeof(int)),
-            //new BoundBinaryOperator(SyntaxKind.SlashToken, BoundBinaryOperatorKind.Division, typeof(int)),
-            
-            
-            
             
             new BoundBinaryOperator(SyntaxKind.LikeToken, BoundBinaryOperatorKind.Like, typeof(string), typeof(string)),
             new BoundBinaryOperator(SyntaxKind.BangLikeToken, BoundBinaryOperatorKind.NotLike, typeof(string), typeof(string)),
@@ -66,6 +58,13 @@ namespace ScsmClient.CriteriaParser.Binding
             new BoundBinaryOperator(SyntaxKind.PipePipeToken, BoundBinaryOperatorKind.LogicalOr, typeof(string)),
             new BoundBinaryOperator(SyntaxKind.EqualsEqualsToken, BoundBinaryOperatorKind.Equals, typeof(string)),
             new BoundBinaryOperator(SyntaxKind.BangEqualsToken, BoundBinaryOperatorKind.NotEquals, typeof(string)),
+
+
+            new BoundBinaryOperator(SyntaxKind.GreaterToken, BoundBinaryOperatorKind.Greater, typeof(bool)),
+            new BoundBinaryOperator(SyntaxKind.GreaterToken, BoundBinaryOperatorKind.Greater, typeof(string)),
+
+            new BoundBinaryOperator(SyntaxKind.LowerToken, BoundBinaryOperatorKind.Lower, typeof(string)),
+
         };
 
         public static BoundBinaryOperator Bind(SyntaxKind syntaxKind, Type leftType, Type rightType)

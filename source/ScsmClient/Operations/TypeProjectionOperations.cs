@@ -16,63 +16,72 @@ namespace ScsmClient.Operations
         }
 
 
-        public IObjectProjectionReader<EnterpriseManagementObject> GetObjectProjectionReader(ObjectProjectionCriteria criteria)
-        {
-            return _client.ManagementGroup.EntityObjects.GetObjectProjectionReader<EnterpriseManagementObject>(criteria, ObjectQueryOptions.Default);
-        }
+        //public IObjectProjectionReader<EnterpriseManagementObject> GetObjectProjectionReader(ObjectProjectionCriteria criteria)
+        //{
+        //    return _client.ManagementGroup.EntityObjects.GetObjectProjectionReader<EnterpriseManagementObject>(criteria, ObjectQueryOptions.Default);
+        //}
 
-        public IObjectProjectionReader<EnterpriseManagementObject> GetObjectProjectionReader(ObjectProjectionCriteria criteria, ObjectQueryOptions options)
+        private IObjectProjectionReader<EnterpriseManagementObject> GetObjectProjectionReader(ObjectProjectionCriteria criteria, ObjectQueryOptions options)
         {
             return _client.ManagementGroup.EntityObjects.GetObjectProjectionReader<EnterpriseManagementObject>(criteria, options);
         }
 
-        public ManagementPackTypeProjection GetTypeProjection(Guid typeProjectionId)
+        public ManagementPackTypeProjection GetTypeProjectionById(Guid typeProjectionId)
         {
             return _client.ManagementGroup.EntityTypes.GetTypeProjection(typeProjectionId);
         }
 
-        public ManagementPackTypeProjection GetTypeProjection(string className, ManagementPack managementPack)
+        public ManagementPackTypeProjection GetTypeProjectionByClassName(string className, ManagementPack managementPack)
         {
             return _client.ManagementGroup.EntityTypes.GetTypeProjection(className, managementPack);
         }
 
         public ManagementPackTypeProjection GetTypeProjectionByClassName(string className)
         {
-            return GetTypeProjections(_client.Criteria()
-                .BuildManagementPackTypeProjectionCriteria($"Name='{className}'")).FirstOrDefault();
+            var crit = new ManagementPackTypeProjectionCriteria($"Name='{className}'");
+            return GetTypeProjectionsByCriteria(crit).FirstOrDefault();
         }
 
-        public ManagementPackTypeProjection GetTypeProjection(string typeProjectionId)
-        {
-            return GetTypeProjection(new Guid(typeProjectionId));
-        }
+        //public ManagementPackTypeProjection GetTypeProjection(string typeProjectionId)
+        //{
+        //    return GetTypeProjectionById(new Guid(typeProjectionId));
+        //}
 
-        public IList<ManagementPackTypeProjection> GetTypeProjections(ManagementPackTypeProjectionCriteria criteria = null)
+        public IList<ManagementPackTypeProjection> GetTypeProjectionsByCriteria(ManagementPackTypeProjectionCriteria criteria = null)
         {
             return criteria == null ? _client.ManagementGroup.EntityTypes.GetTypeProjections() :_client.ManagementGroup.EntityTypes.GetTypeProjections(criteria);
         }
 
-        public IList<ManagementPackTypeProjection> GetTypeProjections(string criteria)
+        public IList<ManagementPackTypeProjection> GetTypeProjectionsByCriteria(string criteria)
         {
-            var crit = _client.Criteria().BuildManagementPackTypeProjectionCriteria(criteria);
+            var crit = new ManagementPackTypeProjectionCriteria(criteria);
             return _client.ManagementGroup.EntityTypes.GetTypeProjections(crit);
         }
 
 
+        public IEnumerable<EnterpriseManagementObjectProjectionDto> GetObjectProjectionObjects(Guid typeProjectionGuid, string criteria, int? maxResult = null)
+        {
+            var tp = GetTypeProjectionById(typeProjectionGuid);
+            return GetObjectProjectionObjects(tp, criteria, maxResult);
+        }
 
-        public IEnumerable<EnterpriseManagementObjectProjectionDto> GetObjectProjectionObjects(string typeProjectionName,
-            string criteria, int? maxResult = null, CancellationToken cancellationToken = default)
+
+        public IEnumerable<EnterpriseManagementObjectProjectionDto> GetObjectProjectionObjects(string typeProjectionName, string criteria, int? maxResult = null)
         {
             var tp = GetTypeProjectionByClassName(typeProjectionName);
-            var crit = _client.Criteria().BuildObjectProjectionCriteria(criteria, tp);
+            return GetObjectProjectionObjects(tp, criteria, maxResult);
+        }
+
+        public IEnumerable<EnterpriseManagementObjectProjectionDto> GetObjectProjectionObjects(ManagementPackTypeProjection typeProjection,
+            string criteria, int? maxResult = null)
+        {
+            
+            var crit = _client.Criteria().BuildObjectProjectionCriteria(criteria, typeProjection);
 
             var critOptions = new ObjectQueryOptions();
             critOptions.DefaultPropertyRetrievalBehavior = ObjectPropertyRetrievalBehavior.All;
             critOptions.ObjectRetrievalMode = ObjectRetrievalOptions.NonBuffered;
             critOptions.MaxResultCount = maxResult ?? Int32.MaxValue;
-            
-            
-            
             
             var reader = GetObjectProjectionReader(crit, critOptions);
             var count = 0;
@@ -80,10 +89,8 @@ namespace ScsmClient.Operations
             {
                 if (count == critOptions.MaxResultCount)
                     break;
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    break;
-                }
+
+                
                 yield return enterpriseManagementObjectProjection.ToObjectProjectionDto();
             }
 

@@ -48,8 +48,8 @@ namespace ScsmClient.CriteriaParser.Syntax
             var tokenText = SyntaxFacts.GetText(tokenKind);
             if (tokenText == null)
                 tokenText = _text.ToString(tokenStart, tokenLength);
-            
-            return new SyntaxToken(_text ,_kind, _start, tokenText, _value);
+
+            return new SyntaxToken(_text, _kind, _start, tokenText, _value);
         }
 
         private void ReadToken()
@@ -68,33 +68,41 @@ namespace ScsmClient.CriteriaParser.Syntax
                 //    _position++;
                 //    break;
                 case '-':
-                {
-                    _position++;
-                    if (ContinueWith("and"))
                     {
-                        _kind = SyntaxKind.AmpersandAmpersandToken;
+                        _position++;
+                        if (ContinueWith("and"))
+                        {
+                            _kind = SyntaxKind.AmpersandAmpersandToken;
+                        }
+                        else if (ContinueWith("or"))
+                        {
+                            _kind = SyntaxKind.PipePipeToken;
+                        }
+                        else if (ContinueWith("eq"))
+                        {
+                            _kind = SyntaxKind.EqualsEqualsToken;
+                        }
+                        else if (ContinueWith("ne"))
+                        {
+                            _kind = SyntaxKind.BangEqualsToken;
+                        }
+                        else if (ContinueWith("gt"))
+                        {
+                            _kind = SyntaxKind.GreaterToken;
+                        }
+                        else if (ContinueWith("lt"))
+                        {
+                            _kind = SyntaxKind.LowerToken;
+                        }
+                        else
+                        {
+                            _kind = SyntaxKind.MinusToken;
+
+                        }
+
+                        break;
                     }
-                    else if(ContinueWith("or"))
-                    {
-                        _kind = SyntaxKind.PipePipeToken;
-                    }
-                    else if (ContinueWith("eq"))
-                    {
-                        _kind = SyntaxKind.EqualsEqualsToken;
-                    }
-                    else if (ContinueWith("ne"))
-                    {
-                        _kind = SyntaxKind.BangEqualsToken;
-                    }
-                    else
-                    {
-                        _kind = SyntaxKind.MinusToken;
-                        
-                    }
-                   
-                    break;
-                }
-                    
+
                 //case '*':
                 //    _kind = SyntaxKind.StarToken;
                 //    _position++;
@@ -154,6 +162,19 @@ namespace ScsmClient.CriteriaParser.Syntax
                         _kind = SyntaxKind.BangToken;
                     }
                     break;
+                case '>':
+                    {
+                        _position++;
+                        _kind = SyntaxKind.GreaterToken;
+                        break;
+                    }
+                case '<':
+                    {
+                        _position++;
+                        _kind = SyntaxKind.LowerToken;
+                        break;
+                    }
+                case '\'':
                 case '"':
                     ReadString();
                     break;
@@ -236,7 +257,7 @@ namespace ScsmClient.CriteriaParser.Syntax
                 _diagnostics.ReportInvalidNumber(location, text, typeof(int));
 
             }
-                
+
 
             _value = value;
             _kind = SyntaxKind.NumberToken;
@@ -244,9 +265,9 @@ namespace ScsmClient.CriteriaParser.Syntax
 
         private void ReadIdentifierOrKeyword()
         {
-            while (char.IsLetter(Current))
+            while (char.IsLetter(Current) || Current == '.' || Current == ':' || Current == '!')
                 _position++;
-            
+
             var length = _position - _start;
             var text = _text.ToString(_start, length);
             _kind = SyntaxFacts.GetKeywordKind(text);
@@ -275,6 +296,18 @@ namespace ScsmClient.CriteriaParser.Syntax
                         break;
                     case '"':
                         if (Lookahead == '"')
+                        {
+                            sb.Append(Current);
+                            _position += 2;
+                        }
+                        else
+                        {
+                            _position++;
+                            done = true;
+                        }
+                        break;
+                    case '\'':
+                        if (Lookahead == '\'')
                         {
                             sb.Append(Current);
                             _position += 2;

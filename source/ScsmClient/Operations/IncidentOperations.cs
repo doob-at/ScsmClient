@@ -18,12 +18,25 @@ namespace ScsmClient.Operations
         {
         }
 
-        public EnterpriseManagementObjectDto Create(IncidentDto incident)
+        public IncidentDto GetById(Guid id)
         {
-            return _client.Object().CreateObject(WellKnown.Incident.ClassId, incident.AsDictionary());
+            var entObj = _client.Object().GetObjectById(id);
+            return new IncidentDto(entObj.Values);
+        }
+
+        public List<IncidentDto> GetByCriteria(string criteria, int? maxResults = null)
+        {
+            var incObjs = _client.TypeProjection().GetObjectProjectionObjects(WellKnown.Incident.ProjectionType, criteria, maxResults).ToList();
+            return incObjs.Select(e => new IncidentDto(e.Values)).ToList();
+        }
+
+        public IncidentDto Create(IncidentDto incident)
+        {
+            var entObj = _client.Object().CreateObjectByClassId(WellKnown.Incident.ClassId, incident.AsDictionary());
+            return new IncidentDto(entObj.Values);
         }
         
-        public EnterpriseManagementObjectDto CreateFromTemplate(string templateName, IncidentDto incident)
+        public IncidentDto CreateFromTemplate(string templateName, IncidentDto incident)
         {
             var template = _client.Template().GetObjectTemplateByName(templateName);
 
@@ -35,7 +48,8 @@ namespace ScsmClient.Operations
                     throw new Exception($"Template '{templateName}' is not an Incident Template!");
                 }
 
-                return _client.Object().CreateObjectFromTemplate(template, incident.AsDictionary());
+                var entObj = _client.Object().CreateObjectFromTemplate(template, incident.AsDictionary());
+                return new IncidentDto(entObj.Values);
             }
             else
             {

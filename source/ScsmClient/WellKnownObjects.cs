@@ -14,6 +14,8 @@ namespace ScsmClient
         {
             public static Guid ClassId => new Guid("A604B942-4C7B-2FB2-28DC-61DC6F465C68");
 
+            public static Guid ProjectionType => new Guid("9cc39579-e071-cca8-ef6e-07263620b87f");
+
             public static class EnumList
             {
                 public static string Urgency => "04b28bfb-8898-9af3-009b-979e58837852";
@@ -42,7 +44,7 @@ namespace ScsmClient
         public static class ServiceRequest
         {
             public static Guid ClassId => new Guid("04b69835-6343-4de2-4b19-6be08c612989");
-
+            public static Guid ProjectionType => new Guid("e44b7c06-590d-64d6-56d2-2219c5e763e0");
             public static class EnumList
             {
                 public static string Urgency => "eb35f771-8b0a-41aa-18fb-0432dfd957c4";

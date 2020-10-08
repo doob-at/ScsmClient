@@ -31,7 +31,7 @@ namespace ScsmClient.Mappers
                 : EnterpriseManagementObjectMapper.Map<EnterpriseManagementObjectDto>(enterpriseManagementObject);
         }
 
-        public static EnterpriseManagementObjectProjectionDto ToObjectProjectionDto(EnterpriseManagementObjectProjection composableProjection)
+        public static EnterpriseManagementObjectProjectionDto ToObjectProjectionDto(IComposableProjection composableProjection)
         {
             return composableProjection == null
                 ? null

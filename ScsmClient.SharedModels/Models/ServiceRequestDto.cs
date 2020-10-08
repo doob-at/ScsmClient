@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Expandable;
 
 namespace ScsmClient.SharedModels.Models
 {
@@ -22,9 +23,9 @@ namespace ScsmClient.SharedModels.Models
 
         }
 
-        public ServiceRequestDto(Dictionary<string, object> dictionary) : base(dictionary)
+        public ServiceRequestDto(IDictionary<string, object> dictionary): base(dictionary)
         {
-
+            
         }
     }
 }

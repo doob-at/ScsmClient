@@ -10,6 +10,7 @@ using Microsoft.EnterpriseManagement.Configuration;
 using Reflectensions.ExtensionMethods;
 using ScsmClient.Attributes;
 using ScsmClient.ExtensionMethods;
+using ScsmClient.Helper;
 using ScsmClient.SharedModels.Models;
 
 namespace ScsmClient.Operations
@@ -29,10 +30,22 @@ namespace ScsmClient.Operations
             return _client.ManagementGroup.EntityObjects.GetObject<EnterpriseManagementObject>(id, critOptions).ToObjectDto();
         }
 
-        public IEnumerable<EnterpriseManagementObjectDto> GetObjects(string className, string criteria, int? maxResult = null)
+        public IEnumerable<EnterpriseManagementObjectDto> GetObjectsByClassName(string className, string criteria, int? maxResult = null)
+        {
+            var objectClass = _client.Class().GetClassByName(className);
+            return GetObjectsByClass(objectClass, criteria, maxResult);
+        }
+
+        public IEnumerable<EnterpriseManagementObjectDto> GetObjectsByClassId(Guid classId, string criteria, int? maxResult = null)
+        {
+            var objectClass = _client.Class().GetClassById(classId);
+            return GetObjectsByClass(objectClass, criteria, maxResult);
+        }
+
+        public IEnumerable<EnterpriseManagementObjectDto> GetObjectsByClass(ManagementPackClass objectClass, string criteria, int? maxResult = null)
         {
 
-            var objectClass = _client.Class().GetClassByName(className);
+           
             var crit = _client.Criteria().BuildObjectCriteria(criteria, objectClass);
 
 
@@ -54,24 +67,25 @@ namespace ScsmClient.Operations
             }
 
         }
+        
 
-        public EnterpriseManagementObjectDto CreateObject(Guid id, Dictionary<string, object> properties)
+        public EnterpriseManagementObjectDto CreateObjectByClassId(Guid id, Dictionary<string, object> properties)
         {
             var objectClass = _client.Class().GetClassById(id);
-            return CreateObject(objectClass, properties);
+            return CreateObjectByClass(objectClass, properties);
         }
 
-        public EnterpriseManagementObjectDto CreateObject(string className, Dictionary<string, object> properties)
+        public EnterpriseManagementObjectDto CreateObjectByClassName(string className, Dictionary<string, object> properties)
         {
             var objectClass = _client.Class().GetClassByName(className);
-            return CreateObject(objectClass, properties);
+            return CreateObjectByClass(objectClass, properties);
         }
 
-        public EnterpriseManagementObjectDto CreateObject(ManagementPackClass objectClass, Dictionary<string, object> properties)
+        public EnterpriseManagementObjectDto CreateObjectByClass(ManagementPackClass objectClass, Dictionary<string, object> properties)
         {
             var obj = new CreatableEnterpriseManagementObject(_client.ManagementGroup, objectClass);
             var objectProperties = objectClass.GetProperties(BaseClassTraversalDepth.Recursive);
-
+            var normalizer = new ValueConverter(_client);
 
             foreach (var kv in properties)
             {
@@ -79,7 +93,8 @@ namespace ScsmClient.Operations
                            objectProperties.FirstOrDefault(p => p.Name.Equals(kv.Key, StringComparison.OrdinalIgnoreCase));
                 if (prop != null)
                 {
-                    var val = NormalizeValue(kv, prop);
+                    
+                    var val = normalizer.NormalizeValue(kv.Value, prop);
                     obj[objectClass, kv.Key].Value = val;
                 }
             }
@@ -88,45 +103,8 @@ namespace ScsmClient.Operations
             return GetObjectById(obj.Id);
         }
 
-        private object NormalizeValue(KeyValuePair<string, object> keyValue, ManagementPackProperty property)
-        {
-            
 
-            if (property.Type == ManagementPackEntityPropertyTypes.@enum)
-            {
-                return NormalizeEnum(keyValue.Value, property.EnumType.GetElement());
-            }
-
-            return keyValue.Value;
-        }
-
-        private object NormalizeEnum(object enumValue, ManagementPackEnumeration managementPackEnumeration)
-        {
-            if (enumValue is Guid guid)
-            {
-                return _client.Enumeration().GetEnumerationChildById(managementPackEnumeration, guid);
-            }
-            else if (enumValue is string str)
-            {
-                if (str.IsGuid())
-                {
-                    return NormalizeEnum(str.ToGuid(), managementPackEnumeration);
-                }
-                return _client.Enumeration().GetEnumerationChildByName(managementPackEnumeration, str);
-            }
-            else if (enumValue is Enum enu)
-            {
-                if (enu.HasId())
-                {
-                    return NormalizeEnum(enu.Id(), managementPackEnumeration);
-                }
-               
-            }
-
-            return enumValue;
-        }
-
-        public EnterpriseManagementObjectDto CreateObjectFromTemplate(string templateName, Dictionary<string, object> properties)
+        public EnterpriseManagementObjectDto CreateObjectFromTemplateName(string templateName, Dictionary<string, object> properties)
         {
 
             var template =_client.Template().GetObjectTemplateByName(templateName);
@@ -137,6 +115,7 @@ namespace ScsmClient.Operations
         {
 
             var obj = new EnterpriseManagementObjectProjection(_client.ManagementGroup, template);
+            var normalizer = new ValueConverter(_client);
 
             var elem = template.TypeID.GetElement();
             if (elem is ManagementPackTypeProjection managementPackTypeProjection)
@@ -147,7 +126,7 @@ namespace ScsmClient.Operations
                     var prop = objectProperties.FirstOrDefault(p => p.Name.Equals(kv.Key, StringComparison.Ordinal)) ??
                                objectProperties.FirstOrDefault(p => p.Name.Equals(kv.Key, StringComparison.OrdinalIgnoreCase));
 
-                    var val = NormalizeValue(kv, prop);
+                    var val = normalizer.NormalizeValue(kv.Value, prop);
                     obj.Object[managementPackTypeProjection.TargetType, kv.Key].Value = val;
                 }
 

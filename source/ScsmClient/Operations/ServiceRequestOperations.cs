@@ -18,35 +18,43 @@ namespace ScsmClient.Operations
         {
         }
 
-        public EnterpriseManagementObjectDto Create(ServiceRequestDto serviceRequest)
+        public ServiceRequestDto GetById(Guid id)
         {
-            return _client.Object().CreateObject(WellKnown.ServiceRequest.ClassId, serviceRequest.AsDictionary());
+            var entObj = _client.Object().GetObjectById(id);
+            return new ServiceRequestDto(entObj.Values);
         }
 
-        
-        public EnterpriseManagementObjectDto CreateFromTemplate(string templateName, ServiceRequestDto serviceRequest)
+        public List<ServiceRequestDto> GetByCriteria(string criteria, int? maxResults = null)
         {
+            var srObjs = _client.TypeProjection().GetObjectProjectionObjects(WellKnown.ServiceRequest.ProjectionType, criteria, maxResults).ToList();
+            return srObjs.Select(e => new ServiceRequestDto(e.Values)).ToList();
+        }
 
-         
+        public ServiceRequestDto Create(ServiceRequestDto serviceReuest)
+        {
+            var entObj = _client.Object().CreateObjectByClassId(WellKnown.ServiceRequest.ClassId, serviceReuest.AsDictionary());
+            return new ServiceRequestDto(entObj.Values);
+        }
+
+        public ServiceRequestDto CreateFromTemplate(string templateName, ServiceRequestDto serviceReuest)
+        {
             var template = _client.Template().GetObjectTemplateByName(templateName);
 
             var elem = template.TypeID.GetElement();
             if (elem is ManagementPackTypeProjection managementPackTypeProjection)
             {
-                if (managementPackTypeProjection.TargetType.Id != WellKnown.Incident.ClassId)
+                if (managementPackTypeProjection.TargetType.Id != WellKnown.ServiceRequest.ClassId)
                 {
-                    throw new Exception($"Template '{templateName}' is not an ServiceRequest Template!");
+                    throw new Exception($"Template '{templateName}' is not a ServiceRequest Template!");
                 }
 
-                return _client.Object().CreateObjectFromTemplate(template, serviceRequest.AsDictionary());
+                var entObj = _client.Object().CreateObjectFromTemplate(template, serviceReuest.AsDictionary());
+                return new ServiceRequestDto(entObj.Values);
             }
             else
             {
-                throw new Exception($"Template '{templateName}' is not an ServiceRequest Template!");
+                throw new Exception($"Template '{templateName}' is not a ServiceRequest Template!");
             }
-            
-
-            
 
         }
 

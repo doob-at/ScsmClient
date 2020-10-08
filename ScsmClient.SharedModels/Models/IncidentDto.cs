@@ -15,9 +15,9 @@ namespace ScsmClient.SharedModels.Models
             
         }
 
-        public IncidentDto(Dictionary<string, object> dictionary): base(dictionary)
+        public IncidentDto(IDictionary<string, object> dictionary): base(dictionary)
         {
-            
+           
         }
     }
 }

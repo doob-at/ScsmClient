@@ -22,6 +22,11 @@ namespace ScsmClient.Caches
             }
 
             item = update(name);
+            if (item == null)
+            {
+                return null;
+            }
+                
             CacheByName[name] = item;
             CacheById[item.Id] = item;
             return item;
@@ -36,6 +41,10 @@ namespace ScsmClient.Caches
             }
 
             item = update(id);
+            if (item == null)
+            {
+                return null;
+            }
             CacheByName[item.Name] = item;
             CacheById[id] = item;
             return item;

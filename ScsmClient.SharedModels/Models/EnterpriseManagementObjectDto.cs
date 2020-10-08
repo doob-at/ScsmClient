@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace ScsmClient.SharedModels.Models
 {
@@ -21,6 +22,17 @@ namespace ScsmClient.SharedModels.Models
 
     public class EnterpriseManagementObjectProjectionDto: EnterpriseManagementObjectDto
     {
-        public Dictionary<string, List<EnterpriseManagementObjectProjectionDto>> RelatedObjects { get; set; } = new Dictionary<string, List<EnterpriseManagementObjectProjectionDto>>();
+        public Dictionary<string, RelatedObjects> RelatedObjects { get; set; } = new Dictionary<string, RelatedObjects>();
+    }
+
+    public class RelatedObjects
+    {
+        public RelationShip RelationShip { get; set; }
+        public List<EnterpriseManagementObjectProjectionDto> Objects { get; set; } = new List<EnterpriseManagementObjectProjectionDto>();
+    }
+
+    public class RelationShip
+    {
+        public string Name { get; set; }
     }
 }

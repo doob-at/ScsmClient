@@ -85,15 +85,20 @@ namespace ScsmClient.Mappers
                 {
                     expression.MapFrom((src, dto) =>
                     {
-                        Dictionary<string, List<IComposableProjection>> related = new Dictionary<string, List<IComposableProjection>>();
+                        Dictionary<string, RelatedObjects> related = new Dictionary<string, RelatedObjects>();
+
                         foreach (var keyValuePair in src)
                         {
+                            var relationShip = new RelationShip();
+                            relationShip.Name = keyValuePair.Key.ParentElement.Name;
+
                             if (!related.ContainsKey(keyValuePair.Key.Name))
                             {
-                                related.Add(keyValuePair.Key.Name, new List<IComposableProjection>());
+                                related.Add(keyValuePair.Key.Name, new RelatedObjects());
                             }
 
-                            related[keyValuePair.Key.Name].Add(keyValuePair.Value);
+                            related[keyValuePair.Key.Name].RelationShip = relationShip;
+                            related[keyValuePair.Key.Name].Objects.Add(ObjectMapper.ToObjectProjectionDto(keyValuePair.Value));
                         }
 
                         return related;
@@ -101,6 +106,8 @@ namespace ScsmClient.Mappers
                 })
                 .IncludeMembers(o => o, s => s.Object);
 
+
+            
         }
     }
 }

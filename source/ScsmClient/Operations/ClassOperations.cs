@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.EnterpriseManagement.Configuration;
+using Reflectensions.ExtensionMethods;
 using ScsmClient.Caches;
 
 namespace ScsmClient.Operations
@@ -17,13 +18,10 @@ namespace ScsmClient.Operations
         {
         }
 
-
-        public IList<ManagementPackClass> GetClasses(ManagementPackClassCriteria criteria)
+        public ManagementPackClass GetClassById(string id)
         {
-            return _client.ManagementGroup.EntityTypes.GetClasses(criteria);
+            return GetClassById(id.ToGuid());
         }
-
-
         public ManagementPackClass GetClassById(Guid id)
         {
             return _client.ManagementGroup.EntityTypes.GetClass(id);
@@ -38,7 +36,7 @@ namespace ScsmClient.Operations
                 if (String.IsNullOrEmpty(parsed.ManagementPackName))
                 {
                     var crit = new ManagementPackClassCriteria($"Name='{className}'");
-                    return GetClasses(crit).FirstOrDefault();
+                    return GetClassesByCriteria(crit).FirstOrDefault();
                 }
                 else
                 {
@@ -60,6 +58,12 @@ namespace ScsmClient.Operations
         }
 
 
+        public IList<ManagementPackClass> GetClassesByCriteria(ManagementPackClassCriteria criteria)
+        {
+            return _client.ManagementGroup.EntityTypes.GetClasses(criteria);
+        }
+
+        
         private (string ClassName, string ManagementPackName) ParseName(string name)
         {
 

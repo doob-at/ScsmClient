@@ -36,7 +36,7 @@ namespace ScsmClientTestCmd
             var cl = scsmClient.Class().GetClassByName("zOrganisationseinheit");
             var crit = scsmClient.Criteria().BuildObjectCriteria("zOKZ = '' and zOKZ like '%Test%'", cl);
 
-            var obs = scsmClient.Object().GetObjects("zOrganisationseinheit", "zOKZ like '%Test%'").ToList();
+            var obs = scsmClient.Object().GetObjectsByClassName("zOrganisationseinheit", "zOKZ like '%Test%'").ToList();
             Main1(args);
 
         }
@@ -68,8 +68,7 @@ namespace ScsmClientTestCmd
             var inc2 = Json.Converter.ToObject<IncidentDto>(json);
             var in3 = Json.Converter.ToObject<IncidentDto>(jsondic);
 
-
-
+            
             scsmclient.Incident().CreateFromTemplate("Networking Issue Incident Template", inc);
 
 
@@ -139,7 +138,7 @@ namespace ScsmClientTestCmd
 
 
 
-            var tps = scsmClient.TypeProjection().GetTypeProjections("Name like 'z%'");
+            var tps = scsmClient.TypeProjection().GetTypeProjectionsByCriteria("Name like 'z%'");
 
             var tp = scsmClient.TypeProjection().GetTypeProjectionByClassName("zTP_zBenutzer_zAccount");
 
