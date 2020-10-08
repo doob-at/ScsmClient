@@ -94,5 +94,8 @@ namespace ScsmClient
         private IncidentOperations _incidentOperations;
         public IncidentOperations Incident() => _incidentOperations = _incidentOperations ?? new IncidentOperations(this);
 
+        private ServiceRequestOperations _serviceRequestOperations;
+        public ServiceRequestOperations ServiceRequest() => _serviceRequestOperations = _serviceRequestOperations ?? new ServiceRequestOperations(this);
+
     }
 }
