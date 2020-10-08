@@ -18,10 +18,15 @@ namespace ScsmClient.Operations
         {
         }
 
-        public IncidentDto GetById(Guid id)
+        public IncidentDto GetByGenericId(Guid id)
         {
             var entObj = _client.Object().GetObjectById(id);
             return new IncidentDto(entObj.Values);
+        }
+
+        public IncidentDto GetById(string id)
+        {
+            return GetByCriteria($"Id == '{id}'", 1).FirstOrDefault();
         }
 
         public List<IncidentDto> GetByCriteria(string criteria, int? maxResults = null)
