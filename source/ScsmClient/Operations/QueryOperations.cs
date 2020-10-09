@@ -11,6 +11,8 @@ namespace ScsmClient.Operations
        
         public QueryOperations(SCSMClient client) : base(client)
         {
+
+            
         }
 
 

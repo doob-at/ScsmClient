@@ -24,20 +24,22 @@ namespace TestScsmCriteriaBuilder
 
             //var filterobj = "zOKZ != null && zName like '%Polizei%'";
 
-            //var okzs = scsmClient.Object().GetObjects("zOrganisationseinheit", filterobj).ToList();
+            //var okzs = scsmClient.Object().GetObjectsByClassName("zOrganisationseinheit", null).ToList();
 
             //var filter1 = "zFirstname == Bernhard && zLastname == Windisch";
 
 
-            //var objs = scsmClient.TypeProjection().GetObjectProjectionObjects("zTP_zBenutzer_zAccount", filter1).ToList();
+           // var objs = scsmClient.TypeProjection().GetObjectProjectionObjects("zTP_zBenutzer_zAccount", filter1).ToList();
 
+           var incs = scsmClient.Incident().GetByCriteria(null);
 
             var filter2 = "G:Id == '3cd8c933-995e-2e21-f145-43a3c06fd585'";
             var filter3 = "G:LastModified > '19.03.2020 9:46' && G:LastModified < '19.03.2020 10:00'";
             var filter4 = "G:LastModified == '19.03.2020 9:46:14.133'";
             var filter5 = "G:LastModified -gt '19.03.2020 9:46:14'";
+            var filter6 = "";
 
-            var objs2 = scsmClient.TypeProjection().GetObjectProjectionObjects("zTP_zBenutzer_zAccount", filter3).ToList();
+            var objs2 = scsmClient.TypeProjection().GetObjectProjectionObjects("zTP_zBenutzer_zAccount", filter6).ToList();
 
         }
 

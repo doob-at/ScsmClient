@@ -18,12 +18,15 @@ namespace ScsmClient.Operations
 
         public EnterpriseManagementObjectCriteria BuildObjectCriteria(string criteria, ManagementPackClass managementPackClass)
         {
+            
             if(!SimpleXml.TryParse(criteria, out var xmlCriteria))
             {
                 xmlCriteria = CreateCriteriaXmlFromFilterString(criteria, managementPackClass);
             }
 
-            return new EnterpriseManagementObjectCriteria(xmlCriteria.ToString(), managementPackClass, _client.ManagementGroup);
+            return xmlCriteria == null ?
+                new EnterpriseManagementObjectCriteria("", managementPackClass) :
+                new EnterpriseManagementObjectCriteria(xmlCriteria.ToString(), managementPackClass, _client.ManagementGroup);
         }
 
         public ObjectProjectionCriteria BuildObjectProjectionCriteria(string criteria, ManagementPackTypeProjection typeProjection)
@@ -32,13 +35,19 @@ namespace ScsmClient.Operations
             {
                 xmlCriteria = CreateCriteriaXmlFromFilterString(criteria, typeProjection);
             }
-            return new ObjectProjectionCriteria(xmlCriteria.ToString(), typeProjection, _client.ManagementGroup);
+
+            return xmlCriteria == null ?
+                new ObjectProjectionCriteria(typeProjection) :
+                new ObjectProjectionCriteria(xmlCriteria.ToString(), typeProjection, _client.ManagementGroup);
         }
        
 
         public SimpleXml CreateCriteriaXmlFromFilterString(string filter, ManagementPackClass managementPackClass)
         {
-
+            if (String.IsNullOrWhiteSpace(filter))
+            {
+                return null;
+            }
             var syntaxTree = SyntaxTree.Parse(filter);
             var compilation = new Compilation(syntaxTree, _client);
             var result = compilation.Evaluate(managementPackClass);
@@ -51,7 +60,10 @@ namespace ScsmClient.Operations
 
         public SimpleXml CreateCriteriaXmlFromFilterString(string filter, ManagementPackTypeProjection typeProjection)
         {
-            
+            if (string.IsNullOrWhiteSpace(filter))
+            {
+                return null;
+            }
             var syntaxTree = SyntaxTree.Parse(filter);
             var compilation = new Compilation(syntaxTree, _client);
             var result = compilation.Evaluate(typeProjection);
