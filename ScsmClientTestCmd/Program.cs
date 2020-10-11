@@ -22,9 +22,10 @@ namespace ScsmClientTestCmd
         {
 
 
-            var creds = new NetworkCredential("LANFL\\administrator", "ABC12abc");
-            var scsmClient = new SCSMClient("192.168.75.20", creds);
+            var creds = new NetworkCredential("BWLAB\\admin", "ABC12abc");
+            var scsmClient = new SCSMClient("192.168.75.121", creds);
 
+            CreatePerson(scsmClient);
             CreateIncident(scsmClient);
             TestCriteria();
 
@@ -38,6 +39,15 @@ namespace ScsmClientTestCmd
 
             var obs = scsmClient.Object().GetObjectsByClassName("zOrganisationseinheit", "zOKZ like '%Test%'").ToList();
             Main1(args);
+
+        }
+
+        static void CreatePerson(ScsmClient.SCSMClient scsmClient)
+        {
+            var person = new Dictionary<string, object>();
+            person["Vorname"] = "Bernhard";
+
+            var p = scsmClient.Object().CreateObjectByClassName("BMI.Person", person);
 
         }
 
