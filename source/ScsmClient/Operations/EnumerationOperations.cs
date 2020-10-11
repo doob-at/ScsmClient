@@ -41,7 +41,7 @@ namespace ScsmClient.Operations
             var stringComparsion = ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
             return _client.ManagementGroup.EntityTypes
                 .GetChildEnumerations(id, TraversalDepth.Recursive)
-                .FirstOrDefault(m => m.DisplayName.Equals(displayName, stringComparsion));
+                .FirstOrDefault(m => m.DisplayName?.Equals(displayName, stringComparsion) == true);
         }
 
         private ManagementPackEnumeration GetEnumerationChildByName(Guid id, string name, bool ignoreCase)
