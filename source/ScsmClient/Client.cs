@@ -57,6 +57,7 @@ namespace ScsmClient
             
 
             ManagementGroup = new EnterpriseManagementGroup(settings);
+            
         }
 
 

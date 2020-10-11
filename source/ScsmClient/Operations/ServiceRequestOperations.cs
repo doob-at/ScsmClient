@@ -35,13 +35,13 @@ namespace ScsmClient.Operations
             return srObjs.Select(e => new ServiceRequestDto(e.Values)).ToList();
         }
 
-        public ServiceRequestDto Create(ServiceRequestDto serviceReuest)
+        public Guid Create(ServiceRequestDto serviceReuest)
         {
-            var entObj = _client.Object().CreateObjectByClassId(WellKnown.ServiceRequest.ClassId, serviceReuest.AsDictionary());
-            return new ServiceRequestDto(entObj.Values);
+            var id = _client.Object().CreateObjectByClassId(WellKnown.ServiceRequest.ClassId, serviceReuest.AsDictionary());
+            return id;
         }
 
-        public ServiceRequestDto CreateFromTemplate(string templateName, ServiceRequestDto serviceReuest)
+        public Guid CreateFromTemplate(string templateName, ServiceRequestDto serviceReuest)
         {
             var template = _client.Template().GetObjectTemplateByName(templateName);
 
@@ -53,8 +53,8 @@ namespace ScsmClient.Operations
                     throw new Exception($"Template '{templateName}' is not a ServiceRequest Template!");
                 }
 
-                var entObj = _client.Object().CreateObjectFromTemplate(template, serviceReuest.AsDictionary());
-                return new ServiceRequestDto(entObj.Values);
+                var id = _client.Object().CreateObjectFromTemplate(template, serviceReuest.AsDictionary());
+                return id;
             }
             else
             {

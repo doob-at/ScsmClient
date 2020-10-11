@@ -30,13 +30,13 @@ namespace ScsmClient.Operations
             return srObjs.Select(e => new ChangeRequestDto(e.Values)).ToList();
         }
 
-        public ChangeRequestDto Create(ChangeRequestDto changeReuest)
+        public Guid Create(ChangeRequestDto changeReuest)
         {
-            var entObj = _client.Object().CreateObjectByClassId(WellKnown.ChangeRequest.ClassId, changeReuest.AsDictionary());
-            return new ChangeRequestDto(entObj.Values);
+            var id = _client.Object().CreateObjectByClassId(WellKnown.ChangeRequest.ClassId, changeReuest.AsDictionary());
+            return id;
         }
 
-        public ChangeRequestDto CreateFromTemplate(string templateName, ChangeRequestDto changeReuest)
+        public Guid CreateFromTemplate(string templateName, ChangeRequestDto changeReuest)
         {
             var template = _client.Template().GetObjectTemplateByName(templateName);
 
@@ -48,8 +48,8 @@ namespace ScsmClient.Operations
                     throw new Exception($"Template '{templateName}' is not a ChangeRequest Template!");
                 }
 
-                var entObj = _client.Object().CreateObjectFromTemplate(template, changeReuest.AsDictionary());
-                return new ChangeRequestDto(entObj.Values);
+                var id = _client.Object().CreateObjectFromTemplate(template, changeReuest.AsDictionary());
+                return id;
             }
             else
             {

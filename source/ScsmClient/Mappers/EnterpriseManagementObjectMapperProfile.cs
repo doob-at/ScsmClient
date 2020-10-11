@@ -17,18 +17,22 @@ namespace ScsmClient.Mappers
                 {
                     expression.MapFrom((src, dto) =>
                     {
-                        
-                        return src.Values.ToDictionary(
-                            v => v.Type.Name,
-                            v =>
-                            {
-                                if (v.Value is ManagementPackEnumeration en)
-                                {
-                                    return en.DisplayName;
-                                }
 
-                                return v.Value;
-                            });
+                        var dict = new Dictionary<string, object>();
+                        foreach (var enterpriseManagementSimpleObject in src.Values)
+                        {
+                            var value = enterpriseManagementSimpleObject.Value;
+                            if (value is ManagementPackEnumeration en)
+                            {
+                                value = en.DisplayName;
+                            }
+
+                            if (!dict.ContainsKey(enterpriseManagementSimpleObject.Type.Name))
+                            {
+                                dict.Add(enterpriseManagementSimpleObject.Type.Name, value);
+                            }
+                        }
+                        return dict;
                     });
                 });
 
@@ -40,24 +44,27 @@ namespace ScsmClient.Mappers
 
         public EnterpriseManagementObjectProjectionMapperProfile()
         {
-            
+
             CreateMap<EnterpriseManagementObject, EnterpriseManagementObjectProjectionDto>()
                  .ForMember(dto => dto.Values, expression =>
                  {
                      expression.MapFrom((src, dto) =>
                      {
 
-                         return src.Values.ToDictionary(
-                             v => v.Type.Name,
-                             v =>
+                         var dict = new Dictionary<string, object>();
+                         foreach (var enterpriseManagementSimpleObject in src.Values)
+                         {
+                             var value = enterpriseManagementSimpleObject.Value;
+                             if (value is ManagementPackEnumeration en)
                              {
-                                 if (v.Value is ManagementPackEnumeration en)
-                                 {
-                                     return en.DisplayName; 
-                                 }
-
-                                 return v.Value;
-                             });
+                                 value = en.DisplayName;
+                             }
+                             if (!dict.ContainsKey(enterpriseManagementSimpleObject.Type.Name))
+                             {
+                                 dict.Add(enterpriseManagementSimpleObject.Type.Name, value);
+                             }
+                         }
+                         return dict;
                      });
                  });
 
@@ -68,17 +75,20 @@ namespace ScsmClient.Mappers
                 {
                     expression.MapFrom((src, dto) =>
                     {
-                        return src.Object.Values.ToDictionary(
-                            v => v.Type.Name,
-                            v =>
+                        var dict = new Dictionary<string, object>();
+                        foreach (var enterpriseManagementSimpleObject in src.Object.Values)
+                        {
+                            var value = enterpriseManagementSimpleObject.Value;
+                            if (value is ManagementPackEnumeration en)
                             {
-                                if (v.Value is ManagementPackEnumeration en)
-                                {
-                                    return en.DisplayName;
-                                }
-
-                                return v.Value;
-                            });
+                                value = en.DisplayName;
+                            }
+                            if (!dict.ContainsKey(enterpriseManagementSimpleObject.Type.Name))
+                            {
+                                dict.Add(enterpriseManagementSimpleObject.Type.Name, value);
+                            }
+                        }
+                        return dict;
                     });
                 })
                 .ForMember(dto => dto.RelatedObjects, expression =>
@@ -107,7 +117,7 @@ namespace ScsmClient.Mappers
                 .IncludeMembers(o => o, s => s.Object);
 
 
-            
+
         }
     }
 }

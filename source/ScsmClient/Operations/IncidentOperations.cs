@@ -35,13 +35,13 @@ namespace ScsmClient.Operations
             return incObjs.Select(e => new IncidentDto(e.Values)).ToList();
         }
 
-        public IncidentDto Create(IncidentDto incident)
+        public Guid Create(IncidentDto incident)
         {
-            var entObj = _client.Object().CreateObjectByClassId(WellKnown.Incident.ClassId, incident.AsDictionary());
-            return new IncidentDto(entObj.Values);
+            var id = _client.Object().CreateObjectByClassId(WellKnown.Incident.ClassId, incident.AsDictionary());
+            return id;
         }
         
-        public IncidentDto CreateFromTemplate(string templateName, IncidentDto incident)
+        public Guid CreateFromTemplate(string templateName, IncidentDto incident)
         {
             var template = _client.Template().GetObjectTemplateByName(templateName);
 
@@ -53,8 +53,8 @@ namespace ScsmClient.Operations
                     throw new Exception($"Template '{templateName}' is not an Incident Template!");
                 }
 
-                var entObj = _client.Object().CreateObjectFromTemplate(template, incident.AsDictionary());
-                return new IncidentDto(entObj.Values);
+                var id = _client.Object().CreateObjectFromTemplate(template, incident.AsDictionary());
+                return id;
             }
             else
             {
