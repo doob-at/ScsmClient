@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -17,6 +20,9 @@ namespace ScsmClient.Operations
 {
     public class ObjectOperations: BaseOperation
     {
+
+        private ConcurrentDictionary<Guid, Dictionary<string, ManagementPackProperty>> _objectPropertyDictionary = new ConcurrentDictionary<Guid, Dictionary<string, ManagementPackProperty>>();
+
         public ObjectOperations(SCSMClient client) : base(client)
         {
         }
@@ -83,17 +89,15 @@ namespace ScsmClient.Operations
 
         public Guid CreateObjectByClass(ManagementPackClass objectClass, Dictionary<string, object> properties)
         {
-            var obj = new CreatableEnterpriseManagementObject(_client.ManagementGroup, objectClass);
-            var objectProperties = objectClass.GetProperties(BaseClassTraversalDepth.Recursive);
+            
+            var objectProperties = GetObjectPropertyDictionary(objectClass);
             var normalizer = new ValueConverter(_client);
 
+            var obj = new CreatableEnterpriseManagementObject(_client.ManagementGroup, objectClass);
             foreach (var kv in properties)
             {
-                var prop = objectProperties.FirstOrDefault(p => p.Name.Equals(kv.Key, StringComparison.Ordinal)) ??
-                           objectProperties.FirstOrDefault(p => p.Name.Equals(kv.Key, StringComparison.OrdinalIgnoreCase));
-                if (prop != null)
+                if (objectProperties.TryGetValue(kv.Key, out var prop))
                 {
-                    
                     var val = normalizer.NormalizeValue(kv.Value, prop);
                     obj[objectClass, kv.Key].Value = val;
                 }
@@ -104,6 +108,7 @@ namespace ScsmClient.Operations
         }
 
 
+        
         public Guid CreateObjectFromTemplateName(string templateName, Dictionary<string, object> properties)
         {
 
@@ -120,18 +125,17 @@ namespace ScsmClient.Operations
             var elem = template.TypeID.GetElement();
             if (elem is ManagementPackTypeProjection managementPackTypeProjection)
             {
-                var objectProperties = managementPackTypeProjection.TargetType.GetProperties(BaseClassTraversalDepth.Recursive);
+                var objectProperties = GetObjectPropertyDictionary(managementPackTypeProjection.TargetType);
                 foreach (var kv in properties)
                 {
-                    var prop = objectProperties.FirstOrDefault(p => p.Name.Equals(kv.Key, StringComparison.Ordinal)) ??
-                               objectProperties.FirstOrDefault(p => p.Name.Equals(kv.Key, StringComparison.OrdinalIgnoreCase));
-
-                    var val = normalizer.NormalizeValue(kv.Value, prop);
-                    obj.Object[managementPackTypeProjection.TargetType, kv.Key].Value = val;
+                    if (objectProperties.TryGetValue(kv.Key, out var prop))
+                    {
+                        var val = normalizer.NormalizeValue(kv.Value, prop);
+                        obj.Object[managementPackTypeProjection.TargetType, kv.Key].Value = val;
+                    }
                 }
 
                 obj.Commit();
-
 
                 return obj.Object.Id;
             }
@@ -143,5 +147,26 @@ namespace ScsmClient.Operations
 
         }
 
+
+        private Dictionary<string, ManagementPackProperty> GetObjectPropertyDictionary(ManagementPackClass objectClass)
+        {
+            return _objectPropertyDictionary.GetOrAdd(objectClass.Id, guid =>
+            {
+                var dict = new Dictionary<string, ManagementPackProperty>();
+                var objectProperties = objectClass.GetProperties(BaseClassTraversalDepth.Recursive);
+                foreach (var managementPackProperty in objectProperties)
+                {
+                    if (!dict.ContainsKey(managementPackProperty.Name))
+                    {
+                        dict.Add(managementPackProperty.Name, managementPackProperty);
+                    }
+                }
+
+                return dict;
+            });
+
+        }
+
     }
+
 }
