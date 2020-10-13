@@ -108,48 +108,60 @@ namespace ScsmClient.Operations
             return obj.Id;
         }
 
-        public List<Guid> CreateObjectsByClassId(Guid id, IEnumerable<Dictionary<string, object>> objects)
+        public Dictionary<int, Guid> CreateObjectsByClassId(Guid id, IEnumerable<Dictionary<string, object>> objects, CancellationToken cancellationToken = default)
         {
+
             var objectClass = _client.Class().GetClassById(id);
-            return CreateObjectsByClass(objectClass, objects);
+            return CreateObjectsByClass(objectClass, objects, cancellationToken);
         }
 
-        public List<Guid> CreateObjectsByClassName(string className, IEnumerable<Dictionary<string, object>> objects)
+        public Dictionary<int, Guid> CreateObjectsByClassName(string className, IEnumerable<Dictionary<string, object>> objects, CancellationToken cancellationToken = default)
         {
+
             var objectClass = _client.Class().GetClassByName(className);
-            return CreateObjectsByClass(objectClass, objects);
+            return CreateObjectsByClass(objectClass, objects, cancellationToken);
         }
 
-        public List<Guid> CreateObjectsByClass(ManagementPackClass objectClass, IEnumerable<Dictionary<string, object>> objects)
+        public Dictionary<int, Guid> CreateObjectsByClass(ManagementPackClass objectClass, IEnumerable<Dictionary<string, object>> objects, CancellationToken cancellationToken = default)
         {
 
+            var result = new Dictionary<int, Guid>();
             var objectProperties = GetObjectPropertyDictionary(objectClass);
             var normalizer = new ValueConverter(_client);
 
+            var groups = GroupIn10(objects);
 
-            var list = new List<Guid>();
-
-            var idd = new IncrementalDiscoveryData();
-            foreach (var dictionary in objects)
+            var index = 0;
+            foreach (var enumerable in groups)
             {
-                var obj = new CreatableEnterpriseManagementObject(_client.ManagementGroup, objectClass);
-                foreach (var kv in dictionary)
+                cancellationToken.ThrowIfCancellationRequested();
+
+                var _list = new List<Guid>();
+                var idd = new IncrementalDiscoveryData();
+                foreach (var dictionary in enumerable)
                 {
-                    if (objectProperties.TryGetValue(kv.Key, out var prop))
+                    var obj = new CreatableEnterpriseManagementObject(_client.ManagementGroup, objectClass);
+                    foreach (var kv in dictionary)
                     {
-                        var val = normalizer.NormalizeValue(kv.Value, prop);
-                        obj[objectClass, kv.Key].Value = val;
+                        if (objectProperties.TryGetValue(kv.Key, out var prop))
+                        {
+                            var val = normalizer.NormalizeValue(kv.Value, prop);
+                            obj[objectClass, kv.Key].Value = val;
+                        }
                     }
+
+                    idd.Add(obj);
+                    _list.Add(obj.Id);
+                }
+                idd.Commit(_client.ManagementGroup);
+                foreach (var guid in _list)
+                {
+                    result.Add(index++, guid);
                 }
 
-                idd.Add(obj);
-                list.Add(obj.Id);
             }
-            idd.Commit(_client.ManagementGroup);
 
-
-            return list;
-
+            return result;
 
         }
 
@@ -194,24 +206,36 @@ namespace ScsmClient.Operations
         }
 
 
-        public List<Guid> CreateObjectsFromTemplateName(string templateName, IEnumerable<Dictionary<string, object>> objects)
+        public Dictionary<int, Guid> CreateObjectsFromTemplateName(string templateName, IEnumerable<Dictionary<string, object>> objects, CancellationToken cancellationToken = default)
         {
 
             var template = _client.Template().GetObjectTemplateByName(templateName);
-            return CreateObjectsFromTemplate(template, objects);
+            return CreateObjectsFromTemplate(template, objects, cancellationToken);
         }
 
-        public List<Guid> CreateObjectsFromTemplate(ManagementPackObjectTemplate template, IEnumerable<Dictionary<string, object>> objects)
+        public Dictionary<int, Guid> CreateObjectsFromTemplate(ManagementPackObjectTemplate template, IEnumerable<Dictionary<string, object>> objects, CancellationToken cancellationToken = default)
         {
 
-            var list = new List<Guid>();
+            var result = new Dictionary<int, Guid>();
             var normalizer = new ValueConverter(_client);
 
             var elem = template.TypeID.GetElement();
-            if (elem is ManagementPackTypeProjection managementPackTypeProjection)
+            if (!(elem is ManagementPackTypeProjection managementPackTypeProjection))
             {
+                throw new Exception($"Template '{template.DisplayName}' is invalid!");
+            }
+
+
+            var groups = GroupIn10(objects);
+
+            var index = 0;
+            foreach (var enumerable in groups)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                var _list = new List<Guid>();
                 var idd = new IncrementalDiscoveryData();
-                foreach (var dictionary in objects)
+                foreach (var dictionary in enumerable)
                 {
                     var obj = new EnterpriseManagementObjectProjection(_client.ManagementGroup, template);
                     var objectProperties = GetObjectPropertyDictionary(managementPackTypeProjection.TargetType);
@@ -223,19 +247,18 @@ namespace ScsmClient.Operations
                             obj.Object[managementPackTypeProjection.TargetType, kv.Key].Value = val;
                         }
                     }
+
                     idd.Add(obj);
-                    list.Add(obj.Object.Id);
+                    _list.Add(obj.Object.Id);
                 }
-
                 idd.Commit(_client.ManagementGroup);
-
-                return list;
-            }
-            else
-            {
-                throw new Exception($"Template '{template.DisplayName}' is invalid!");
+                foreach (var guid in _list)
+                {
+                    result.Add(index++, guid);
+                }
             }
 
+            return result;
 
         }
 
@@ -259,6 +282,21 @@ namespace ScsmClient.Operations
 
         }
 
+        private IEnumerable<IEnumerable<T>> GroupIn10<T>(IEnumerable<T> enumerable)
+        {
+            var dictionaries = enumerable.ToList();
+            var dictCount = dictionaries.Count;
+            if (dictCount % 10 != 0)
+                dictCount = (dictCount - dictCount % 10) + 10;
+
+            var batchsize = dictCount >= 100 ? dictCount / 10 : 10;
+
+            var groups = dictionaries.Select((x, idx) => new { x, idx })
+                .GroupBy(x => x.idx / batchsize)
+                .Select(g => g.Select(a => a.x));
+
+            return groups;
+        }
     }
 
 }
