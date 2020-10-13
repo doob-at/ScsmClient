@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -44,14 +45,22 @@ namespace ScsmClientTestCmd
 
         static void CreatePerson(ScsmClient.SCSMClient scsmClient)
         {
+            var list = new List<Dictionary<string, object>>();
+            for (int i = 0; i < 40000; i++)
+            {
+                var json =
+                    "{\r\n  \"Geburtsdatum\": \"1997-03-29T00:00:00\",\r\n  \"Nachname\": \"Tester2\",\r\n  \"Fax\": null,\r\n  \"Vorname\": \"Christian\",\r\n  \"Geschlecht\": \"maennlich\",\r\n  \"Telefon\": null,\r\n  \"BPK\": \"HEEscXzyiXx6HU+iloZR9jj5doY=\",\r\n  \"Bundesdienst\": true,\r\n  \"AkademischerGradVor\": \"\",\r\n  \"Adresse\": null,\r\n  \"Title\": \"\",\r\n  \"Mobile\": null,\r\n  \"Personalnummer\": \"90275376\",\r\n  \"EMail\": null,\r\n  \"AkademischerGradNach\": \"\"\r\n}";
+                var person = Json.Converter.ToDictionary<string, object>(json);
+                person["Nachname"] = $"{person["Nachname"]}-{i}";
+                list.Add(person);
+            }
+            
 
-            var json =
-                "{\r\n  \"Geburtsdatum\": \"1997-03-29T00:00:00\",\r\n  \"Nachname\": \"Beisteiner\",\r\n  \"Fax\": null,\r\n  \"Vorname\": \"Christian\",\r\n  \"Geschlecht\": \"maennlich\",\r\n  \"Telefon\": null,\r\n  \"BPK\": \"HEEscXzyiXx6HU+iloZR9jj5doY=\",\r\n  \"Bundesdienst\": true,\r\n  \"AkademischerGradVor\": \"\",\r\n  \"Adresse\": null,\r\n  \"Title\": \"\",\r\n  \"Mobile\": null,\r\n  \"Personalnummer\": \"90275376\",\r\n  \"EMail\": null,\r\n  \"AkademischerGradNach\": \"\"\r\n}";
-            var person = Json.Converter.ToDictionary<string, object>(json);
-            //person["Vorname"] = "Bernhard";
-
-            var p = scsmClient.Object().CreateObjectByClassName("BMI.Person", person);
-
+            var sw = new Stopwatch();
+            sw.Start();
+            var p = scsmClient.Object().CreateObjectsByClassName("BMI.Person", list.ToArray());
+            sw.Stop();
+            var duration = sw.Elapsed;
         }
 
         static void CreateIncident(SCSMClient scsmclient)

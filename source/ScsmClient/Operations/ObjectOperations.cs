@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EnterpriseManagement.Common;
 using Microsoft.EnterpriseManagement.Configuration;
+using Microsoft.EnterpriseManagement.ConnectorFramework;
 using Reflectensions.ExtensionMethods;
 using ScsmClient.Attributes;
 using ScsmClient.ExtensionMethods;
@@ -18,7 +19,7 @@ using ScsmClient.SharedModels.Models;
 
 namespace ScsmClient.Operations
 {
-    public class ObjectOperations: BaseOperation
+    public class ObjectOperations : BaseOperation
     {
 
         private ConcurrentDictionary<Guid, Dictionary<string, ManagementPackProperty>> _objectPropertyDictionary = new ConcurrentDictionary<Guid, Dictionary<string, ManagementPackProperty>>();
@@ -26,7 +27,7 @@ namespace ScsmClient.Operations
         public ObjectOperations(SCSMClient client) : base(client)
         {
         }
-        
+
         public EnterpriseManagementObjectDto GetObjectById(Guid id)
         {
             var critOptions = new ObjectQueryOptions();
@@ -51,7 +52,7 @@ namespace ScsmClient.Operations
         public IEnumerable<EnterpriseManagementObjectDto> GetObjectsByClass(ManagementPackClass objectClass, string criteria, int? maxResult = null)
         {
 
-           
+
             var crit = _client.Criteria().BuildObjectCriteria(criteria, objectClass);
 
 
@@ -62,9 +63,9 @@ namespace ScsmClient.Operations
 
 
             var reader = _client.ManagementGroup.EntityObjects.GetObjectReader<EnterpriseManagementObject>(crit, critOptions);
-            
+
             var count = 0;
-            
+
             foreach (EnterpriseManagementObject enterpriseManagementObject in reader)
             {
                 if (count == critOptions.MaxResultCount)
@@ -73,7 +74,7 @@ namespace ScsmClient.Operations
             }
 
         }
-        
+
 
         public Guid CreateObjectByClassId(Guid id, Dictionary<string, object> properties)
         {
@@ -89,7 +90,7 @@ namespace ScsmClient.Operations
 
         public Guid CreateObjectByClass(ManagementPackClass objectClass, Dictionary<string, object> properties)
         {
-            
+
             var objectProperties = GetObjectPropertyDictionary(objectClass);
             var normalizer = new ValueConverter(_client);
 
@@ -107,12 +108,57 @@ namespace ScsmClient.Operations
             return obj.Id;
         }
 
+        public List<Guid> CreateObjectsByClassId(Guid id, IEnumerable<Dictionary<string, object>> objects)
+        {
+            var objectClass = _client.Class().GetClassById(id);
+            return CreateObjectsByClass(objectClass, objects);
+        }
 
-        
+        public List<Guid> CreateObjectsByClassName(string className, IEnumerable<Dictionary<string, object>> objects)
+        {
+            var objectClass = _client.Class().GetClassByName(className);
+            return CreateObjectsByClass(objectClass, objects);
+        }
+
+        public List<Guid> CreateObjectsByClass(ManagementPackClass objectClass, IEnumerable<Dictionary<string, object>> objects)
+        {
+
+            var objectProperties = GetObjectPropertyDictionary(objectClass);
+            var normalizer = new ValueConverter(_client);
+
+
+            var list = new List<Guid>();
+
+            var idd = new IncrementalDiscoveryData();
+            foreach (var dictionary in objects)
+            {
+                var obj = new CreatableEnterpriseManagementObject(_client.ManagementGroup, objectClass);
+                foreach (var kv in dictionary)
+                {
+                    if (objectProperties.TryGetValue(kv.Key, out var prop))
+                    {
+                        var val = normalizer.NormalizeValue(kv.Value, prop);
+                        obj[objectClass, kv.Key].Value = val;
+                    }
+                }
+
+                idd.Add(obj);
+                list.Add(obj.Id);
+            }
+            idd.Commit(_client.ManagementGroup);
+
+
+            return list;
+
+
+        }
+
+
+
         public Guid CreateObjectFromTemplateName(string templateName, Dictionary<string, object> properties)
         {
 
-            var template =_client.Template().GetObjectTemplateByName(templateName);
+            var template = _client.Template().GetObjectTemplateByName(templateName);
             return CreateObjectFromTemplate(template, properties);
         }
 
@@ -143,7 +189,53 @@ namespace ScsmClient.Operations
             {
                 throw new Exception($"Template '{template.DisplayName}' is invalid!");
             }
-            
+
+
+        }
+
+
+        public List<Guid> CreateObjectsFromTemplateName(string templateName, IEnumerable<Dictionary<string, object>> objects)
+        {
+
+            var template = _client.Template().GetObjectTemplateByName(templateName);
+            return CreateObjectsFromTemplate(template, objects);
+        }
+
+        public List<Guid> CreateObjectsFromTemplate(ManagementPackObjectTemplate template, IEnumerable<Dictionary<string, object>> objects)
+        {
+
+            var list = new List<Guid>();
+            var normalizer = new ValueConverter(_client);
+
+            var elem = template.TypeID.GetElement();
+            if (elem is ManagementPackTypeProjection managementPackTypeProjection)
+            {
+                var idd = new IncrementalDiscoveryData();
+                foreach (var dictionary in objects)
+                {
+                    var obj = new EnterpriseManagementObjectProjection(_client.ManagementGroup, template);
+                    var objectProperties = GetObjectPropertyDictionary(managementPackTypeProjection.TargetType);
+                    foreach (var kv in dictionary)
+                    {
+                        if (objectProperties.TryGetValue(kv.Key, out var prop))
+                        {
+                            var val = normalizer.NormalizeValue(kv.Value, prop);
+                            obj.Object[managementPackTypeProjection.TargetType, kv.Key].Value = val;
+                        }
+                    }
+                    idd.Add(obj);
+                    list.Add(obj.Object.Id);
+                }
+
+                idd.Commit(_client.ManagementGroup);
+
+                return list;
+            }
+            else
+            {
+                throw new Exception($"Template '{template.DisplayName}' is invalid!");
+            }
+
 
         }
 

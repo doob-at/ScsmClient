@@ -101,5 +101,8 @@ namespace ScsmClient
         private ChangeRequestOperations _changeRequestOperations;
         public ChangeRequestOperations ChangeRequest() => _changeRequestOperations = _changeRequestOperations ?? new ChangeRequestOperations(this);
 
+        private RelationsOperations _relationsOperations;
+        public RelationsOperations Relations() => _relationsOperations = _relationsOperations ?? new RelationsOperations(this);
+
     }
 }

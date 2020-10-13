@@ -63,7 +63,12 @@ namespace ScsmClient.Operations
             return _client.ManagementGroup.EntityTypes.GetClasses(criteria);
         }
 
-        
+        public ManagementPackRelationship GetRelationshipClassByName(string name)
+        {
+            var crit = new ManagementPackRelationshipCriteria($"Name='{name}'");
+            return _client.ManagementGroup.EntityTypes.GetRelationshipClasses(crit).FirstOrDefault();
+        }
+
         private (string ClassName, string ManagementPackName) ParseName(string name)
         {
 
