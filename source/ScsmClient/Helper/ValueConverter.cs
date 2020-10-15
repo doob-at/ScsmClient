@@ -26,6 +26,10 @@ namespace ScsmClient.Helper
             {
                 case ManagementPackEntityPropertyTypes.@enum:
                     return NormalizeEnum(value, property.EnumType.GetElement());
+                case ManagementPackEntityPropertyTypes.datetime:
+                {
+                    return NormalizeDate(value);
+                }
                 default:
                     return value;
             }
@@ -86,6 +90,16 @@ namespace ScsmClient.Helper
             return enumValue.ToString();
         }
 
+        private string NormalizeDate(object value)
+        {
+            if (!(value is DateTime dt))
+            {
+                dt = ToNullableDateTime(value.ToString());
+            }
+            return dt.ToString("yyyy-MM-ddTHH:mm:ss.FFFFF");
+        }
+
+
         public string NormalizeGenericValueForCriteria(string value, string propertyname)
         {
             if (propertyname.StartsWith("G:", StringComparison.OrdinalIgnoreCase))
@@ -96,15 +110,10 @@ namespace ScsmClient.Helper
             switch (propertyname.ToLower())
             {
                 case "lastmodified":
-                    {
-                        var dt = ToNullableDateTime(value);
-                        return dt.ToString("yyyy-MM-ddTHH:mm:ss.FFFFF");
-                    }
                 case "timeadded":
-                    {
-                        var dt = ToNullableDateTime(value);
-                        return dt.ToString("yyyy-MM-ddTHH:mm:ss.FFFFF");
-                    }
+                {
+                    return NormalizeDate(value);
+                }
             }
 
             return value;
