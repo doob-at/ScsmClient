@@ -26,10 +26,6 @@ namespace ScsmClient.Helper
             {
                 case ManagementPackEntityPropertyTypes.@enum:
                     return NormalizeEnum(value, property.EnumType.GetElement());
-                case ManagementPackEntityPropertyTypes.datetime:
-                {
-                    return NormalizeDate(value);
-                }
                 default:
                     return value;
             }
@@ -68,6 +64,10 @@ namespace ScsmClient.Helper
             {
                 case ManagementPackEntityPropertyTypes.@enum:
                     return NormalizeEnumForCriteria(value, property.EnumType.GetElement());
+                case ManagementPackEntityPropertyTypes.datetime:
+                {
+                    return NormalizeDate(value);
+                }
                 default:
                     return value.ToString();
             }

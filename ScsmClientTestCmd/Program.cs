@@ -26,9 +26,9 @@ namespace ScsmClientTestCmd
             var creds = new NetworkCredential("BWLAB\\admin", "ABC12abc");
             var scsmClient = new SCSMClient("192.168.75.121", creds);
 
-            CreatePerson(scsmClient);
-            CreateIncident(scsmClient);
-            TestCriteria();
+            //CreatePerson(scsmClient);
+            //CreateIncident(scsmClient);
+            TestCriteria(scsmClient);
 
             return;
             
@@ -96,31 +96,31 @@ namespace ScsmClientTestCmd
 
         }
 
-        static void TestCriteria()
+        static void TestCriteria(SCSMClient scsmClient)
         {
-            var creds = new NetworkCredential("LANFL\\administrator", "ABC12abc");
-            var scsmClient = new SCSMClient("192.168.75.20", creds);
+            
 
             //var list = scsmClient.ManagementPack().GetManagementPacks().OrderBy(m => m.Name).ToList();
-            var cla = scsmClient.Class().GetClassByName("[zMP_zOrganisationseinheit]zOrganisationseinheit");
+            //var cla = scsmClient.Class().GetClassByName("[zMP_zOrganisationseinheit]zOrganisationseinheit");
 
-            //var crit = new ManagementPackClassCriteria($"Name='[zMP_zOrganisationseinheit]zOrganisationseinheit' and ManagementPack='zMP_zOrganisationseinheit'");
-            //var foundClass = scsmClient.ManagementGroup.EntityTypes.GetClasses(crit).FirstOrDefault();
+            ////var crit = new ManagementPackClassCriteria($"Name='[zMP_zOrganisationseinheit]zOrganisationseinheit' and ManagementPack='zMP_zOrganisationseinheit'");
+            ////var foundClass = scsmClient.ManagementGroup.EntityTypes.GetClasses(crit).FirstOrDefault();
 
-            var cla2 = scsmClient.Class().GetClassByName("zBenutzer");
+            //var cla2 = scsmClient.Class().GetClassByName("zBenutzer");
 
-            var enum1 = cla.PropertyCollection.Where(p => p.Type == ManagementPackEntityPropertyTypes.@enum).Select(p =>
-                scsmClient.ManagementGroup.EntityTypes.GetChildEnumerations(p.EnumType.Id, TraversalDepth.Recursive)).ToList();
+            //var enum1 = cla.PropertyCollection.Where(p => p.Type == ManagementPackEntityPropertyTypes.@enum).Select(p =>
+            //    scsmClient.ManagementGroup.EntityTypes.GetChildEnumerations(p.EnumType.Id, TraversalDepth.Recursive)).ToList();
 
-            var enum1s = cla.PropertyCollection
-                .Where(p => p.Type == ManagementPackEntityPropertyTypes.@enum)
-                .Select(p => scsmClient.Enumeration().GetEnumerationChildByName(p.EnumType.GetElement(), "Fachabteilung")).ToList();
+            //var enum1s = cla.PropertyCollection
+            //    .Where(p => p.Type == ManagementPackEntityPropertyTypes.@enum)
+            //    .Select(p => scsmClient.Enumeration().GetEnumerationChildByName(p.EnumType.GetElement(), "Fachabteilung")).ToList();
 
-            var enum2s = cla2.PropertyCollection.Where(p => p.Type == ManagementPackEntityPropertyTypes.@enum).Select(p =>
-                scsmClient.ManagementGroup.EntityTypes.GetChildEnumerations(p.EnumType.Id, TraversalDepth.Recursive)).ToList();
+            //var enum2s = cla2.PropertyCollection.Where(p => p.Type == ManagementPackEntityPropertyTypes.@enum).Select(p =>
+            //    scsmClient.ManagementGroup.EntityTypes.GetChildEnumerations(p.EnumType.Id, TraversalDepth.Recursive)).ToList();
 
-           
-            
+
+            var objs = scsmClient.TypeProjection()
+                .GetObjectProjectionObjects("BMI.Person.Projection", "Geburtsdatum == '14.06.1981 00:00:00'").ToList();
 
         }
 
