@@ -26,13 +26,29 @@ namespace ScsmClientTestCmd
             var creds = new NetworkCredential("BWLAB\\admin", "ABC12abc");
             var scsmClient = new SCSMClient("192.168.75.121", creds);
 
-            //CreatePerson(scsmClient);
+
+
+            //var relClasses = scsmClient.Relations().FindRelationShip("BMI.Person", "BMI.Organisationseinheit");
+
+
+
+
+            //var personid = CreatePerson(scsmClient);
+            //var accountId = CreateAccount(scsmClient);
+            //var ben = CreateBenutzer(scsmClient);
             //CreateIncident(scsmClient);
             TestCriteria(scsmClient);
+            //var id = CreatePersonWithRelations(scsmClient);
+
+
+            //var personId = Guid.Parse("309a5c0e-6b53-999d-8198-b32e445b1054");
+            //var accountId = Guid.Parse("b9daa419-8a0b-0431-ef0b-5c431f8937c3");
+            //Guid relId = CreateRelation(scsmClient, accountId, ben);
+
 
             return;
-            
-            
+
+
 
 
             var cl = scsmClient.Class().GetClassByName("zOrganisationseinheit");
@@ -43,24 +59,101 @@ namespace ScsmClientTestCmd
 
         }
 
-        static void CreatePerson(ScsmClient.SCSMClient scsmClient)
+        private static Guid CreateRelation(SCSMClient scsmClient, Guid personId, Guid accountId)
         {
-            var list = new List<Dictionary<string, object>>();
-            for (int i = 0; i < 100; i++)
-            {
-                var json =
-                    "{\r\n  \"Geburtsdatum\": \"1997-03-29T00:00:00\",\r\n  \"Nachname\": \"Tester2\",\r\n  \"Fax\": null,\r\n  \"Vorname\": \"Christian\",\r\n  \"Geschlecht\": \"maennlich\",\r\n  \"Telefon\": null,\r\n  \"BPK\": \"HEEscXzyiXx6HU+iloZR9jj5doY=\",\r\n  \"Bundesdienst\": true,\r\n  \"AkademischerGradVor\": \"\",\r\n  \"Adresse\": null,\r\n  \"Title\": \"\",\r\n  \"Mobile\": null,\r\n  \"Personalnummer\": \"90275376\",\r\n  \"EMail\": null,\r\n  \"AkademischerGradNach\": \"\"\r\n}";
-                var person = Json.Converter.ToDictionary<string, object>(json);
-                person["Nachname"] = $"{person["Nachname"]}-{i}";
-                list.Add(person);
-            }
-            
 
-            var sw = new Stopwatch();
-            sw.Start();
-            var p = scsmClient.Object().CreateObjectsByClassName("BMI.Person", list.ToArray());
-            sw.Stop();
-            var duration = sw.Elapsed;
+
+            return scsmClient.Relations().AddRelatedObjectByRelationshipName("BMI.AccountToBenutzer.Relation", personId, accountId);
+
+
+        }
+
+        static Guid CreatePerson(SCSMClient scsmClient)
+        {
+            
+            var json =
+                "{\r\n  \"Geburtsdatum\": \"1981-06-06T00:00:00\",\r\n  \"Nachname\": \"Windisch\",\r\n  \"Fax\": null,\r\n  \"Vorname\": \"Bernhard\",\r\n  \"Geschlecht\": \"männlich\",\r\n  \"Telefon\": null,\r\n  \"BPK\": \"LLMPuM6U4GraXjbcD7ChSrVotaQ=\",\r\n  \"Bundesdienst\": false,\r\n  \"AkademischerGradVor\": \"\",\r\n  \"Adresse\": null,\r\n  \"Title\": \"\",\r\n  \"Mobile\": null,\r\n  \"Personalnummer\": null,\r\n  \"EMail\": null,\r\n  \"AkademischerGradNach\": \"\"\r\n}";
+            var person = Json.Converter.ToDictionary<string, object>(json);
+
+
+
+            return scsmClient.Object().CreateObjectByClassName("BMI.Person", person);
+
+        }
+
+        static Guid CreatePersonWithRelations(SCSMClient scsmClient)
+        {
+            var person = new Dictionary<string, object>();
+            person["Geburtsdatum"] = new DateTime(1981,6,6);
+            person["Nachname"] = "Windisch-r4";
+            person["Vorname"] = "Bernhard-r4";
+            person["Geschlecht"] = "Männlich";
+            person["BPK"] = "LLMPuM6U4GraXjbcD7ChSrVotaQ=";
+            person["Bundesdienst"] = false;
+
+
+            var acc1 = new Dictionary<string, object>();
+            acc1["Username"] = "windis01";
+            acc1["InitialPassword"] = "ABC12abc";
+            acc1["Beschreibung"] = "Nested Account";
+
+            var ben1 = new Dictionary<string, object>();
+            ben1["Type"] = "Stammportal";
+            ben1["GiltAb"] = new DateTime(2020, 11, 1);
+            ben1["GiltBis"] = new DateTime(2020,12,31);
+
+            acc1["!BMI.Benutzer.Stammportal"] = ben1;
+
+            var acc2 = new Dictionary<string, object>();
+            acc2["Username"] = "windis02";
+            acc2["InitialPassword"] = "ABC12abc";
+            acc2["Beschreibung"] = "Nested Account";
+
+            var ben2 = new Dictionary<string, object>();
+            ben2["Type"] = "Stammportal";
+            ben2["GiltAb"] = new DateTime(2021, 1, 1);
+            ben2["GiltBis"] = new DateTime(2021, 12, 31);
+            acc2["!BMI.Benutzer.Stammportal"] = ben2;
+
+
+
+            person["BMI.Account!"] = new List<object>
+            {
+                acc1,
+                acc2
+            };
+
+            person["!BMI.Organisationseinheit"] = "852c1c92-6b09-a7ea-7ad4-09b2f2801d4f";
+
+            //var relClasses = scsmClient.Relations().FindRelationShip("BMI.Person", "BMI.Account");
+
+            return scsmClient.Object().CreateObjectByClassName("BMI.Person", person);
+
+        }
+
+        static Guid CreateAccount(ScsmClient.SCSMClient scsmClient)
+        {
+
+            var json =
+                "{\r\n  \"Username\": \"windisc1\",\r\n  \"InitialPassword\": \"ABC12abc\",\r\n  \"Beschreibung\": \"Test Account\",\r\n  \"GVGID\": null\r\n}";
+            var acc = Json.Converter.ToDictionary<string, object>(json);
+
+            return scsmClient.Object().CreateObjectByClassName("BMI.Account", acc);
+
+
+        }
+
+        static Guid CreateBenutzer(SCSMClient scsmClient)
+        {
+            var dict = new Dictionary<string, object>();
+            dict["Type"] = "Stammportal";
+            dict["GiltAb"] = DateTime.Now;
+
+          
+
+            return scsmClient.Object().CreateObjectByClassName("BMI.StammportalBenutzer", dict);
+
+
         }
 
         static void CreateIncident(SCSMClient scsmclient)
@@ -90,7 +183,7 @@ namespace ScsmClientTestCmd
             var inc2 = Json.Converter.ToObject<IncidentDto>(json);
             var in3 = Json.Converter.ToObject<IncidentDto>(jsondic);
 
-            
+
             scsmclient.Incident().CreateFromTemplate("Networking Issue Incident Template", inc);
 
 
@@ -98,7 +191,7 @@ namespace ScsmClientTestCmd
 
         static void TestCriteria(SCSMClient scsmClient)
         {
-            
+
 
             //var list = scsmClient.ManagementPack().GetManagementPacks().OrderBy(m => m.Name).ToList();
             //var cla = scsmClient.Class().GetClassByName("[zMP_zOrganisationseinheit]zOrganisationseinheit");
@@ -119,8 +212,20 @@ namespace ScsmClientTestCmd
             //    scsmClient.ManagementGroup.EntityTypes.GetChildEnumerations(p.EnumType.Id, TraversalDepth.Recursive)).ToList();
 
 
-            var objs = scsmClient.TypeProjection()
-                .GetObjectProjectionObjects("BMI.Person.Projection", "Geburtsdatum == '14.06.1981 00:00:00'").ToList();
+            //var accs = scsmClient.TypeProjection()
+            //    .GetObjectProjectionObjects("BMI.Account.Projection", "", null).ToList();
+
+            //var objs = scsmClient.TypeProjection()
+            //    .GetObjectProjectionObjects("BMI.Account.Projection", "BMI.Benutzer!Type -like 'stamm%'", null).ToList();
+
+            //var bens = scsmClient.TypeProjection()
+            //    .GetObjectProjectionObjects("BMI.Benutzer.Projection", "Type -like 'stamm%'", null).ToList();
+
+            //var org = scsmClient.Object().GetObjectsByClassName("BMI.Organisationseinheit", "OKZ -like '%Polizei%'")
+            //    .FirstOrDefault();
+
+            var pers = scsmClient.TypeProjection().GetObjectProjectionObjects("BMI.PErson.Projection", "vorname -eq 'Bernhard-r4'")
+                .FirstOrDefault();
 
         }
 

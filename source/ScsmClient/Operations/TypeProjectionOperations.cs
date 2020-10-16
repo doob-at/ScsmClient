@@ -59,21 +59,21 @@ namespace ScsmClient.Operations
         }
 
 
-        public IEnumerable<EnterpriseManagementObjectProjectionDto> GetObjectProjectionObjects(Guid typeProjectionGuid, string criteria, int? maxResult = null)
+        public IEnumerable<EnterpriseManagementObjectProjectionDto> GetObjectProjectionObjects(Guid typeProjectionGuid, string criteria, int? maxResult = null, int? levels = null)
         {
             var tp = GetTypeProjectionById(typeProjectionGuid);
-            return GetObjectProjectionObjects(tp, criteria, maxResult);
+            return GetObjectProjectionObjects(tp, criteria, maxResult, levels);
         }
 
 
-        public IEnumerable<EnterpriseManagementObjectProjectionDto> GetObjectProjectionObjects(string typeProjectionName, string criteria, int? maxResult = null)
+        public IEnumerable<EnterpriseManagementObjectProjectionDto> GetObjectProjectionObjects(string typeProjectionName, string criteria, int? maxResult = null, int? levels = null)
         {
             var tp = GetTypeProjectionByClassName(typeProjectionName);
-            return GetObjectProjectionObjects(tp, criteria, maxResult);
+            return GetObjectProjectionObjects(tp, criteria, maxResult, levels);
         }
 
         public IEnumerable<EnterpriseManagementObjectProjectionDto> GetObjectProjectionObjects(ManagementPackTypeProjection typeProjection,
-            string criteria, int? maxResult = null)
+            string criteria, int? maxResult = null, int? levels = null)
         {
             
             var crit = _client.Criteria().BuildObjectProjectionCriteria(criteria, typeProjection);
@@ -91,7 +91,7 @@ namespace ScsmClient.Operations
                     break;
 
                 
-                yield return enterpriseManagementObjectProjection.ToObjectProjectionDto();
+                yield return enterpriseManagementObjectProjection.ToObjectProjectionDto(levels);
             }
 
         }

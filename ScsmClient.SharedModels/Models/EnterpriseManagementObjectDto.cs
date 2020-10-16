@@ -22,17 +22,17 @@ namespace ScsmClient.SharedModels.Models
 
     public class EnterpriseManagementObjectProjectionDto: EnterpriseManagementObjectDto
     {
-        public Dictionary<string, RelatedObjects> RelatedObjects { get; set; } = new Dictionary<string, RelatedObjects>();
+        public Dictionary<string, List<EnterpriseManagementObjectProjectionDto>> RelatedObjects { get; set; } = new Dictionary<string, List<EnterpriseManagementObjectProjectionDto>>();
     }
 
-    public class RelatedObjects
-    {
-        public RelationShip RelationShip { get; set; }
-        public List<EnterpriseManagementObjectProjectionDto> Objects { get; set; } = new List<EnterpriseManagementObjectProjectionDto>();
-    }
+    //public class RelatedObjects
+    //{
+    //    public RelationShip RelationShip { get; set; }
+    //    public List<EnterpriseManagementObjectProjectionDto> Objects { get; set; } = new List<EnterpriseManagementObjectProjectionDto>();
+    //}
 
-    public class RelationShip
-    {
-        public string Name { get; set; }
-    }
+    //public class RelationShip
+    //{
+    //    public string Name { get; set; }
+    //}
 }

@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
+using Microsoft.EnterpriseManagement;
 using Microsoft.EnterpriseManagement.Configuration;
+using Reflectensions.ExtensionMethods;
 using ScsmClient.CriteriaParser.Binding;
 using ScsmClient.Helper;
 
@@ -17,9 +20,9 @@ namespace ScsmClient.CriteriaParser
         private ManagementPackTypeProjection _managementPackTypeProjection;
         private ValueConverter ValueConverter { get; }
 
-        private bool _baseIsTypeProjection; 
+        private bool _baseIsTypeProjection;
 
-        private List<string> _references = new List<string>();
+        private Dictionary<string, (string alias, string reference)> _references = new Dictionary<string, (string alias, string reference)>();
 
         public Evaluator(BoundExpression root, SCSMClient scsmClient)
         {
@@ -46,7 +49,7 @@ namespace ScsmClient.CriteriaParser
         {
             var expressionString = EvaluateExpression(_root);
 
-            var references = String.Join(Environment.NewLine, _references);
+            var references = String.Join(Environment.NewLine, _references.Select(r => r.Value.reference));
             var crit = $"<Criteria xmlns=\"http://Microsoft.EnterpriseManagement.Core.Criteria/\">{references}{expressionString}</Criteria>";
             return SimpleXml.Parse(crit);
         }
@@ -113,29 +116,29 @@ namespace ScsmClient.CriteriaParser
                 //case BoundBinaryOperatorKind.Multiplication:
                 //    return (int)left * (int)right;
                 //case BoundBinaryOperatorKind.Division:
-                    //return (int)left / (int)right;
+                //return (int)left / (int)right;
                 case BoundBinaryOperatorKind.LogicalAnd:
                     return Expression(And(left, right));
                 case BoundBinaryOperatorKind.LogicalOr:
                     return Expression(Or(left, right));
                 case BoundBinaryOperatorKind.Equals:
-                {
-                    if (right is NullValue)
                     {
-                        return Expression(UnaryExpression(left, "IsNull"));
+                        if (right is NullValue)
+                        {
+                            return Expression(UnaryExpression(left, "IsNull"));
+                        }
+                        return Expression(SimpleExpression(left, "Equal", right));
                     }
-                    return Expression(SimpleExpression(left, "Equal", right));
-                }
 
                 case BoundBinaryOperatorKind.NotEquals:
-                {
-                    if (right is NullValue)
                     {
-                        return Expression(UnaryExpression(left, "IsNotNull"));
+                        if (right is NullValue)
+                        {
+                            return Expression(UnaryExpression(left, "IsNotNull"));
+                        }
+                        return Expression(SimpleExpression(left, "NotEqual", right));
                     }
-                    return Expression(SimpleExpression(left, "NotEqual", right));
-                }
-                    
+
                 case BoundBinaryOperatorKind.Like:
                     return Expression(SimpleExpression(left, "Like", right));
                 case BoundBinaryOperatorKind.NotLike:
@@ -182,7 +185,7 @@ namespace ScsmClient.CriteriaParser
                     ? ValueConverter.NormalizeValueForCriteria(right, propertyElement.property)
                     : right.ToString();
             }
-            
+
 
             var expr = $"<SimpleExpression><ValueExpressionLeft>{propertyElement.path}</ValueExpressionLeft><Operator>{@operator}</Operator><ValueExpressionRight><Value>{value}</Value></ValueExpressionRight></SimpleExpression>";
             return expr;
@@ -201,95 +204,146 @@ namespace ScsmClient.CriteriaParser
             return $"<Expression>{simpleExpression}</Expression>";
         }
 
-
         private (string path, ManagementPackProperty property) BuildPropertyElement(string propertyName)
         {
-            if (propertyName.Contains("!"))
+            var regMatch = new Regex(@"^((?<type>[G|P]):)?(?<class>.+!)?(?<property>.+)?$", RegexOptions.IgnoreCase).Match(propertyName);
+            if (!regMatch.Success)
             {
-                return BuildRelationshipProperty(propertyName);
+                throw new Exception("Can't parse PropertyName!");
             }
 
-            return BuildTypeProperty(propertyName);
-        }
+            var type = regMatch.Groups["type"]?.Value?.ToNull()?.ToUpper() ?? "P";
+            var pClass = regMatch.Groups["class"]?.Value;
+            var property = regMatch.Groups["property"].Value;
 
-        private (string path, ManagementPackProperty property) BuildTypeProperty(string propertyName)
-        {
-            string prefix = "P";
-            if (propertyName.Contains(":"))
-            {
-                var spl = propertyName.Split(':');
-                prefix = spl[0];
-                propertyName = spl[1];
-            }
-
-
-            switch (prefix.ToUpper())
+            switch (type)
             {
                 case "P":
-                {
-                    var prop = FindProperty(propertyName);
-                    if (prop == null)
                     {
-                        var managementPackClass = _baseIsTypeProjection ? _managementPackTypeProjection.TargetType : _baseManagementPackClass;
-                        throw new Exception($"Can't find property '{propertyName}' for type '{managementPackClass.Name}'");
+                        StringBuilder propertyElement = new StringBuilder();
+                        propertyElement.Append("<Property>$Context");
+                        ManagementPackClass managementPackClass = null;
+                        if (!String.IsNullOrWhiteSpace(pClass))
+                        {
+                            var projectionPart = BuildProjectionPathPart(pClass);
+                            propertyElement.Append(projectionPart.path);
+                            managementPackClass = projectionPart.properyClass;
+                        }
+
+                        var propertyPart = BuildPropertyPathPart(property, managementPackClass);
+                        propertyElement.Append(propertyPart.path);
+                        propertyElement.Append("</Property>");
+                        return (propertyElement.ToString(), propertyPart.property);
                     }
-                    var managementPack = prop.GetManagementPack();
-                    var mpAlias = $"Alias_{managementPack.Name.Replace('.', '_')}";
-                    var refString =
-                        $"<Reference Id=\"{managementPack.Name}\" PublicKeyToken=\"{managementPack.KeyToken}\" Version=\"{managementPack.Version}\" Alias=\"{mpAlias}\" />";
-
-                    if (!_references.Contains(refString))
-                    {
-                        _references.Add(refString);
-                    }
-
-
-                    var value = $"$Context/Property[Type='{mpAlias}!{prop.ParentElement.Name}']/{prop.Name}$";
-
-                    return ($"<Property>{value}</Property>", prop);
-                }
                 case "G":
                     return ($"<GenericProperty>{propertyName}</GenericProperty>", null);
                 default:
-                    throw new Exception($"Prefix '{prefix}' not valid!");
+                    throw new Exception($"Prefix '{type}' not valid!");
             }
+
         }
 
-        private (string path, ManagementPackProperty property) BuildRelationshipProperty(string propertyName)
+        private (string path, ManagementPackClass properyClass) BuildProjectionPathPart(string classesPart)
         {
+            var parts = classesPart.Split('!').Select(p => p?.Trim().ToNull()).Where(p => p != null).ToList();
 
-            var splitted = propertyName.Split('!');
-            var realtionship = splitted[0];
-            propertyName = splitted[1];
+            StringBuilder relationshipPath = new StringBuilder();
+            ManagementPackClass propertyClass = null;
 
-
-            var rel =_managementPackTypeProjection.FirstOrDefault(end => end.Value.TargetType.Name == realtionship);
-
-            var managementPack = rel.Key.GetManagementPack();
-
-            var mpAlias = $"Alias_{managementPack.Name.Replace('.', '_')}";
-            var refString =
-                $"<Reference Id=\"{managementPack.Name}\" PublicKeyToken=\"{managementPack.KeyToken}\" Version=\"{managementPack.Version}\" Alias=\"{mpAlias}\" />";
-
-            if (!_references.Contains(refString))
+            for (var i = 0; i < parts.Count; i++)
             {
-                _references.Add(refString);
-            }
+                var part = parts[i];
+                var isLast = i == parts.Count -1;
 
-            string seedRole = null;
-            if (rel.Value is ManagementPackTypeProjectionComponent managementPackTypeProjectionComponent)
-            {
-                var regMatch = new Regex(@"SeedRole='(?<seedrole>.+)'", RegexOptions.IgnoreCase).Match(managementPackTypeProjectionComponent.Path);
-                if (regMatch.Success)
+                var relation = FindRelationEndpoint(_managementPackTypeProjection, part);
+                if (relation == null)
                 {
-                    seedRole = $"SeedRole='{regMatch.Groups["seedrole"]?.Value}' ";
+                    throw new Exception($"Relation for Class '{part}' not found!");
                 }
+                var rel = relation.Value;
+
+                if (isLast)
+                {
+                    propertyClass = rel.Key.Type.GetElement();
+                }
+
                 
+                var managementPack = rel.Key.GetManagementPack();
+
+                string mpAlias = null;
+                if (_references.ContainsKey(managementPack.Name))
+                {
+                    mpAlias = _references[managementPack.Name].alias;
+                }
+                else
+                {
+                    mpAlias = $"A{Guid.NewGuid():N}";
+                    var refString = $"<Reference Id=\"{managementPack.Name}\" PublicKeyToken=\"{managementPack.KeyToken}\" Version=\"{managementPack.Version}\" Alias=\"{mpAlias}\" />";
+                    _references.Add(managementPack.Name, (mpAlias, refString));
+                }
+
+                string seedRole = null;
+                if (rel.Value is ManagementPackTypeProjectionComponent managementPackTypeProjectionComponent)
+                {
+                    var regMatch = new Regex(@"SeedRole='(?<seedrole>.+)'", RegexOptions.IgnoreCase).Match(managementPackTypeProjectionComponent.Path);
+                    if (regMatch.Success)
+                    {
+                        seedRole = $"SeedRole='{regMatch.Groups["seedrole"]?.Value}' ";
+                    }
+
+                }
+
+                relationshipPath.Append($"/Path[Relationship='{mpAlias}!{rel.Key.ParentElement.Name}' {seedRole}TypeConstraint='{mpAlias}!{part}']");
+
             }
 
-            var path = $"<Property>$Context/Path[Relationship='{mpAlias}!{rel.Key.ParentElement.Name}' {seedRole}TypeConstraint='{mpAlias}!{realtionship}']/Property[Type='{mpAlias}!{realtionship}']/{propertyName}$</Property>";
-            return (path, null);
+            return (relationshipPath.ToString(), propertyClass);
+        }
 
+        private (string path, ManagementPackProperty property) BuildPropertyPathPart(string propertyName, ManagementPackClass managementPackClass)
+        {
+            managementPackClass = managementPackClass ?? (_baseIsTypeProjection ? _managementPackTypeProjection.TargetType : _baseManagementPackClass);
+
+            var prop = FindProperty(propertyName, managementPackClass);
+            if (prop == null)
+            {
+                throw new Exception($"Can't find property '{propertyName}' for type '{managementPackClass.Name}'");
+            }
+            var managementPack = prop.GetManagementPack();
+            string mpAlias = null;
+            if (_references.ContainsKey(managementPack.Name))
+            {
+                mpAlias = _references[managementPack.Name].alias;
+            }
+            else
+            {
+                mpAlias = $"A{Guid.NewGuid():N}";
+                var refString = $"<Reference Id=\"{managementPack.Name}\" PublicKeyToken=\"{managementPack.KeyToken}\" Version=\"{managementPack.Version}\" Alias=\"{mpAlias}\" />";
+                _references.Add(managementPack.Name, (mpAlias, refString));
+            }
+
+            var value = $"/Property[Type='{mpAlias}!{prop.ParentElement.Name}']/{prop.Name}$";
+
+            return (value, prop);
+        }
+
+        private KeyValuePair<ManagementPackRelationshipEndpoint, ITypeProjectionComponent>? FindRelationEndpoint(ITypeProjectionComponent managementPackTypeProjection, string relationClass)
+        {
+            foreach (var keyValuePair in managementPackTypeProjection)
+            {
+                if (keyValuePair.Value.TargetType.Name == relationClass)
+                {
+                    return keyValuePair;
+                }
+
+                var found = FindRelationEndpoint(keyValuePair.Value, relationClass);
+                if (found != null)
+                {
+                    return found;
+                }
+
+            }
+            return null;
         }
 
 
@@ -305,7 +359,7 @@ namespace ScsmClient.CriteriaParser
                 managementPackClass = FindParentClass(className, managementPackClass);
             }
 
-            
+
             var prop = managementPackClass.PropertyCollection.FirstOrDefault(p =>
                     p.Name.Equals(propertyName, StringComparison.Ordinal)) ??
                 managementPackClass.PropertyCollection.FirstOrDefault(p =>
@@ -323,8 +377,8 @@ namespace ScsmClient.CriteriaParser
             }
 
             return null;
-            
-            
+
+
         }
 
         private ManagementPackClass FindParentClass(string className, ManagementPackClass currentClass)
@@ -344,24 +398,8 @@ namespace ScsmClient.CriteriaParser
             return parent == null ? null : FindParentClass(className, parent);
         }
 
-
-        //private string PrepareElementValue(object value, ManagementPackProperty property)
-        //{
-        //    if (property == null)
-        //    {
-        //        return value.ToString();
-        //    }
-
-        //    switch (property.Type)
-        //    {
-        //        case ManagementPackEntityPropertyTypes.@enum:
-        //        {
-
-        //        }
-        //    }
-        //}
     }
 
 
-   
+
 }
