@@ -212,8 +212,8 @@ namespace ScsmClientTestCmd
             //    scsmClient.ManagementGroup.EntityTypes.GetChildEnumerations(p.EnumType.Id, TraversalDepth.Recursive)).ToList();
 
 
-            //var accs = scsmClient.TypeProjection()
-            //    .GetObjectProjectionObjects("BMI.Account.Projection", "", null).ToList();
+            var accs = scsmClient.TypeProjection()
+                .GetObjectProjectionObjects("BMI.Account.Projection", "Username -like 'windis0%'", null).ToList();
 
             //var objs = scsmClient.TypeProjection()
             //    .GetObjectProjectionObjects("BMI.Account.Projection", "BMI.Benutzer!Type -like 'stamm%'", null).ToList();
@@ -224,9 +224,18 @@ namespace ScsmClientTestCmd
             //var org = scsmClient.Object().GetObjectsByClassName("BMI.Organisationseinheit", "OKZ -like '%Polizei%'")
             //    .FirstOrDefault();
 
-            var pers = scsmClient.TypeProjection().GetObjectProjectionObjects("BMI.PErson.Projection", "vorname -eq 'Bernhard-r4'")
-                .FirstOrDefault();
+            var pers = scsmClient.TypeProjection()
+                .GetObjectProjectionObjects("BMI.PErson.Projection", "vorname -like 'Bernhard%' -and Nachname -like 'Wind%'",null, 1).ToList();
 
+            var per = pers.Where(p => p.ContainsKey("!BMI.Account")).ToList();
+
+            
+            
+            var bmiAccount = per[0].GetValue<List<ScsmObject>>("!BMI.Account");
+            
+
+            var json = Json.Converter.ToJson(per[1], true);
+            Console.WriteLine(json);
         }
 
         static void Main1(string[] args)

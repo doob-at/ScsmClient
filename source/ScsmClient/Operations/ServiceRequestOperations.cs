@@ -21,7 +21,7 @@ namespace ScsmClient.Operations
         public ServiceRequestDto GetByGenericId(Guid id)
         {
             var entObj = _client.Object().GetObjectById(id);
-            return new ServiceRequestDto(entObj.Values);
+            return new ServiceRequestDto(entObj);
         }
 
         public ServiceRequestDto GetById(string id)
@@ -32,7 +32,7 @@ namespace ScsmClient.Operations
         public List<ServiceRequestDto> GetByCriteria(string criteria, int? maxResults = null)
         {
             var srObjs = _client.TypeProjection().GetObjectProjectionObjects(WellKnown.ServiceRequest.ProjectionType, criteria, maxResults).ToList();
-            return srObjs.Select(e => new ServiceRequestDto(e.Values)).ToList();
+            return srObjs.Select(e => new ServiceRequestDto(e)).ToList();
         }
 
         public Guid Create(ServiceRequestDto serviceReuest)

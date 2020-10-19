@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Expandable;
 
 namespace ScsmClient.SharedModels.Models
 {
@@ -20,10 +21,17 @@ namespace ScsmClient.SharedModels.Models
         public Dictionary<string, object> Values { get; set; }
     }
 
-    public class EnterpriseManagementObjectProjectionDto: EnterpriseManagementObjectDto
+    public class ScsmObject : ExpandableObject
     {
-        public Dictionary<string, List<EnterpriseManagementObjectProjectionDto>> RelatedObjects { get; set; } = new Dictionary<string, List<EnterpriseManagementObjectProjectionDto>>();
+        public Guid ObjectId { get; set; }
+        public DateTime LastModified { get; set; }
+        public DateTime TimeAdded { get; set; }
     }
+
+    //public class EnterpriseManagementObjectProjectionDto: EnterpriseManagementObjectDto
+    //{
+    //    public Dictionary<string, List<EnterpriseManagementObjectProjectionDto>> RelatedObjects { get; set; } = new Dictionary<string, List<EnterpriseManagementObjectProjectionDto>>();
+    //}
 
     //public class RelatedObjects
     //{

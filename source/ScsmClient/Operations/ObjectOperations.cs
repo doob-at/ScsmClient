@@ -39,24 +39,24 @@ namespace ScsmClient.Operations
             return _client.ManagementGroup.EntityObjects.GetObject<EnterpriseManagementObject>(id, critOptions);
         }
 
-        public EnterpriseManagementObjectDto GetObjectById(Guid id)
+        public ScsmObject GetObjectById(Guid id)
         {
-            return GetEnterpriseManagementObjectById(id).ToObjectDto();
+            return GetEnterpriseManagementObjectById(id).ToScsmObject();
         }
 
-        public IEnumerable<EnterpriseManagementObjectDto> GetObjectsByClassName(string className, string criteria, int? maxResult = null)
+        public IEnumerable<ScsmObject> GetObjectsByClassName(string className, string criteria, int? maxResult = null)
         {
             var objectClass = _client.Class().GetClassByName(className);
             return GetObjectsByClass(objectClass, criteria, maxResult);
         }
 
-        public IEnumerable<EnterpriseManagementObjectDto> GetObjectsByClassId(Guid classId, string criteria, int? maxResult = null)
+        public IEnumerable<ScsmObject> GetObjectsByClassId(Guid classId, string criteria, int? maxResult = null)
         {
             var objectClass = _client.Class().GetClassById(classId);
             return GetObjectsByClass(objectClass, criteria, maxResult);
         }
 
-        public IEnumerable<EnterpriseManagementObjectDto> GetObjectsByClass(ManagementPackClass objectClass, string criteria, int? maxResult = null)
+        public IEnumerable<ScsmObject> GetObjectsByClass(ManagementPackClass objectClass, string criteria, int? maxResult = null)
         {
 
 
@@ -77,7 +77,7 @@ namespace ScsmClient.Operations
             {
                 if (count == critOptions.MaxResultCount)
                     break;
-                yield return enterpriseManagementObject.ToObjectDto();
+                yield return enterpriseManagementObject.ToScsmObject();
             }
 
         }
@@ -149,9 +149,9 @@ namespace ScsmClient.Operations
             {
                 var name = kv.Key;
                 var value = kv.Value;
-                if (name.StartsWith("!") || name.EndsWith("!"))
+                if (name.StartsWith("!"))
                 {
-                    var className = name.Trim('!');
+                    var className = name.Substring(1);
 
                     if (!value.GetType().IsEnumerableType(false))
                     {

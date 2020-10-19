@@ -34,10 +34,14 @@ namespace ScsmClient.SharedModels.Models
 
         }
 
-        public WorkItemDto(IDictionary<string, object> dictionary): base(dictionary)
+        public WorkItemDto(IDictionary<string, object> dictionary) : base(dictionary)
         {
-            
+
         }
 
+        public WorkItemDto(ExpandableObject expandableObject) : base(expandableObject)
+        {
+
+        }
     }
 }

@@ -19,5 +19,10 @@ namespace ScsmClient.SharedModels.Models
         {
            
         }
+
+        public IncidentDto(ExpandableObject expandableObject) : base(expandableObject)
+        {
+
+        }
     }
 }

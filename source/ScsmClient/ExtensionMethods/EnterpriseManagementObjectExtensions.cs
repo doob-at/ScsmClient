@@ -9,39 +9,120 @@ namespace ScsmClient.ExtensionMethods
     public static class EnterpriseManagementObjectExtensions
     {
 
-        public static EnterpriseManagementObjectProjectionDto ToObjectProjectionDto(this IComposableProjection composableProjection, int? levels = null)
+        //public static EnterpriseManagementObjectDto ToObjectProjectionDto(this IComposableProjection composableProjection, int? levels = null)
+        //{
+        //    var dto = new EnterpriseManagementObjectDto
+        //    {
+        //        Id = composableProjection.Object.Id,
+        //        Name = composableProjection.Object.Name,
+        //        Path = composableProjection.Object.Path,
+        //        DisplayName = composableProjection.Object.DisplayName,
+        //        FullName = composableProjection.Object.FullName,
+        //        ManagementPackClassIds = composableProjection.Object.ManagementPackClassIds.ToList(),
+        //        LeastDerivedNonAbstractManagementPackClassId =
+        //           composableProjection.Object.LeastDerivedNonAbstractManagementPackClassId,
+        //        TimeAdded = composableProjection.Object.TimeAdded,
+        //        LastModifiedBy = composableProjection.Object.LastModifiedBy,
+        //        LastModified = composableProjection.Object.LastModified
+        //    };
+
+        //    var valuesDict = new Dictionary<string, object>();
+        //    foreach (var enterpriseManagementSimpleObject in composableProjection.Object.Values)
+        //    {
+        //        var value = enterpriseManagementSimpleObject.Value;
+        //        if (value is ManagementPackEnumeration en)
+        //        {
+        //            value = en.DisplayName;
+        //        }
+
+        //        if (!valuesDict.ContainsKey(enterpriseManagementSimpleObject.Type.Name))
+        //        {
+        //            valuesDict.Add(enterpriseManagementSimpleObject.Type.Name, value);
+        //        }
+        //    }
+
+        //    dto.Values = valuesDict;
+
+        //    if (levels.HasValue)
+        //    {
+        //        if (levels.Value <= 0)
+        //        {
+        //            return dto;
+        //        }
+
+        //        levels--;
+        //    }
+
+        //    Dictionary<string, List<EnterpriseManagementObjectDto>> related = new Dictionary<string, List<EnterpriseManagementObjectDto>>();
+
+        //    foreach (var keyValuePair in composableProjection)
+        //    {
+        //        var name = keyValuePair.Value.Object.GetClasses(BaseClassTraversalDepth.None).First().Name;
+        //        if (!related.ContainsKey(name))
+        //        {
+        //            related.Add(name, new List<EnterpriseManagementObjectDto>());
+        //        }
+
+        //        var relatedValue = ToObjectProjectionDto(keyValuePair.Value, levels);
+        //        related[name].Add(relatedValue);
+        //    }
+            
+        //    foreach (var pair in related)
+        //    {
+        //        dto.Values[$"!{pair.Key}"] = pair.Value;
+        //    }
+
+        //    return dto;
+        //}
+
+        //public static EnterpriseManagementObjectDto ToObjectDto(this EnterpriseManagementObject enterpriseManagementObject)
+        //{
+        //    var dto = new EnterpriseManagementObjectDto
+        //    {
+        //        Id = enterpriseManagementObject.Id,
+        //        Name = enterpriseManagementObject.Name,
+        //        Path = enterpriseManagementObject.Path,
+        //        DisplayName = enterpriseManagementObject.DisplayName,
+        //        FullName = enterpriseManagementObject.FullName,
+        //        ManagementPackClassIds = enterpriseManagementObject.ManagementPackClassIds.ToList(),
+        //        LeastDerivedNonAbstractManagementPackClassId =
+        //            enterpriseManagementObject.LeastDerivedNonAbstractManagementPackClassId,
+        //        TimeAdded = enterpriseManagementObject.TimeAdded,
+        //        LastModifiedBy = enterpriseManagementObject.LastModifiedBy,
+        //        LastModified = enterpriseManagementObject.LastModified
+        //    };
+
+        //    var valuesDict = new Dictionary<string, object>();
+        //    foreach (var enterpriseManagementSimpleObject in enterpriseManagementObject.Values)
+        //    {
+        //        var value = enterpriseManagementSimpleObject.Value;
+        //        if (value is ManagementPackEnumeration en)
+        //        {
+        //            value = en.DisplayName;
+        //        }
+
+        //        if (!valuesDict.ContainsKey(enterpriseManagementSimpleObject.Type.Name))
+        //        {
+        //            valuesDict.Add(enterpriseManagementSimpleObject.Type.Name, value);
+        //        }
+        //    }
+
+        //    dto.Values = valuesDict;
+
+        //    return dto;
+        //}
+
+        
+        public static ScsmObject ToScsmObject(this IComposableProjection composableProjection, int? levels = null)
         {
-            var dto = new EnterpriseManagementObjectProjectionDto
+            var dto = new ScsmObject()
             {
-                Id = composableProjection.Object.Id,
-                Name = composableProjection.Object.Name,
-                Path = composableProjection.Object.Path,
-                DisplayName = composableProjection.Object.DisplayName,
-                FullName = composableProjection.Object.FullName,
-                ManagementPackClassIds = composableProjection.Object.ManagementPackClassIds.ToList(),
-                LeastDerivedNonAbstractManagementPackClassId =
-                   composableProjection.Object.LeastDerivedNonAbstractManagementPackClassId,
+                ObjectId = composableProjection.Object.Id,
                 TimeAdded = composableProjection.Object.TimeAdded,
-                LastModifiedBy = composableProjection.Object.LastModifiedBy,
                 LastModified = composableProjection.Object.LastModified
             };
 
-            var valuesDict = new Dictionary<string, object>();
-            foreach (var enterpriseManagementSimpleObject in composableProjection.Object.Values)
-            {
-                var value = enterpriseManagementSimpleObject.Value;
-                if (value is ManagementPackEnumeration en)
-                {
-                    value = en.DisplayName;
-                }
-
-                if (!valuesDict.ContainsKey(enterpriseManagementSimpleObject.Type.Name))
-                {
-                    valuesDict.Add(enterpriseManagementSimpleObject.Type.Name, value);
-                }
-            }
-
-            dto.Values = valuesDict;
+            dto.SetEnterpriseManagementSimpleObjectValues(composableProjection.Object.Values);
 
             if (levels.HasValue)
             {
@@ -53,44 +134,45 @@ namespace ScsmClient.ExtensionMethods
                 levels--;
             }
 
-            Dictionary<string, List<EnterpriseManagementObjectProjectionDto>> related = new Dictionary<string, List<EnterpriseManagementObjectProjectionDto>>();
+            Dictionary<string, List<ScsmObject>> related = new Dictionary<string, List<ScsmObject>>();
 
             foreach (var keyValuePair in composableProjection)
             {
-                var name = keyValuePair.Value.Object.GetClasses(BaseClassTraversalDepth.None).First().Name;
+                var name = keyValuePair.Value.Object.GetBaseClassName();
                 if (!related.ContainsKey(name))
                 {
-                    related.Add(name, new List<EnterpriseManagementObjectProjectionDto>());
+                    related.Add(name, new List<ScsmObject>());
                 }
 
-                var relatedValue = ToObjectProjectionDto(keyValuePair.Value, levels);
+                var relatedValue = ToScsmObject(keyValuePair.Value, levels);
                 related[name].Add(relatedValue);
             }
 
-            dto.RelatedObjects = related;
+            foreach (var pair in related)
+            {
+                dto[$"!{pair.Key}"] = pair.Value;
+            }
 
             return dto;
         }
 
-        public static EnterpriseManagementObjectDto ToObjectDto(this EnterpriseManagementObject enterpriseManagementObject)
+        public static ScsmObject ToScsmObject(this EnterpriseManagementObject enterpriseManagementObject)
         {
-            var dto = new EnterpriseManagementObjectDto
+            var dto = new ScsmObject()
             {
-                Id = enterpriseManagementObject.Id,
-                Name = enterpriseManagementObject.Name,
-                Path = enterpriseManagementObject.Path,
-                DisplayName = enterpriseManagementObject.DisplayName,
-                FullName = enterpriseManagementObject.FullName,
-                ManagementPackClassIds = enterpriseManagementObject.ManagementPackClassIds.ToList(),
-                LeastDerivedNonAbstractManagementPackClassId =
-                    enterpriseManagementObject.LeastDerivedNonAbstractManagementPackClassId,
+                ObjectId = enterpriseManagementObject.Id,
                 TimeAdded = enterpriseManagementObject.TimeAdded,
-                LastModifiedBy = enterpriseManagementObject.LastModifiedBy,
                 LastModified = enterpriseManagementObject.LastModified
             };
+            
+            dto.SetEnterpriseManagementSimpleObjectValues(enterpriseManagementObject.Values);
 
-            var valuesDict = new Dictionary<string, object>();
-            foreach (var enterpriseManagementSimpleObject in enterpriseManagementObject.Values)
+            return dto;
+        }
+
+        private static ScsmObject SetEnterpriseManagementSimpleObjectValues(this ScsmObject scsmObject, IList<EnterpriseManagementSimpleObject> simpleObjects)
+        {
+            foreach (var enterpriseManagementSimpleObject in simpleObjects)
             {
                 var value = enterpriseManagementSimpleObject.Value;
                 if (value is ManagementPackEnumeration en)
@@ -98,15 +180,24 @@ namespace ScsmClient.ExtensionMethods
                     value = en.DisplayName;
                 }
 
-                if (!valuesDict.ContainsKey(enterpriseManagementSimpleObject.Type.Name))
+                if (!scsmObject.ContainsKey(enterpriseManagementSimpleObject.Type.Name))
                 {
-                    valuesDict.Add(enterpriseManagementSimpleObject.Type.Name, value);
+                    scsmObject[enterpriseManagementSimpleObject.Type.Name] = value;
                 }
             }
 
-            dto.Values = valuesDict;
+            return scsmObject;
+        }
 
-            return dto;
+
+        public static ManagementPackClass GetBaseClass(this EnterpriseManagementObject enterpriseManagementObject)
+        {
+            return enterpriseManagementObject.GetClasses(BaseClassTraversalDepth.None).First();
+        }
+
+        public static string GetBaseClassName(this EnterpriseManagementObject enterpriseManagementObject)
+        {
+            return enterpriseManagementObject.GetBaseClass().Name;
         }
     }
 }

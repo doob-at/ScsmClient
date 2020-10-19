@@ -28,9 +28,14 @@ namespace ScsmClient.SharedModels.Models
 
         }
 
-        public ChangeRequestDto(IDictionary<string, object> dictionary): base(dictionary)
+        public ChangeRequestDto(IDictionary<string, object> dictionary) : base(dictionary)
         {
-            
+
+        }
+
+        public ChangeRequestDto(ExpandableObject expandableObject) : base(expandableObject)
+        {
+
         }
     }
 }

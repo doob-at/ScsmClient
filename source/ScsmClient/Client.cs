@@ -47,13 +47,15 @@ namespace ScsmClient
         {
 
             var settings = new EnterpriseManagementConnectionSettings(ServerName);
-
+            
             if (Credential != null)
             {
                 settings.UserName = Credential.UserName;
                 settings.Domain = Credential.Domain;
                 settings.Password = Credential.SecurePassword;
             }
+
+            
             
 
             ManagementGroup = new EnterpriseManagementGroup(settings);

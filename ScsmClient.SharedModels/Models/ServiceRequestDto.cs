@@ -27,5 +27,10 @@ namespace ScsmClient.SharedModels.Models
         {
             
         }
+
+        public ServiceRequestDto(ExpandableObject expandableObject) : base(expandableObject)
+        {
+
+        }
     }
 }
