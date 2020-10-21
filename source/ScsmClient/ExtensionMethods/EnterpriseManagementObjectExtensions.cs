@@ -150,7 +150,7 @@ namespace ScsmClient.ExtensionMethods
 
             foreach (var pair in related)
             {
-                dto[$"!{pair.Key}"] = pair.Value;
+                dto[$"{pair.Key}!"] = pair.Value;
             }
 
             return dto;

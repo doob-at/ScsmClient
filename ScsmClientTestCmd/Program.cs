@@ -102,7 +102,7 @@ namespace ScsmClientTestCmd
             ben1["GiltAb"] = new DateTime(2020, 11, 1);
             ben1["GiltBis"] = new DateTime(2020,12,31);
 
-            acc1["!BMI.Benutzer.Stammportal"] = ben1;
+            acc1["BMI.Benutzer.Stammportal!"] = ben1;
 
             var acc2 = new Dictionary<string, object>();
             acc2["Username"] = "windis02";
@@ -110,10 +110,11 @@ namespace ScsmClientTestCmd
             acc2["Beschreibung"] = "Nested Account";
 
             var ben2 = new Dictionary<string, object>();
-            ben2["Type"] = "Stammportal";
+            ben2["~type"] = "BMI.Benutzer.Stammportal";
+            ben2["Type"] = "Stammportal2";
             ben2["GiltAb"] = new DateTime(2021, 1, 1);
             ben2["GiltBis"] = new DateTime(2021, 12, 31);
-            acc2["!BMI.Benutzer.Stammportal"] = ben2;
+            acc2["BMI.Benutzer!"] = ben2;
 
 
 
@@ -123,12 +124,15 @@ namespace ScsmClientTestCmd
                 acc2
             };
 
-            person["!BMI.Organisationseinheit"] = "852c1c92-6b09-a7ea-7ad4-09b2f2801d4f";
+            person["BMI.Organisationseinheit!OKZ"] = "BMI-PI_S_ZELL_SEE";
 
             //var relClasses = scsmClient.Relations().FindRelationShip("BMI.Person", "BMI.Account");
 
-            return scsmClient.Object().CreateObjectByClassName("BMI.Person", person);
+            var newP = scsmClient.Object().CreateObjectByClassName("BMI.Person", person);
 
+            var nP = scsmClient.Object().GetObjectById(newP);
+
+            return newP;
         }
 
         static Guid CreateAccount(ScsmClient.SCSMClient scsmClient)
@@ -212,8 +216,8 @@ namespace ScsmClientTestCmd
             //    scsmClient.ManagementGroup.EntityTypes.GetChildEnumerations(p.EnumType.Id, TraversalDepth.Recursive)).ToList();
 
 
-            var accs = scsmClient.TypeProjection()
-                .GetObjectProjectionObjects("BMI.Account.Projection", "Username -like 'windis0%'", null).ToList();
+            //var accs = scsmClient.TypeProjection()
+            //    .GetObjectProjectionObjects("BMI.Account.Projection", "Username -like 'windis0%'", null).ToList();
 
             //var objs = scsmClient.TypeProjection()
             //    .GetObjectProjectionObjects("BMI.Account.Projection", "BMI.Benutzer!Type -like 'stamm%'", null).ToList();
@@ -221,21 +225,20 @@ namespace ScsmClientTestCmd
             //var bens = scsmClient.TypeProjection()
             //    .GetObjectProjectionObjects("BMI.Benutzer.Projection", "Type -like 'stamm%'", null).ToList();
 
-            //var org = scsmClient.Object().GetObjectsByClassName("BMI.Organisationseinheit", "OKZ -like '%Polizei%'")
-            //    .FirstOrDefault();
+            var org = scsmClient.Object().GetObjectsByClassName("BMI.Organisationseinheit", "Name -like '%Polizei%'", 1).ToList();
 
             var pers = scsmClient.TypeProjection()
-                .GetObjectProjectionObjects("BMI.PErson.Projection", "vorname -like 'Bernhard%' -and Nachname -like 'Wind%'",null, 1).ToList();
+                .GetObjectProjectionObjects("BMI.PErson.Projection", "vorname -like 'Bernhard%' -and Nachname -like 'Wind%'",1, 1).ToList();
 
-            var per = pers.Where(p => p.ContainsKey("!BMI.Account")).ToList();
+            //var per = pers.Where(p => p.ContainsKey("!BMI.Account")).ToList();
 
-            
-            
-            var bmiAccount = per[0].GetValue<List<ScsmObject>>("!BMI.Account");
-            
 
-            var json = Json.Converter.ToJson(per[1], true);
-            Console.WriteLine(json);
+
+            //var bmiAccount = per[0].GetValue<List<ScsmObject>>("!BMI.Account");
+
+
+            //var json = Json.Converter.ToJson(per[1], true);
+            //Console.WriteLine(json);
         }
 
         static void Main1(string[] args)

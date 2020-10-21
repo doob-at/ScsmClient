@@ -79,18 +79,21 @@ namespace ScsmClient.Operations
             var crit = _client.Criteria().BuildObjectProjectionCriteria(criteria, typeProjection);
 
             var critOptions = new ObjectQueryOptions();
+
             critOptions.DefaultPropertyRetrievalBehavior = ObjectPropertyRetrievalBehavior.All;
-            critOptions.ObjectRetrievalMode = ObjectRetrievalOptions.NonBuffered;
-            critOptions.MaxResultCount = maxResult ?? Int32.MaxValue;
-            
+            if (maxResult.HasValue && maxResult.Value != int.MaxValue)
+            {
+                critOptions.MaxResultCount = maxResult.Value;
+                critOptions.ObjectRetrievalMode = ObjectRetrievalOptions.Buffered;
+            }
+            //var sortprop = new EnterpriseManagementObjectGenericProperty(EnterpriseManagementObjectGenericPropertyName.TimeAdded);
+            var sortCrit = _client.Criteria().CreateSortCriteriaXmlFrom("-G:TimeAdded", typeProjection);
+            critOptions.AddSortProperty(sortCrit, typeProjection, _client.ManagementGroup);
+
             var reader = GetObjectProjectionReader(crit, critOptions);
-            var count = 0;
+           
             foreach (var enterpriseManagementObjectProjection in reader)
             {
-                if (count == critOptions.MaxResultCount)
-                    break;
-
-                
                 yield return enterpriseManagementObjectProjection.ToScsmObject(levels);
             }
 
