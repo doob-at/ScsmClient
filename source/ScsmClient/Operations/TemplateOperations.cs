@@ -13,7 +13,10 @@ namespace ScsmClient.Operations
         {
         }
 
-
+        public ManagementPackObjectTemplate GetObjectTemplateById(Guid id)
+        {
+            return _client.ManagementGroup.Templates.GetObjectTemplate(id);
+        }
         public ManagementPackObjectTemplate GetObjectTemplateByName(string templateName)
         {
 

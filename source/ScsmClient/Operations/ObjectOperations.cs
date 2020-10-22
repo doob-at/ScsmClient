@@ -100,146 +100,10 @@ namespace ScsmClient.Operations
 
         public Guid CreateObjectByClass(ManagementPackClass objectClass, Dictionary<string, object> properties)
         {
-
-            var obj = buildCreatableEnterpriseManagementObject(objectClass, properties);
-
-            var idd = new IncrementalDiscoveryData();
-
-            var rootId = AddIncremental(obj, ref idd);
-
-            idd.Commit(_client.ManagementGroup);
-
-            return rootId;
-
+            return CreateObjectsByClass(objectClass, new[] {properties}, CancellationToken.None).FirstOrDefault().Value;
         }
 
-        private Guid AddIncremental(CreatableEnterpriseManagementObjectWithRelations obj, ref IncrementalDiscoveryData incrementalDiscoveryData)
-        {
-            incrementalDiscoveryData.Add(obj.CreatableEnterpriseManagementObject);
-            if (obj.RelatedObjects != null)
-            {
-                foreach (var child in obj.RelatedObjects)
-                {
-
-                    AddIncremental(child, ref incrementalDiscoveryData);
-                    incrementalDiscoveryData.Add(_client.Relations().buildCreatableEnterpriseManagementRelationshipObject(
-                        obj.CreatableEnterpriseManagementObject, child.CreatableEnterpriseManagementObject));
-                }
-            }
-
-            return obj.CreatableEnterpriseManagementObject.Id;
-        }
-
-        private CreatableEnterpriseManagementObjectWithRelations buildCreatableEnterpriseManagementObject(
-            string className, Dictionary<string, object> properties)
-        {
-            var objectClass = _client.Types().GetClassByName(className);
-            return buildCreatableEnterpriseManagementObject(objectClass, properties);
-        }
-
-        private CreatableEnterpriseManagementObjectWithRelations buildCreatableEnterpriseManagementObject(
-            ManagementPackClass objectClass, Dictionary<string, object> properties)
-        {
-
-            
-            var objectProperties = GetObjectPropertyDictionary(objectClass);
-            var normalizer = new ValueConverter(_client);
-
-            var obj = new CreatableEnterpriseManagementObject(_client.ManagementGroup, objectClass);
-            var result = new CreatableEnterpriseManagementObjectWithRelations(obj);
-
-            foreach (var kv in properties)
-            {
-                var name = kv.Key;
-                var value = kv.Value;
-                if (name.Contains("!"))
-                {
-
-                    if(value == null)
-                        continue;
-
-                    string className = null;
-                    string propertyName = null;
-
-                    var splittedName = name.Split("!".ToCharArray(), 2);
-                    className = splittedName[0];
-                    if (splittedName.Length > 1)
-                    {
-                        propertyName = splittedName[1]?.Trim().ToNull();
-                    }
-                    
-                    if (!value.GetType().IsEnumerableType(false))
-                    {
-                        value = new List<object>{value};
-                    } 
-
-                    if (value.GetType().IsEnumerableType(false))
-                    {
-                        var enu = value as IEnumerable;
-
-                        foreach (var o in enu)
-                        {
-                            var oVal = o;
-                            var itemClassName = className;
-                            
-                            if (!String.IsNullOrWhiteSpace(propertyName))
-                            {
-                                var foundobj = GetEnterpriseManagementObjectsByClassName(itemClassName, $"{propertyName} -eq '{oVal}'", 1).FirstOrDefault();
-                                if (foundobj != null)
-                                {
-                                    var related = new CreatableEnterpriseManagementObjectWithRelations(foundobj);
-                                    result.AddRelatedObject(related);
-                                    
-                                }
-                                continue;
-                            }
-
-                            switch (oVal)
-                            {
-                                case Dictionary<string, object> dict:
-                                {
-                                    if (dict.ContainsKey("~type"))
-                                    {
-                                        itemClassName = dict["~type"].ToString();
-                                    }
-
-                                    result.AddRelatedObject(buildCreatableEnterpriseManagementObject(itemClassName, dict));
-                                    break;
-                                }
-                                case Guid guid:
-                                {
-                                    var existingObject = GetEnterpriseManagementObjectById(guid);
-                                    var related = new CreatableEnterpriseManagementObjectWithRelations(existingObject);
-                                    result.AddRelatedObject(related);
-                                    break;
-                                }
-                                case string str:
-                                {
-                                    var g = str.ToGuid();
-                                    var existingObject = GetEnterpriseManagementObjectById(g);
-                                    var related = new CreatableEnterpriseManagementObjectWithRelations(existingObject);
-                                    result.AddRelatedObject(related);
-                                    break;
-                                }
-                            }
-
-                        }
-                    }
-                    
-                    
-                    
-                }
-
-                if (objectProperties.TryGetValue(name, out var prop))
-                {
-                    var val = normalizer.NormalizeValue(kv.Value, prop);
-                    obj[objectClass, name].Value = val;
-                }
-            }
-
-            return result;
-        }
-
+       
         public Dictionary<int, Guid> CreateObjectsByClassId(Guid id, IEnumerable<Dictionary<string, object>> objects, CancellationToken cancellationToken = default)
         {
 
@@ -258,9 +122,6 @@ namespace ScsmClient.Operations
         {
 
             var result = new Dictionary<int, Guid>();
-            var objectProperties = GetObjectPropertyDictionary(objectClass);
-            var normalizer = new ValueConverter(_client);
-
             var groups = GroupIn10(objects);
 
             var index = 0;
@@ -290,6 +151,12 @@ namespace ScsmClient.Operations
         }
 
 
+        public Guid CreateObjectFromTemplateId(Guid id, Dictionary<string, object> properties)
+        {
+
+            var template = _client.Template().GetObjectTemplateById(id);
+            return CreateObjectFromTemplate(template, properties);
+        }
 
         public Guid CreateObjectFromTemplateName(string templateName, Dictionary<string, object> properties)
         {
@@ -301,34 +168,15 @@ namespace ScsmClient.Operations
         public Guid CreateObjectFromTemplate(ManagementPackObjectTemplate template, Dictionary<string, object> properties)
         {
 
-            var obj = new EnterpriseManagementObjectProjection(_client.ManagementGroup, template);
-            var normalizer = new ValueConverter(_client);
-
-            var elem = template.TypeID.GetElement();
-            if (elem is ManagementPackTypeProjection managementPackTypeProjection)
-            {
-                var objectProperties = GetObjectPropertyDictionary(managementPackTypeProjection.TargetType);
-                foreach (var kv in properties)
-                {
-                    if (objectProperties.TryGetValue(kv.Key, out var prop))
-                    {
-                        var val = normalizer.NormalizeValue(kv.Value, prop);
-                        obj.Object[managementPackTypeProjection.TargetType, kv.Key].Value = val;
-                    }
-                }
-
-                obj.Commit();
-
-                return obj.Object.Id;
-            }
-            else
-            {
-                throw new Exception($"Template '{template.DisplayName}' is invalid!");
-            }
-
-
+            return CreateObjectsFromTemplate(template, new[] {properties}, CancellationToken.None).First().Value;
         }
 
+        public Dictionary<int, Guid> CreateObjectsFromTemplateId(Guid id, IEnumerable<Dictionary<string, object>> objects, CancellationToken cancellationToken = default)
+        {
+
+            var template = _client.Template().GetObjectTemplateById(id);
+            return CreateObjectsFromTemplate(template, objects, cancellationToken);
+        }
 
         public Dictionary<int, Guid> CreateObjectsFromTemplateName(string templateName, IEnumerable<Dictionary<string, object>> objects, CancellationToken cancellationToken = default)
         {
@@ -359,8 +207,10 @@ namespace ScsmClient.Operations
 
                 var _list = new List<Guid>();
                 var idd = new IncrementalDiscoveryData();
+                
                 foreach (var dictionary in enumerable)
                 {
+                    
                     var obj = new EnterpriseManagementObjectProjection(_client.ManagementGroup, template);
                     var objectProperties = GetObjectPropertyDictionary(managementPackTypeProjection.TargetType);
                     foreach (var kv in dictionary)
@@ -385,6 +235,7 @@ namespace ScsmClient.Operations
             return result;
 
         }
+
 
 
         private Dictionary<string, ManagementPackProperty> GetObjectPropertyDictionary(ManagementPackClass objectClass)
@@ -421,5 +272,133 @@ namespace ScsmClient.Operations
 
             return groups;
         }
+
+        private Guid AddIncremental(CreatableEnterpriseManagementObjectWithRelations obj, ref IncrementalDiscoveryData incrementalDiscoveryData)
+        {
+            incrementalDiscoveryData.Add(obj.CreatableEnterpriseManagementObject);
+            if (obj.RelatedObjects != null)
+            {
+                foreach (var child in obj.RelatedObjects)
+                {
+
+                    AddIncremental(child, ref incrementalDiscoveryData);
+                    incrementalDiscoveryData.Add(_client.Relations().buildCreatableEnterpriseManagementRelationshipObject(
+                        obj.CreatableEnterpriseManagementObject, child.CreatableEnterpriseManagementObject));
+                }
+            }
+
+            return obj.CreatableEnterpriseManagementObject.Id;
+        }
+
+        private CreatableEnterpriseManagementObjectWithRelations buildCreatableEnterpriseManagementObject(
+            string className, Dictionary<string, object> properties)
+        {
+            var objectClass = _client.Types().GetClassByName(className);
+            return buildCreatableEnterpriseManagementObject(objectClass, properties);
+        }
+
+        private CreatableEnterpriseManagementObjectWithRelations buildCreatableEnterpriseManagementObject(
+            ManagementPackClass objectClass, Dictionary<string, object> properties)
+        {
+
+
+            var objectProperties = GetObjectPropertyDictionary(objectClass);
+            var normalizer = new ValueConverter(_client);
+
+            var obj = new CreatableEnterpriseManagementObject(_client.ManagementGroup, objectClass);
+            var result = new CreatableEnterpriseManagementObjectWithRelations(obj);
+
+            foreach (var kv in properties)
+            {
+                var name = kv.Key;
+                var value = kv.Value;
+                if (name.Contains("!"))
+                {
+
+                    if (value == null)
+                        continue;
+
+                    string className = null;
+                    string propertyName = null;
+
+                    var splittedName = name.Split("!".ToCharArray(), 2);
+                    className = splittedName[0];
+                    if (splittedName.Length > 1)
+                    {
+                        propertyName = splittedName[1]?.Trim().ToNull();
+                    }
+
+                    if (!value.GetType().IsEnumerableType(false))
+                    {
+                        value = new List<object> { value };
+                    }
+
+                    if (value.GetType().IsEnumerableType(false))
+                    {
+                        var enu = value as IEnumerable;
+
+                        foreach (var o in enu)
+                        {
+                            var oVal = o;
+                            var itemClassName = className;
+
+                            if (!String.IsNullOrWhiteSpace(propertyName))
+                            {
+                                var foundobj = GetEnterpriseManagementObjectsByClassName(itemClassName, $"{propertyName} -eq '{oVal}'", 1).FirstOrDefault();
+                                if (foundobj != null)
+                                {
+                                    var related = new CreatableEnterpriseManagementObjectWithRelations(foundobj);
+                                    result.AddRelatedObject(related);
+
+                                }
+                                continue;
+                            }
+
+                            switch (oVal)
+                            {
+                                case Dictionary<string, object> dict:
+                                    {
+                                        if (dict.ContainsKey("~type"))
+                                        {
+                                            itemClassName = dict["~type"].ToString();
+                                        }
+
+                                        result.AddRelatedObject(buildCreatableEnterpriseManagementObject(itemClassName, dict));
+                                        break;
+                                    }
+                                case Guid guid:
+                                    {
+                                        var existingObject = GetEnterpriseManagementObjectById(guid);
+                                        var related = new CreatableEnterpriseManagementObjectWithRelations(existingObject);
+                                        result.AddRelatedObject(related);
+                                        break;
+                                    }
+                                case string str:
+                                    {
+                                        var g = str.ToGuid();
+                                        var existingObject = GetEnterpriseManagementObjectById(g);
+                                        var related = new CreatableEnterpriseManagementObjectWithRelations(existingObject);
+                                        result.AddRelatedObject(related);
+                                        break;
+                                    }
+                            }
+
+                        }
+                    }
+
+
+
+                }
+
+                if (objectProperties.TryGetValue(name, out var prop))
+                {
+                    var val = normalizer.NormalizeValue(kv.Value, prop);
+                    obj[objectClass, name].Value = val;
+                }
+            }
+
+            return result;
+        }
+
     }
 }
