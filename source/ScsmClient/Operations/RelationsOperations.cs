@@ -21,8 +21,8 @@ namespace ScsmClient.Operations
         public ManagementPackRelationship FindRelationShip(string firstClassName, string secondClassName)
         {
 
-            var firstClass = _client.Class().GetClassByName(firstClassName);
-            var secondClass = _client.Class().GetClassByName(secondClassName);
+            var firstClass = _client.Types().GetClassByName(firstClassName);
+            var secondClass = _client.Types().GetClassByName(secondClassName);
 
             return FindRelationShip(firstClass, secondClass);
         }
@@ -57,7 +57,7 @@ namespace ScsmClient.Operations
 
         public Guid AddRelatedObjectByRelationshipName(string relationshipName, Guid firstId, Guid secondId)
         {
-            var relClass = _client.Class().GetRelationshipClassByName(relationshipName);
+            var relClass = _client.Types().GetRelationshipClassByName(relationshipName);
             var sourceObj = _client.ManagementGroup.EntityObjects.GetObject<EnterpriseManagementObject>(firstId, ObjectQueryOptions.Default);
             var targetObj = _client.ManagementGroup.EntityObjects.GetObject<EnterpriseManagementObject>(secondId, ObjectQueryOptions.Default);
 
@@ -116,6 +116,5 @@ namespace ScsmClient.Operations
 
         }
         
-       
     }
 }

@@ -16,10 +16,6 @@
     <ProjectReference Include="..\..\ScsmClient.SharedModels\ScsmClient.SharedModels.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Model\" />
-  </ItemGroup>
-
   
 
 </Project>

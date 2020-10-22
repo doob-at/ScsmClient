@@ -51,10 +51,10 @@ namespace ScsmClientTestCmd
 
 
 
-            var cl = scsmClient.Class().GetClassByName("zOrganisationseinheit");
+            var cl = scsmClient.Types().GetClassByName("zOrganisationseinheit");
             var crit = scsmClient.Criteria().BuildObjectCriteria("zOKZ = '' and zOKZ like '%Test%'", cl);
 
-            var obs = scsmClient.Object().GetObjectsByClassName("zOrganisationseinheit", "zOKZ like '%Test%'").ToList();
+            var obs = scsmClient.ScsmObject().GetObjectsByTypeName("zOrganisationseinheit", "zOKZ like '%Test%'").ToList();
             Main1(args);
 
         }
@@ -130,7 +130,7 @@ namespace ScsmClientTestCmd
 
             var newP = scsmClient.Object().CreateObjectByClassName("BMI.Person", person);
 
-            var nP = scsmClient.Object().GetObjectById(newP);
+            var nP = scsmClient.ScsmObject().GetObjectById(newP);
 
             return newP;
         }
@@ -198,12 +198,12 @@ namespace ScsmClientTestCmd
 
 
             //var list = scsmClient.ManagementPack().GetManagementPacks().OrderBy(m => m.Name).ToList();
-            //var cla = scsmClient.Class().GetClassByName("[zMP_zOrganisationseinheit]zOrganisationseinheit");
+            //var cla = scsmClient.Types().GetClassByName("[zMP_zOrganisationseinheit]zOrganisationseinheit");
 
             ////var crit = new ManagementPackClassCriteria($"Name='[zMP_zOrganisationseinheit]zOrganisationseinheit' and ManagementPack='zMP_zOrganisationseinheit'");
             ////var foundClass = scsmClient.ManagementGroup.EntityTypes.GetClasses(crit).FirstOrDefault();
 
-            //var cla2 = scsmClient.Class().GetClassByName("zBenutzer");
+            //var cla2 = scsmClient.Types().GetClassByName("zBenutzer");
 
             //var enum1 = cla.PropertyCollection.Where(p => p.Type == ManagementPackEntityPropertyTypes.@enum).Select(p =>
             //    scsmClient.ManagementGroup.EntityTypes.GetChildEnumerations(p.EnumType.Id, TraversalDepth.Recursive)).ToList();
@@ -225,10 +225,10 @@ namespace ScsmClientTestCmd
             //var bens = scsmClient.TypeProjection()
             //    .GetObjectProjectionObjects("BMI.Benutzer.Projection", "Type -like 'stamm%'", null).ToList();
 
-            var org = scsmClient.Object().GetObjectsByClassName("BMI.Organisationseinheit", "Name -like '%Polizei%'", 1).ToList();
+            var org = scsmClient.ScsmObject().GetObjectsByTypeName("BMI.Organisationseinheit", "Name -like '%Polizei%'", 1).ToList();
 
             var pers = scsmClient.TypeProjection()
-                .GetObjectProjectionObjects("BMI.PErson.Projection", "vorname -like 'Bernhard%' -and Nachname -like 'Wind%'",1, 1).ToList();
+                .GetTypeProjectionObjects("BMI.PErson.Projection", "vorname -like 'Bernhard%' -and Nachname -like 'Wind%'",1, 1).ToList();
 
             //var per = pers.Where(p => p.ContainsKey("!BMI.Account")).ToList();
 
@@ -271,15 +271,15 @@ namespace ScsmClientTestCmd
 
 
             var res = scsmClient.TypeProjection()
-                .GetObjectProjectionObjects("zTP_zBenutzer_zAccount", criteriaString).ToList();
+                .GetTypeProjectionObjects("zTP_zBenutzer_zAccount", criteriaString).ToList();
 
 
 
 
 
-            var tps = scsmClient.TypeProjection().GetTypeProjectionsByCriteria("Name like 'z%'");
+            var tps = scsmClient.Types().GetTypeProjectionsByCriteria("Name like 'z%'");
 
-            var tp = scsmClient.TypeProjection().GetTypeProjectionByClassName("zTP_zBenutzer_zAccount");
+            var tp = scsmClient.Types().GetTypeProjectionByName("zTP_zBenutzer_zAccount");
 
             //var mps = scsmClient.ManagementPack().GetManagementPacks().OrderBy(m => m.Name).ToList();
             ////var criteriaxml = scsmClient.Criteria().CreateCriteriaXmlFromFilterString("zFirstName like \"%Harald\"", tp);

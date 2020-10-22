@@ -80,8 +80,8 @@ namespace ScsmClient
         public TypeProjectionOperations TypeProjection() => _typeProjectionOperations = _typeProjectionOperations ?? new TypeProjectionOperations(this);
         
 
-        private ClassOperations _classOperations;
-        public ClassOperations Class() => _classOperations = _classOperations ?? new ClassOperations(this);
+        private TypeOperations _typeOperations;
+        public TypeOperations Types() => _typeOperations = _typeOperations ?? new TypeOperations(this);
         
 
         private ObjectOperations _objectOperations;
@@ -105,6 +105,9 @@ namespace ScsmClient
 
         private RelationsOperations _relationsOperations;
         public RelationsOperations Relations() => _relationsOperations = _relationsOperations ?? new RelationsOperations(this);
+
+        private ScsmObjectOperations _scsmObject;
+        public ScsmObjectOperations ScsmObject() => _scsmObject = _scsmObject ?? new ScsmObjectOperations(this);
 
     }
 }

@@ -258,7 +258,7 @@ namespace ScsmClient.CriteriaParser
                 var relation = FindRelationEndpoint(_managementPackTypeProjection, part);
                 if (relation == null)
                 {
-                    throw new Exception($"Relation for Class '{part}' not found!");
+                    throw new Exception($"Relation for Types '{part}' not found!");
                 }
                 var rel = relation.Value;
 

@@ -17,6 +17,7 @@ using Reflectensions.ExtensionMethods;
 using ScsmClient.Attributes;
 using ScsmClient.ExtensionMethods;
 using ScsmClient.Helper;
+using ScsmClient.Model;
 using ScsmClient.SharedModels.Models;
 using IEnumerable = System.Collections.IEnumerable;
 
@@ -31,7 +32,7 @@ namespace ScsmClient.Operations
         {
         }
 
-        internal EnterpriseManagementObject GetEnterpriseManagementObjectById(Guid id)
+        public EnterpriseManagementObject GetEnterpriseManagementObjectById(Guid id)
         {
             var critOptions = new ObjectQueryOptions();
             critOptions.DefaultPropertyRetrievalBehavior = ObjectPropertyRetrievalBehavior.All;
@@ -42,18 +43,17 @@ namespace ScsmClient.Operations
 
         public IEnumerable<EnterpriseManagementObject> GetEnterpriseManagementObjectsByClassName(string className, string criteria, int? maxResult = null)
         {
-            var objectClass = _client.Class().GetClassByName(className);
+            var objectClass = _client.Types().GetClassByName(className);
             return GetEnterpriseManagementObjectsByClass(objectClass, criteria, maxResult);
         }
 
         public IEnumerable<EnterpriseManagementObject> GetEnterpriseManagementObjectsByClassId(Guid classId, string criteria, int? maxResult = null)
         {
-            var objectClass = _client.Class().GetClassById(classId);
+            var objectClass = _client.Types().GetClassById(classId);
             return GetEnterpriseManagementObjectsByClass(objectClass, criteria, maxResult);
         }
 
-
-        internal IEnumerable<EnterpriseManagementObject> GetEnterpriseManagementObjectsByClass(ManagementPackClass objectClass, string criteria, int? maxResult = null)
+        public IEnumerable<EnterpriseManagementObject> GetEnterpriseManagementObjectsByClass(ManagementPackClass objectClass, string criteria, int? maxResult = null)
         {
 
 
@@ -86,60 +86,15 @@ namespace ScsmClient.Operations
         }
 
 
-        public ScsmObject GetObjectById(Guid id)
-        {
-            return GetEnterpriseManagementObjectById(id).ToScsmObject();
-        }
-
-        public IEnumerable<ScsmObject> GetObjectsByClassName(string className, string criteria, int? maxResult = null)
-        {
-            var objectClass = _client.Class().GetClassByName(className);
-            return GetObjectsByClass(objectClass, criteria, maxResult);
-        }
-
-        public IEnumerable<ScsmObject> GetObjectsByClassId(Guid classId, string criteria, int? maxResult = null)
-        {
-            var objectClass = _client.Class().GetClassById(classId);
-            return GetObjectsByClass(objectClass, criteria, maxResult);
-        }
-
-        public IEnumerable<ScsmObject> GetObjectsByClass(ManagementPackClass objectClass, string criteria, int? maxResult = null)
-        {
-            return GetEnterpriseManagementObjectsByClass(objectClass, criteria, maxResult)
-                .Select(obj => obj.ToScsmObject());
-
-            //var crit = _client.Criteria().BuildObjectCriteria(criteria, objectClass);
-
-
-            //var critOptions = new ObjectQueryOptions();
-            //critOptions.DefaultPropertyRetrievalBehavior = ObjectPropertyRetrievalBehavior.All;
-            //critOptions.ObjectRetrievalMode = ObjectRetrievalOptions.NonBuffered;
-            //critOptions.MaxResultCount = maxResult ?? Int32.MaxValue;
-
-
-            //var reader = _client.ManagementGroup.EntityObjects.GetObjectReader<EnterpriseManagementObject>(crit, critOptions);
-
-            //var count = 0;
-
-            //foreach (EnterpriseManagementObject enterpriseManagementObject in reader)
-            //{
-            //    if (count == critOptions.MaxResultCount)
-            //        break;
-            //    yield return enterpriseManagementObject.ToScsmObject();
-            //}
-
-        }
-
-
         public Guid CreateObjectByClassId(Guid id, Dictionary<string, object> properties)
         {
-            var objectClass = _client.Class().GetClassById(id);
+            var objectClass = _client.Types().GetClassById(id);
             return CreateObjectByClass(objectClass, properties);
         }
 
         public Guid CreateObjectByClassName(string className, Dictionary<string, object> properties)
         {
-            var objectClass = _client.Class().GetClassByName(className);
+            var objectClass = _client.Types().GetClassByName(className);
             return CreateObjectByClass(objectClass, properties);
         }
 
@@ -178,7 +133,7 @@ namespace ScsmClient.Operations
         private CreatableEnterpriseManagementObjectWithRelations buildCreatableEnterpriseManagementObject(
             string className, Dictionary<string, object> properties)
         {
-            var objectClass = _client.Class().GetClassByName(className);
+            var objectClass = _client.Types().GetClassByName(className);
             return buildCreatableEnterpriseManagementObject(objectClass, properties);
         }
 
@@ -288,14 +243,14 @@ namespace ScsmClient.Operations
         public Dictionary<int, Guid> CreateObjectsByClassId(Guid id, IEnumerable<Dictionary<string, object>> objects, CancellationToken cancellationToken = default)
         {
 
-            var objectClass = _client.Class().GetClassById(id);
+            var objectClass = _client.Types().GetClassById(id);
             return CreateObjectsByClass(objectClass, objects, cancellationToken);
         }
 
         public Dictionary<int, Guid> CreateObjectsByClassName(string className, IEnumerable<Dictionary<string, object>> objects, CancellationToken cancellationToken = default)
         {
 
-            var objectClass = _client.Class().GetClassByName(className);
+            var objectClass = _client.Types().GetClassByName(className);
             return CreateObjectsByClass(objectClass, objects, cancellationToken);
         }
 
@@ -467,28 +422,4 @@ namespace ScsmClient.Operations
             return groups;
         }
     }
-
-    public class CreatableEnterpriseManagementObjectWithRelations
-    {
-        public EnterpriseManagementObject CreatableEnterpriseManagementObject { get; }
-
-        public List<CreatableEnterpriseManagementObjectWithRelations> RelatedObjects { get; set; }
-
-        public CreatableEnterpriseManagementObjectWithRelations(EnterpriseManagementObject creatableEnterpriseManagementObject)
-        {
-            CreatableEnterpriseManagementObject = creatableEnterpriseManagementObject;
-        }
-
-        public CreatableEnterpriseManagementObjectWithRelations AddRelatedObject(
-            CreatableEnterpriseManagementObjectWithRelations creatableEnterpriseManagementObject)
-        {
-            if (RelatedObjects == null)
-            {
-                RelatedObjects = new List<CreatableEnterpriseManagementObjectWithRelations>();
-            }
-            RelatedObjects.Add(creatableEnterpriseManagementObject);
-            return this;
-        }
-    }
-
 }

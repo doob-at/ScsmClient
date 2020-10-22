@@ -15,7 +15,7 @@ namespace ScsmClient.Operations
 
         public ChangeRequestDto GetByGenericId(Guid id)
         {
-            var entObj = _client.Object().GetObjectById(id);
+            var entObj = _client.ScsmObject().GetObjectById(id);
             return new ChangeRequestDto(entObj);
         }
 
@@ -26,7 +26,7 @@ namespace ScsmClient.Operations
 
         public List<ChangeRequestDto> GetByCriteria(string criteria, int? maxResults = null)
         {
-            var srObjs = _client.TypeProjection().GetObjectProjectionObjects(WellKnown.ChangeRequest.ProjectionType, criteria, maxResults).ToList();
+            var srObjs = _client.ScsmObject().GetObjectsByTypeId(WellKnown.ChangeRequest.ProjectionType, criteria, maxResults).ToList();
             return srObjs.Select(e => new ChangeRequestDto(e)).ToList();
         }
 

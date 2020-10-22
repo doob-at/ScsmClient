@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using Microsoft.EnterpriseManagement.Common;
 using Microsoft.EnterpriseManagement.Configuration;
+using Microsoft.EnterpriseManagement.ConnectorFramework;
 using ScsmClient.ExtensionMethods;
 using ScsmClient.SharedModels.Models;
 
@@ -16,63 +17,26 @@ namespace ScsmClient.Operations
         }
 
 
-        //public IObjectProjectionReader<EnterpriseManagementObject> GetObjectProjectionReader(ObjectProjectionCriteria criteria)
-        //{
-        //    return _client.ManagementGroup.EntityObjects.GetObjectProjectionReader<EnterpriseManagementObject>(criteria, ObjectQueryOptions.Default);
-        //}
-
         private IObjectProjectionReader<EnterpriseManagementObject> GetObjectProjectionReader(ObjectProjectionCriteria criteria, ObjectQueryOptions options)
         {
             return _client.ManagementGroup.EntityObjects.GetObjectProjectionReader<EnterpriseManagementObject>(criteria, options);
         }
 
-        public ManagementPackTypeProjection GetTypeProjectionById(Guid typeProjectionId)
-        {
-            return _client.ManagementGroup.EntityTypes.GetTypeProjection(typeProjectionId);
-        }
 
-        public ManagementPackTypeProjection GetTypeProjectionByClassName(string className, ManagementPack managementPack)
+        public IEnumerable<EnterpriseManagementObjectProjection> GetTypeProjectionObjects(Guid typeProjectionGuid, string criteria, int? maxResult = null, int? levels = null)
         {
-            return _client.ManagementGroup.EntityTypes.GetTypeProjection(className, managementPack);
-        }
-
-        public ManagementPackTypeProjection GetTypeProjectionByClassName(string className)
-        {
-            var crit = new ManagementPackTypeProjectionCriteria($"Name='{className}'");
-            return GetTypeProjectionsByCriteria(crit).FirstOrDefault();
-        }
-
-        //public ManagementPackTypeProjection GetTypeProjection(string typeProjectionId)
-        //{
-        //    return GetTypeProjectionById(new Guid(typeProjectionId));
-        //}
-
-        public IList<ManagementPackTypeProjection> GetTypeProjectionsByCriteria(ManagementPackTypeProjectionCriteria criteria = null)
-        {
-            return criteria == null ? _client.ManagementGroup.EntityTypes.GetTypeProjections() :_client.ManagementGroup.EntityTypes.GetTypeProjections(criteria);
-        }
-
-        public IList<ManagementPackTypeProjection> GetTypeProjectionsByCriteria(string criteria)
-        {
-            var crit = new ManagementPackTypeProjectionCriteria(criteria);
-            return _client.ManagementGroup.EntityTypes.GetTypeProjections(crit);
+            var tp = _client.Types().GetTypeProjectionById(typeProjectionGuid);
+            return GetTypeProjectionObjects(tp, criteria, maxResult, levels);
         }
 
 
-        public IEnumerable<ScsmObject> GetObjectProjectionObjects(Guid typeProjectionGuid, string criteria, int? maxResult = null, int? levels = null)
+        public IEnumerable<EnterpriseManagementObjectProjection> GetTypeProjectionObjects(string typeProjectionName, string criteria, int? maxResult = null, int? levels = null)
         {
-            var tp = GetTypeProjectionById(typeProjectionGuid);
-            return GetObjectProjectionObjects(tp, criteria, maxResult, levels);
+            var tp = _client.Types().GetTypeProjectionByName(typeProjectionName);
+            return GetTypeProjectionObjects(tp, criteria, maxResult, levels);
         }
 
-
-        public IEnumerable<ScsmObject> GetObjectProjectionObjects(string typeProjectionName, string criteria, int? maxResult = null, int? levels = null)
-        {
-            var tp = GetTypeProjectionByClassName(typeProjectionName);
-            return GetObjectProjectionObjects(tp, criteria, maxResult, levels);
-        }
-
-        public IEnumerable<ScsmObject> GetObjectProjectionObjects(ManagementPackTypeProjection typeProjection,
+        public IEnumerable<EnterpriseManagementObjectProjection> GetTypeProjectionObjects(ManagementPackTypeProjection typeProjection,
             string criteria, int? maxResult = null, int? levels = null)
         {
             
@@ -94,9 +58,14 @@ namespace ScsmClient.Operations
            
             foreach (var enterpriseManagementObjectProjection in reader)
             {
-                yield return enterpriseManagementObjectProjection.ToScsmObject(levels);
+                yield return enterpriseManagementObjectProjection;
             }
 
         }
+
+
+        
+
+       
     }
 }

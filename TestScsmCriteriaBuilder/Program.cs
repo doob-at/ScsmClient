@@ -1,14 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EnterpriseManagement.Common;
-using Microsoft.EnterpriseManagement.Configuration;
 using ScsmClient;
-using ScsmClient.CriteriaParser;
-using ScsmClient.CriteriaParser.Syntax;
 
 namespace TestScsmCriteriaBuilder
 {
@@ -39,7 +32,7 @@ namespace TestScsmCriteriaBuilder
            // var filter5 = "G:LastModified -gt '19.03.2020 9:46:14'";
            // var filter6 = "";
 
-            var objs2 = scsmClient.Object().GetObjectsByClassName("zBenutzerBase", null).ToList();
+            var objs2 = scsmClient.ScsmObject().GetObjectsByTypeName("zBenutzerBase", null).ToList();
 
         }
 
@@ -51,7 +44,7 @@ namespace TestScsmCriteriaBuilder
             var creds = new NetworkCredential("LANFL\\administrator", "ABC12abc");
             var scsmClient = new SCSMClient("192.168.75.20", creds);
 
-            //var incidentClass = scsmClient.Class().GetClassByName("zOrganisationseinheit");
+            //var incidentClass = scsmClient.Types().GetClassByName("zOrganisationseinheit");
 
             var filter1 = "G:Id == 'd8e70ac7-3a63-8e80-5fca-4ebf6ab682de'";
             var filter2 = "Id == 658";
@@ -92,7 +85,7 @@ namespace TestScsmCriteriaBuilder
 </Criteria>";
 
 
-            var obj = scsmClient.Object().GetObjectById(Guid.Parse("d8e70ac7-3a63-8e80-5fca-4ebf6ab682de"));
+            var obj = scsmClient.ScsmObject().GetObjectById(Guid.Parse("d8e70ac7-3a63-8e80-5fca-4ebf6ab682de"));
             var inc = scsmClient.Incident().GetByCriteria(filter4).ToList().FirstOrDefault();
 
             //var found = scsmClient.TypeProjection().GetObjectProjectionReader(objProjectionCriteria, ObjectQueryOptions.Default);
