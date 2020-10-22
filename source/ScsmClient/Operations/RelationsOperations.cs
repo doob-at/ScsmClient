@@ -21,16 +21,16 @@ namespace ScsmClient.Operations
 
         
 
-        public ManagementPackRelationship FindRelationShip(string firstClassName, string secondClassName)
+        public ManagementPackRelationship FindRelationship(string firstClassName, string secondClassName)
         {
 
             var firstClass = _client.Types().GetClassByName(firstClassName);
             var secondClass = _client.Types().GetClassByName(secondClassName);
 
-            return FindRelationShip(firstClass, secondClass);
+            return FindRelationship(firstClass, secondClass);
         }
 
-        public ManagementPackRelationship FindRelationShip(ManagementPackClass firstClass, ManagementPackClass secondClass)
+        public ManagementPackRelationship FindRelationship(ManagementPackClass firstClass, ManagementPackClass secondClass)
         {
 
             var relClasses = _client.ManagementGroup.EntityTypes.GetRelationshipClasses();
@@ -51,34 +51,34 @@ namespace ScsmClient.Operations
                 secondClass = secondClass.Base?.GetElement();
                 if (secondClass != null)
                 {
-                    return FindRelationShip(firstClass, secondClass);
+                    return FindRelationship(firstClass, secondClass);
                 }
             }
             return relationShipClass;
 
         }
 
-        public Guid FindRelationShip(Guid sourceId, Guid targetId)
+        public Guid CreateRelation(Guid sourceId, Guid targetId)
         {
             var sourceObject = _client.Object().GetEnterpriseManagementObjectById(sourceId);
             var targetObject = _client.Object().GetEnterpriseManagementObjectById(targetId);
 
-            var relationship = FindRelationShip(sourceObject.GetManagementPackClass(),
+            var relationship = FindRelationship(sourceObject.GetManagementPackClass(),
                 targetObject.GetManagementPackClass());
 
-            return CreateRelationship(relationship, sourceObject, targetObject);
+            return CreateRelation(relationship, sourceObject, targetObject);
         }
 
-        public Guid CreateRelationshipByName(string relationshipName, Guid sourceId, Guid targetId)
+        public Guid CreateRelationByName(string relationshipName, Guid sourceId, Guid targetId)
         {
             var relClass = _client.Types().GetRelationshipClassByName(relationshipName);
             var sourceObj = _client.Object().GetEnterpriseManagementObjectById(sourceId);
             var targetObj = _client.Object().GetEnterpriseManagementObjectById(targetId);
 
-            return CreateRelationship(relClass, sourceObj, targetObj);
+            return CreateRelation(relClass, sourceObj, targetObj);
         }
 
-        public Guid CreateRelationship(ManagementPackRelationship relationship, EnterpriseManagementObject first, EnterpriseManagementObject second)
+        public Guid CreateRelation(ManagementPackRelationship relationship, EnterpriseManagementObject first, EnterpriseManagementObject second)
         {
             var relationshipObject = buildCreatableEnterpriseManagementRelationshipObject(relationship, first, second);
             
@@ -89,7 +89,7 @@ namespace ScsmClient.Operations
 
         internal CreatableEnterpriseManagementRelationshipObject buildCreatableEnterpriseManagementRelationshipObject(EnterpriseManagementObject first, EnterpriseManagementObject second)
         {
-            var relationshipClass = FindRelationShip(first.GetManagementPackClass(), second.GetManagementPackClass());
+            var relationshipClass = FindRelationship(first.GetManagementPackClass(), second.GetManagementPackClass());
             return buildCreatableEnterpriseManagementRelationshipObject(relationshipClass, first, second);
         }
 
@@ -119,7 +119,7 @@ namespace ScsmClient.Operations
         }
 
 
-        public void RemoveRelationShip<T>(EnterpriseManagementRelationshipObject<T> rel) where T : EnterpriseManagementObject
+        internal void RemoveRelation<T>(EnterpriseManagementRelationshipObject<T> rel) where T : EnterpriseManagementObject
         {
 
             var idd = new IncrementalDiscoveryData();

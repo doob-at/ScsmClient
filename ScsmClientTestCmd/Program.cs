@@ -63,7 +63,7 @@ namespace ScsmClientTestCmd
         {
 
 
-            return scsmClient.Relations().CreateRelationshipByName("BMI.AccountToBenutzer.Relation", personId, accountId);
+            return scsmClient.Relations().CreateRelationByName("BMI.AccountToBenutzer.Relation", personId, accountId);
 
 
         }
