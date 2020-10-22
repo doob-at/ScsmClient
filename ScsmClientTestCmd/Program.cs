@@ -37,9 +37,9 @@ namespace ScsmClientTestCmd
             //var accountId = CreateAccount(scsmClient);
             //var ben = CreateBenutzer(scsmClient);
             //CreateIncident(scsmClient);
-            TestCriteria(scsmClient);
+            //TestCriteria(scsmClient);
             //var id = CreatePersonWithRelations(scsmClient);
-
+            CreateUserFromJson(scsmClient);
 
             //var personId = Guid.Parse("309a5c0e-6b53-999d-8198-b32e445b1054");
             //var accountId = Guid.Parse("b9daa419-8a0b-0431-ef0b-5c431f8937c3");
@@ -241,6 +241,49 @@ namespace ScsmClientTestCmd
             //Console.WriteLine(json);
         }
 
+
+        static Guid CreateUserFromJson(SCSMClient scsmClient)
+        {
+
+            var jsonString = @"
+{
+  ""Vorname"": ""Bernhard"",
+  ""Nachname"": ""Windisch"",
+  ""Geburtsdatum"": ""1981-06-06T00:00:00"",
+  ""Geschlecht"": ""männlich"",
+  ""Titel"": null,
+  ""AkademischerGradVor"": null,
+  ""AkademischerGradNach"": null,
+  ""EMail"": null,
+  ""Bundesdienst"": false,
+  ""Personalnummer"": null,
+  ""BPK"": ""LLMPuM6U4GraXjbcD7ChSrVotaQ="",
+  ""BMI.Organisationseinheit!OKZ"": ""BMI-PI_ST_LEIBNITZ"",
+  ""BMI.Account!"": [
+    {
+      ""Username"": ""windisc2"",
+      ""Beschreibung"": ""Test-Account"",
+      ""InitialPassword"": ""U9l3_j"",
+      ""GVGID"": null,
+      ""BMI.Benutzer!"": [
+        {
+          ""~type"": ""BMI.Benutzer.Stammportal"",
+          ""Type"": ""Stammportal"",
+          ""GiltAb"": ""2020-11-01T00:00:00"",
+          ""GiltBis"": ""2021-01-31T00:00:00"",
+          ""ReferenceId"": null
+        }
+      ]
+    }
+  ]
+}
+";
+
+            var dict = Json.Converter.ToDictionary(jsonString);
+            var result = scsmClient.Object().CreateObjectsByClassName("BMI.Person", new List<Dictionary<string, object>>(){dict});
+
+            return result.First().Value;
+        }
         static void Main1(string[] args)
         {
 

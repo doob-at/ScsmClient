@@ -13,6 +13,8 @@ using Microsoft.EnterpriseManagement;
 using Microsoft.EnterpriseManagement.Common;
 using Microsoft.EnterpriseManagement.Configuration;
 using Microsoft.EnterpriseManagement.ConnectorFramework;
+using Newtonsoft.Json.Linq;
+using Reflectensions;
 using Reflectensions.ExtensionMethods;
 using ScsmClient.Attributes;
 using ScsmClient.ExtensionMethods;
@@ -354,8 +356,14 @@ namespace ScsmClient.Operations
                                 continue;
                             }
 
+                            if (oVal is JObject jObject)
+                            {
+                                oVal = Json.Converter.ToDictionary(jObject);
+                            }
+
                             switch (oVal)
                             {
+                                
                                 case Dictionary<string, object> dict:
                                     {
                                         if (dict.ContainsKey("~type"))
