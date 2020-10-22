@@ -138,7 +138,7 @@ namespace ScsmClient.ExtensionMethods
 
             foreach (var keyValuePair in composableProjection)
             {
-                var name = keyValuePair.Value.Object.GetBaseClassName();
+                var name = keyValuePair.Value.Object.GetManagementPackClassName();
                 if (!related.ContainsKey(name))
                 {
                     related.Add(name, new List<ScsmObject>());
@@ -190,14 +190,14 @@ namespace ScsmClient.ExtensionMethods
         }
 
 
-        public static ManagementPackClass GetBaseClass(this EnterpriseManagementObject enterpriseManagementObject)
+        public static ManagementPackClass GetManagementPackClass(this EnterpriseManagementObject enterpriseManagementObject)
         {
             return enterpriseManagementObject.GetClasses(BaseClassTraversalDepth.None).First();
         }
 
-        public static string GetBaseClassName(this EnterpriseManagementObject enterpriseManagementObject)
+        public static string GetManagementPackClassName(this EnterpriseManagementObject enterpriseManagementObject)
         {
-            return enterpriseManagementObject.GetBaseClass().Name;
+            return enterpriseManagementObject.GetManagementPackClass().Name;
         }
     }
 }

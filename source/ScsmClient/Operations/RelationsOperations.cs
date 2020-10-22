@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.EnterpriseManagement.Common;
 using Microsoft.EnterpriseManagement.Configuration;
 using Microsoft.EnterpriseManagement.ConnectorFramework;
+using ScsmClient.ExtensionMethods;
 
 namespace ScsmClient.Operations
 {
@@ -17,6 +18,8 @@ namespace ScsmClient.Operations
 
             
         }
+
+        
 
         public ManagementPackRelationship FindRelationShip(string firstClassName, string secondClassName)
         {
@@ -55,16 +58,27 @@ namespace ScsmClient.Operations
 
         }
 
-        public Guid AddRelatedObjectByRelationshipName(string relationshipName, Guid firstId, Guid secondId)
+        public Guid FindRelationShip(Guid sourceId, Guid targetId)
         {
-            var relClass = _client.Types().GetRelationshipClassByName(relationshipName);
-            var sourceObj = _client.ManagementGroup.EntityObjects.GetObject<EnterpriseManagementObject>(firstId, ObjectQueryOptions.Default);
-            var targetObj = _client.ManagementGroup.EntityObjects.GetObject<EnterpriseManagementObject>(secondId, ObjectQueryOptions.Default);
+            var sourceObject = _client.Object().GetEnterpriseManagementObjectById(sourceId);
+            var targetObject = _client.Object().GetEnterpriseManagementObjectById(targetId);
 
-            return AddRelatedObject(relClass, sourceObj, targetObj);
+            var relationship = FindRelationShip(sourceObject.GetManagementPackClass(),
+                targetObject.GetManagementPackClass());
+
+            return CreateRelationship(relationship, sourceObject, targetObject);
         }
 
-        public Guid AddRelatedObject(ManagementPackRelationship relationship, EnterpriseManagementObject first, EnterpriseManagementObject second)
+        public Guid CreateRelationshipByName(string relationshipName, Guid sourceId, Guid targetId)
+        {
+            var relClass = _client.Types().GetRelationshipClassByName(relationshipName);
+            var sourceObj = _client.Object().GetEnterpriseManagementObjectById(sourceId);
+            var targetObj = _client.Object().GetEnterpriseManagementObjectById(targetId);
+
+            return CreateRelationship(relClass, sourceObj, targetObj);
+        }
+
+        public Guid CreateRelationship(ManagementPackRelationship relationship, EnterpriseManagementObject first, EnterpriseManagementObject second)
         {
             var relationshipObject = buildCreatableEnterpriseManagementRelationshipObject(relationship, first, second);
             
@@ -75,9 +89,7 @@ namespace ScsmClient.Operations
 
         internal CreatableEnterpriseManagementRelationshipObject buildCreatableEnterpriseManagementRelationshipObject(EnterpriseManagementObject first, EnterpriseManagementObject second)
         {
-            var relationshipClass = FindRelationShip(first.GetClasses(BaseClassTraversalDepth.None).First().Name,
-                second.GetClasses(BaseClassTraversalDepth.None).First().Name);
-
+            var relationshipClass = FindRelationShip(first.GetManagementPackClass(), second.GetManagementPackClass());
             return buildCreatableEnterpriseManagementRelationshipObject(relationshipClass, first, second);
         }
 
