@@ -16,11 +16,6 @@ namespace ScsmClient.Operations
     public class AttachmentOperations : BaseOperation
     {
         
-        private List<string> _allowedClassesForAttachments = new List<string>()
-        {
-            "System.WorkItem"
-        };
-
         public AttachmentOperations(SCSMClient client) : base(client)
         {
         }
