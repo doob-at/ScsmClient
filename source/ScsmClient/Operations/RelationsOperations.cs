@@ -10,16 +10,16 @@ using ScsmClient.ExtensionMethods;
 
 namespace ScsmClient.Operations
 {
-    public class RelationsOperations: BaseOperation
+    public class RelationsOperations : BaseOperation
     {
-       
+
         public RelationsOperations(SCSMClient client) : base(client)
         {
 
-            
+
         }
 
-        
+
 
         public ManagementPackRelationship FindRelationship(string firstClassName, string secondClassName)
         {
@@ -30,41 +30,97 @@ namespace ScsmClient.Operations
             return FindRelationship(firstClass, secondClass);
         }
 
-        public ManagementPackRelationship FindRelationship(ManagementPackClass firstClass, ManagementPackClass secondClass)
+        public ManagementPackRelationship FindRelationship(ManagementPackClass sourceClass, ManagementPackClass targetClass)
         {
 
             var relClasses = _client.ManagementGroup.EntityTypes.GetRelationshipClasses();
 
-            //var firstClassTargets = relClasses.Where(r => r.Target.Type.GetElement().Id == firstClass.Id).ToList();
-            //var firstClassSources = relClasses.Where(r => r.Source.Type.GetElement().Id == firstClass.Id).ToList();
+            var relationShipClass = relClasses.FirstOrDefault(r =>
+                r.Source.Type.GetElement().Id == sourceClass.Id && r.Target.Type.GetElement().Id == targetClass.Id ||
+                r.Source.Type.GetElement().Id == targetClass.Id && r.Target.Type.GetElement().Id == sourceClass.Id);
 
-            //var secondClassTargets = relClasses.Where(r => r.Target.Type.GetElement().Id == secondClass.Id).ToList();
-            //var secondClassSources = relClasses.Where(r => r.Source.Type.GetElement().Id == secondClass.Id).ToList();
+            if (relationShipClass == null)
+            {
+                var _sourceClass = sourceClass;
+                while (_sourceClass != null)
+                {
+                    var found = FindRelationshipForTargetBaseClasses(_sourceClass, targetClass, relClasses);
+                    if (found != null)
+                    {
+                        return found;
+                    }
+                    _sourceClass = _sourceClass.Base?.GetElement();
+                }
+                throw new Exception($"Can't find a realtion between '{sourceClass.Name}' and '{targetClass.Name}'");
+            }
+            return relationShipClass;
+
+        }
+
+        private ManagementPackRelationship FindRelationshipForTargetBaseClasses(ManagementPackClass firstClass, ManagementPackClass secondClass, IList<ManagementPackRelationship> relationships)
+        {
 
 
-            var relationShipClass = relClasses.FirstOrDefault(r => 
+            var relationShipClass = relationships.FirstOrDefault(r =>
                 r.Source.Type.GetElement().Id == firstClass.Id && r.Target.Type.GetElement().Id == secondClass.Id ||
                 r.Source.Type.GetElement().Id == secondClass.Id && r.Target.Type.GetElement().Id == firstClass.Id);
 
             if (relationShipClass == null)
             {
-                secondClass = secondClass.Base?.GetElement();
-                if (secondClass != null)
+                var _secondClass = secondClass.Base?.GetElement();
+                if (_secondClass != null)
                 {
-                    return FindRelationship(firstClass, secondClass);
+                    return FindRelationshipForTargetBaseClasses(firstClass, _secondClass, relationships);
                 }
             }
             return relationShipClass;
 
         }
 
+        private ManagementPackRelationship FindRelationshipForSourceBaseClasses(ManagementPackClass firstClass, ManagementPackClass secondClass, IList<ManagementPackRelationship> relationships)
+        {
+
+
+            var relationShipClass = relationships.FirstOrDefault(r =>
+                r.Source.Type.GetElement().Id == firstClass.Id && r.Target.Type.GetElement().Id == secondClass.Id ||
+                r.Source.Type.GetElement().Id == secondClass.Id && r.Target.Type.GetElement().Id == firstClass.Id);
+
+            if (relationShipClass == null)
+            {
+                var _firstClass = firstClass.Base?.GetElement();
+                if (_firstClass != null)
+                {
+                    return FindRelationshipForSourceBaseClasses(_firstClass, secondClass, relationships);
+                }
+            }
+            return relationShipClass;
+
+        }
+
+
         public Guid CreateRelation(Guid sourceId, Guid targetId)
         {
             var sourceObject = _client.Object().GetEnterpriseManagementObjectById(sourceId);
             var targetObject = _client.Object().GetEnterpriseManagementObjectById(targetId);
+            return CreateRelation(sourceObject, targetObject);
+        }
 
+        public object CreateRelation(Guid sourceId, EnterpriseManagementObject targetObject)
+        {
+            var sourceObject = _client.Object().GetEnterpriseManagementObjectById(sourceId);
+            return CreateRelation(sourceObject, targetObject);
+        }
+
+        public Guid CreateRelation(EnterpriseManagementObject sourceObject, Guid targetId)
+        {
+            var targetObject = _client.Object().GetEnterpriseManagementObjectById(targetId);
+            return CreateRelation(sourceObject, targetObject);
+        }
+
+        public Guid CreateRelation(EnterpriseManagementObject sourceObject, EnterpriseManagementObject targetObject)
+        {
             var relationship = FindRelationship(sourceObject.GetManagementPackClass(),
-                targetObject.GetManagementPackClass());
+                 targetObject.GetManagementPackClass());
 
             return CreateRelation(relationship, sourceObject, targetObject);
         }
@@ -81,11 +137,44 @@ namespace ScsmClient.Operations
         public Guid CreateRelation(ManagementPackRelationship relationship, EnterpriseManagementObject first, EnterpriseManagementObject second)
         {
             var relationshipObject = buildCreatableEnterpriseManagementRelationshipObject(relationship, first, second);
-            
+
             relationshipObject.Commit();
-            
+
             return relationshipObject.Id;
         }
+
+
+
+        public IEnumerable<EnterpriseManagementObject> GetAllRelatedObjects(Guid sourceId)
+        {
+            return GetRelatedObjectsByClassId(sourceId, Guid.Empty);
+        }
+        public IEnumerable<EnterpriseManagementObject> GetRelatedObjectsByClassName(Guid sourceId, string className)
+        {
+            var managementPackClass = _client.Types().GetClassByName(className);
+            return GetRelatedObjectsByClassId(sourceId, managementPackClass.Id);
+        }
+        public IEnumerable<EnterpriseManagementObject> GetRelatedObjectsByClass(Guid sourceId, ManagementPackClass managementPackClass)
+        {
+            _client.Types().GetClassByName("System.FileAttachment");
+            return GetRelatedObjectsByClassId(sourceId, managementPackClass.Id);
+        }
+        public IEnumerable<EnterpriseManagementObject> GetRelatedObjectsByClassId(Guid sourceId, Guid managementPackClassId)
+        {
+            var query = _client.ManagementGroup.EntityObjects
+                .GetRelationshipObjects<EnterpriseManagementObject>(sourceId, ObjectQueryOptions.Default)
+                .OrderBy(ro => ro.LastModified)
+                .Select(ro => ro.TargetObject);
+
+            if (managementPackClassId != Guid.Empty)
+            {
+                query = query.Where(ro => ro.GetManagementPackClass().Id == managementPackClassId);
+            }
+
+            return query;
+        }
+
+
 
         internal CreatableEnterpriseManagementRelationshipObject buildCreatableEnterpriseManagementRelationshipObject(EnterpriseManagementObject first, EnterpriseManagementObject second)
         {
@@ -127,6 +216,7 @@ namespace ScsmClient.Operations
             idd.Commit(_client.ManagementGroup);
 
         }
-        
+
+
     }
 }

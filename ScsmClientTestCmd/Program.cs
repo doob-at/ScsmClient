@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -31,7 +32,8 @@ namespace ScsmClientTestCmd
             //var relClasses = scsmClient.Relations().FindRelationShip("BMI.Person", "BMI.Organisationseinheit");
 
 
-
+            //scsmClient.Relations().CreateRelation(Guid.Parse("f12726fc-6861-f856-9ee0-5ea69c2e0c56"),
+            //    Guid.Parse("4df2806f-3cb0-41e8-9467-799242975b03"));
 
             //var personid = CreatePerson(scsmClient);
             //var accountId = CreateAccount(scsmClient);
@@ -39,11 +41,35 @@ namespace ScsmClientTestCmd
             //CreateIncident(scsmClient);
             //TestCriteria(scsmClient);
             //var id = CreatePersonWithRelations(scsmClient);
-            CreateUserFromJson(scsmClient);
+            var person = CreateUserFromJson(scsmClient);
 
             //var personId = Guid.Parse("309a5c0e-6b53-999d-8198-b32e445b1054");
             //var accountId = Guid.Parse("b9daa419-8a0b-0431-ef0b-5c431f8937c3");
             //Guid relId = CreateRelation(scsmClient, accountId, ben);
+
+            
+            var ch = CreateChange(scsmClient);
+            var rel = scsmClient.Relations().CreateRelation( person, ch);
+
+            var str = File.OpenRead(@"Z:\Repos\BMI\BMI.Benutzerverwaltung.UI\BMI.Benutzerverwaltung.UI\bin\Debug\netcoreapp3.1\win-x64\Logs\BMI.Benutzerverwaltung.UI20201004.log");
+            //var attachmentContent = "Das ist ein Test";
+            //var attachmentContentStream = new MemoryStream();
+            //var strwriter = new StreamWriter(attachmentContentStream);
+            //strwriter.Write(attachmentContent);
+
+            var fa = scsmClient.Attachment().AddAttachment(ch, "testfile.txt", str, "Nur zum testen");
+            var fa1 = scsmClient.Attachment().AddAttachment(ch, "testfile1.txt", str, "Nur zum testen1");
+            var fa2 = scsmClient.Attachment().AddAttachment(ch, "testfile2.txt", str, "Nur zum testen2");
+
+
+            var change = scsmClient.ChangeRequest().GetByGenericId(ch);
+
+            var scChange = scsmClient.ScsmObject()
+                .GetObjectsByTypeId(WellKnown.ChangeRequest.ProjectionType, $"G:Id == '{ch}'").FirstOrDefault();
+
+
+            var attachments = scsmClient.Attachment().GetAttachments(ch);
+            var rels = scsmClient.Relations().GetAllRelatedObjects(ch);
 
 
             return;
@@ -57,6 +83,16 @@ namespace ScsmClientTestCmd
             var obs = scsmClient.ScsmObject().GetObjectsByTypeName("zOrganisationseinheit", "zOKZ like '%Test%'").ToList();
             Main1(args);
 
+        }
+
+        private static Guid CreateChange(SCSMClient scsmclient)
+        {
+            var cr = new ScsmClient.SharedModels.Models.ChangeRequestDto();
+            cr.Title = $"Neue Person erstellen - Mit Attachment";
+            cr.Description =
+                $"Automatisiertes erstellen von folgender Person inkl. etwaiger Abhängigkeiten";
+            
+            return scsmclient.ChangeRequest().Create(cr);
         }
 
         private static Guid CreateRelation(SCSMClient scsmClient, Guid personId, Guid accountId)

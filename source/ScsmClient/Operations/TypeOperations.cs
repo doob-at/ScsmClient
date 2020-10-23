@@ -31,7 +31,15 @@ namespace ScsmClient.Operations
         {
             return CachedClasses.GetOrAddById(id, s =>
             {
-                return _client.ManagementGroup.EntityTypes.GetClass(id);
+                try
+                {
+                    return _client.ManagementGroup.EntityTypes.GetClass(id);
+                }
+                catch (Exception e)
+                {
+                    return null;
+                }
+                
             });
 
         }
@@ -61,8 +69,16 @@ namespace ScsmClient.Operations
 
             return CachedClasses.GetOrAddByName($"[{managementPack.Name}]{name}", s =>
             {
-                var parsed = ParseName(name);
-                return _client.ManagementGroup.EntityTypes.GetClass(parsed.TypeName, managementPack);
+                try
+                {
+                    var parsed = ParseName(name);
+                    return _client.ManagementGroup.EntityTypes.GetClass(parsed.TypeName, managementPack);
+                }
+                catch (Exception e)
+                {
+                    return null;
+                }
+                
             });
 
         }

@@ -106,8 +106,11 @@ namespace ScsmClient
         private RelationsOperations _relationsOperations;
         public RelationsOperations Relations() => _relationsOperations = _relationsOperations ?? new RelationsOperations(this);
 
-        private ScsmObjectOperations _scsmObject;
-        public ScsmObjectOperations ScsmObject() => _scsmObject = _scsmObject ?? new ScsmObjectOperations(this);
+        private ScsmObjectOperations _scsmObjectOperations;
+        public ScsmObjectOperations ScsmObject() => _scsmObjectOperations = _scsmObjectOperations ?? new ScsmObjectOperations(this);
+
+        private AttachmentOperations _attachmentOperations;
+        public AttachmentOperations Attachment() => _attachmentOperations = _attachmentOperations ?? new AttachmentOperations(this);
 
     }
 }

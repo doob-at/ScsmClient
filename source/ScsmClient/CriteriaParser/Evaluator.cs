@@ -236,7 +236,7 @@ namespace ScsmClient.CriteriaParser
                         return (propertyElement.ToString(), propertyPart.property);
                     }
                 case "G":
-                    return ($"<GenericProperty>{propertyName}</GenericProperty>", null);
+                    return ($"<GenericProperty>{property}</GenericProperty>", null);
                 default:
                     throw new Exception($"Prefix '{type}' not valid!");
             }
