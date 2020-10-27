@@ -25,6 +25,21 @@ namespace ScsmClient.SharedModels.Models
         public Guid ObjectId { get; set; }
         public DateTime LastModified { get; set; }
         public DateTime TimeAdded { get; set; }
+
+        public ScsmObject(): base()
+        {
+            
+        }
+
+        public ScsmObject(IDictionary<string, object> dictionary) : base(dictionary)
+        {
+
+        }
+
+        public ScsmObject(ExpandableObject expandableObject) : base(expandableObject)
+        {
+
+        }
     }
 
     //public class EnterpriseManagementObjectProjectionDto: EnterpriseManagementObjectDto

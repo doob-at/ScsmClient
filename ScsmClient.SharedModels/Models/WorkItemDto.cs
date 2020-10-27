@@ -4,7 +4,7 @@ using Reflectensions.HelperClasses;
 
 namespace ScsmClient.SharedModels.Models
 {
-    public class WorkItemDto: ExpandableObject
+    public class WorkItemDto: ScsmObject
     {
         public string Title { get; set; }
         public string Description { get; set; }

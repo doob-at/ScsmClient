@@ -59,7 +59,10 @@ namespace ScsmClient.Operations
 
         }
 
-
+        public void Update(Guid changeId, Dictionary<string, object> properties)
+        {
+            _client.Object().UpdateObject(changeId, properties);
+        }
     }
 
     
