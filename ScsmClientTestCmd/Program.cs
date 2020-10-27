@@ -79,14 +79,13 @@ namespace ScsmClientTestCmd
 
             //scsmClient.Object().UpdateObject(person);
 
+            var template = "BMI Create Person ChangeRequest";
+            var ch = new ChangeRequestDto();
+            ch.Title = $"TestChange from Template - '{template}'";
 
-            var ch = scsmClient.ChangeRequest().GetById("62");
-            ch.Status = WellKnown.ChangeRequest.Status.Completed;
-            ch.Area = WellKnown.ChangeRequest.Area.File.DiskVolumesAndDFS;
-            ch.Category = WellKnown.ChangeRequest.Category.Emergency;
-            ch.ImplementationResults = WellKnown.ChangeRequest.ImplementationResults.SuccessfullyImplemented;
+            scsmClient.ChangeRequest().CreateFromTemplate(template, ch);
 
-            scsmClient.Object().UpdateObject(ch.ObjectId, ch.AsDictionary());
+            
 
             return;
 

@@ -217,6 +217,9 @@ namespace ScsmClient.Operations
                     var objectProperties = GetObjectPropertyDictionary(managementPackTypeProjection.TargetType);
                     foreach (var kv in dictionary)
                     {
+                        if (kv.Value == null)
+                            continue;
+
                         if (objectProperties.TryGetValue(kv.Key, out var prop))
                         {
                             var val = normalizer.NormalizeValue(kv.Value, prop);
@@ -396,12 +399,12 @@ namespace ScsmClient.Operations
             {
                 var name = kv.Key;
                 var value = kv.Value;
+
+                if (value == null)
+                    continue;
+
                 if (name.Contains("!"))
                 {
-
-                    if (value == null)
-                        continue;
-
                     string className = null;
                     string propertyName = null;
 
@@ -505,12 +508,13 @@ namespace ScsmClient.Operations
             {
                 var name = kv.Key;
                 var value = kv.Value;
+
+                if (value == null)
+                    continue;
+
                 if (name.Contains("!"))
                 {
-
-                    if (value == null)
-                        continue;
-
+                    
                     string className = null;
                     string propertyName = null;
 
@@ -588,7 +592,7 @@ namespace ScsmClient.Operations
 
 
                 }
-
+                
                 if (objectProperties.TryGetValue(name, out var prop))
                 {
                     if (!prop.Key)
