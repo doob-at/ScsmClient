@@ -59,9 +59,15 @@ namespace ScsmClient.Operations
 
         }
 
-        public void Update(Guid changeId, Dictionary<string, object> properties)
+        public void UpdateByGenericId(Guid changeId, Dictionary<string, object> properties)
         {
             _client.Object().UpdateObject(changeId, properties);
+        }
+
+        public void UpdateById(string id, Dictionary<string, object> properties)
+        {
+            var ch = GetById(id);
+            _client.Object().UpdateObject(ch.ObjectId, properties);
         }
     }
 

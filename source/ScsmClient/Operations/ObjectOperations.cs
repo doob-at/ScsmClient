@@ -243,7 +243,7 @@ namespace ScsmClient.Operations
             var obj = GetEnterpriseManagementObjectsByClassName(className, criteria);
             return DeleteObjects(obj, cancellationToken);
         }
-        public int DeleteObjectsBaClassId(Guid classId, string criteria, CancellationToken cancellationToken = default)
+        public int DeleteObjectsByClassId(Guid classId, string criteria, CancellationToken cancellationToken = default)
         {
             var obj = GetEnterpriseManagementObjectsByClassId(classId, criteria);
             return DeleteObjects(obj, cancellationToken);
