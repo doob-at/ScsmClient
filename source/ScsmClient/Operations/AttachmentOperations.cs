@@ -35,8 +35,15 @@ namespace ScsmClient.Operations
             obj[fileAttachmentClass, "DisplayName"].Value = displayName;
             obj[fileAttachmentClass, "Content"].Value = content;
             obj[fileAttachmentClass, "Size"].Value = content.Length;
-            obj[fileAttachmentClass, "Description"].Value = description;
+           
             obj[fileAttachmentClass, "AddedDate"].Value = DateTime.UtcNow;
+
+            if (description != null)
+            {
+                obj[fileAttachmentClass, "Description"].Value = description;
+            }
+            
+
 
             if (displayName.Contains('.'))
             {

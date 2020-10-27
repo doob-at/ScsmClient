@@ -25,9 +25,9 @@ namespace ScsmClient.Operations
             return GetByCriteria($"Id == '{id}'", 1).FirstOrDefault();
         }
 
-        public List<ChangeRequestDto> GetByCriteria(string criteria, int? maxResults = null)
+        public List<ChangeRequestDto> GetByCriteria(string criteria, int? maxResults = null, int? levels = null)
         {
-            var srObjs = _client.ScsmObject().GetObjectsByTypeId(WellKnown.ChangeRequest.ProjectionType, criteria, maxResults).ToList();
+            var srObjs = _client.ScsmObject().GetObjectsByTypeId(WellKnown.ChangeRequest.ProjectionType, criteria, maxResults, levels).ToList();
             return srObjs.Select(e => new ChangeRequestDto(e)).ToList();
         }
 
