@@ -6,12 +6,14 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Microsoft.EnterpriseManagement.Common;
 using Microsoft.EnterpriseManagement.Configuration;
 using Reflectensions;
 using Reflectensions.ExtensionMethods;
 using ScsmClient;
 using ScsmClient.ExtensionMethods;
+using ScsmClient.Helper;
 using ScsmClient.SharedModels;
 using ScsmClient.SharedModels.Models;
 
@@ -79,13 +81,31 @@ namespace ScsmClientTestCmd
 
             //scsmClient.Object().UpdateObject(person);
 
-            var template = "BMI Create Person ChangeRequest";
-            var ch = new ChangeRequestDto();
-            ch.Title = $"TestChange from Template - '{template}'";
+            //var template = "BMI Create Person ChangeRequest";
+            //var ch = new ChangeRequestDto();
+            //ch.Title = $"TestChange from Template - '{template}'";
 
-            scsmClient.ChangeRequest().CreateFromTemplate(template, ch);
+            //scsmClient.ChangeRequest().CreateFromTemplate(template, ch);
 
+
+            //var sr = scsmClient.ServiceRequest().GetById("112");
+
+
+
+
+            var nsr = new ServiceRequestDto();
+            nsr.Title = "Test SR";
+            nsr.UserInput = "<UserInputs><UserInput Question=\"Password\" Answer=\"ABC12abc\" Type=\"string\" /></UserInputs>";
+            nsr["BMI.Account!Id"] = "A56";
+
+            var srId = scsmClient.ServiceRequest().CreateFromTemplate("BMI Reset Password", nsr);
+
+            nsr.Title = "öauksbfdöasöbdgiua";
+
+           scsmClient.Object().UpdateObject(srId, nsr.AsDictionary());
             
+
+            var _sr = scsmClient.ServiceRequest().GetByGenericId(srId);
 
             return;
 
@@ -98,6 +118,11 @@ namespace ScsmClientTestCmd
             //var obs = scsmClient.ScsmObject().GetObjectsByTypeName("zOrganisationseinheit", "zOKZ like '%Test%'").ToList();
             //Main1(args);
 
+        }
+
+        public static string XmlString(string text)
+        {
+            return new XElement("t", text).LastNode.ToString();
         }
 
         private static Guid CreateChange(SCSMClient scsmclient)
