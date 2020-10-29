@@ -122,6 +122,8 @@ namespace ScsmClientTestCmd
 
            var ch = scsmClient.ChangeRequest().GetByGenericId(Guid.Parse("5797ad96-27f0-6bbe-8d5b-3a0e6453a5fa"));
 
+           var workitems = ch.GetValuesOrDefault<WorkItem>("System.WorkItem.Activity.ManualActivity!").ToList();
+
            
            //var act = scsmClient.ScsmObject().GetObjectById(Guid.Parse("cd9eec23-ceaf-89e1-b9a6-d17c1f646da1"));
 
