@@ -375,6 +375,11 @@ namespace ScsmClient.SharedModels
             }
 
         }
+
+        public static class WorkItem
+        {
+            public static Guid ClassId => new Guid("f59821e2-0364-ed2c-19e3-752efbb1ece9");
+        }
     }
 
 

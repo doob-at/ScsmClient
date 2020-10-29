@@ -5,7 +5,7 @@ using Reflectensions.HelperClasses;
 
 namespace ScsmClient.SharedModels.Models
 {
-    public class ChangeRequestDto: WorkItemDto
+    public class ChangeRequest: WorkItem
     {
         public string Reason { get; set; }
         public string Notes { get; set; }
@@ -24,17 +24,17 @@ namespace ScsmClient.SharedModels.Models
         public string ImplementationResults { get; set; }
         public string Area { get; set; }
 
-        public ChangeRequestDto() : base()
+        public ChangeRequest() : base()
         {
 
         }
 
-        public ChangeRequestDto(IDictionary<string, object> dictionary) : base(dictionary)
+        public ChangeRequest(IDictionary<string, object> dictionary) : base(dictionary)
         {
 
         }
 
-        public ChangeRequestDto(ExpandableObject expandableObject) : base(expandableObject)
+        public ChangeRequest(ExpandableObject expandableObject) : base(expandableObject)
         {
 
         }

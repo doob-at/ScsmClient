@@ -18,30 +18,30 @@ namespace ScsmClient.Operations
         {
         }
 
-        public ServiceRequestDto GetByGenericId(Guid id)
+        public ServiceRequest GetByGenericId(Guid id)
         {
             var entObj = _client.ScsmObject().GetObjectById(id);
-            return new ServiceRequestDto(entObj);
+            return new ServiceRequest(entObj);
         }
 
-        public ServiceRequestDto GetById(string id)
+        public ServiceRequest GetById(string id)
         {
             return GetByCriteria($"Id == '{id}'", 1).FirstOrDefault();
         }
 
-        public List<ServiceRequestDto> GetByCriteria(string criteria, int? maxResults = null)
+        public List<ServiceRequest> GetByCriteria(string criteria, int? maxResults = null)
         {
             var srObjs = _client.ScsmObject().GetObjectsByTypeId(WellKnown.ServiceRequest.ProjectionType, criteria, maxResults).ToList();
-            return srObjs.Select(e => new ServiceRequestDto(e)).ToList();
+            return srObjs.Select(e => new ServiceRequest(e)).ToList();
         }
 
-        public Guid Create(ServiceRequestDto serviceReuest)
+        public Guid Create(ServiceRequest serviceReuest)
         {
             var id = _client.Object().CreateObjectByClassId(WellKnown.ServiceRequest.ClassId, serviceReuest.AsDictionary());
             return id;
         }
 
-        public Guid CreateFromTemplate(string templateName, ServiceRequestDto serviceReuest)
+        public Guid CreateFromTemplate(string templateName, ServiceRequest serviceReuest)
         {
             var template = _client.Template().GetObjectTemplateByName(templateName);
 

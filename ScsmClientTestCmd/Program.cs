@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -26,11 +27,46 @@ namespace ScsmClientTestCmd
         {
 
 
+
+           
+
+            var ui = new UserInput();
+            ui["Password"] = "Test";
+            ui["Special"] = new UserInputValue("[...123]", "xml");
+
+
+            var json = Json.Converter.ToJson(ui);
+
+            var uii = Json.Converter.ToObject<UserInput>(json);
+
+
+            var nJson = @"
+{
+    ""Password"":""Test@<>!"",
+    ""Special"": {
+        ""Value"": ""[...123]"",
+        ""Type"": ""xml""
+    },
+    ""Ok"": true,
+    ""Age"": {
+        ""Value"": ""39"",
+        ""Type"": ""int""
+    },
+
+}
+";
+            var uii2 = Json.Converter.ToObject<UserInput>(nJson);
+
+
+            var xml = uii2.ToXml();
+
+            var uii3 = UserInput.FromXml(xml);
+
             var creds = new NetworkCredential("BWLAB\\admin", "ABC12abc");
             var scsmClient = new SCSMClient("192.168.75.121", creds);
 
 
-           
+
             //var relClasses = scsmClient.Relations().FindRelationShip("BMI.Person", "BMI.Organisationseinheit");
 
 
@@ -49,7 +85,7 @@ namespace ScsmClientTestCmd
             //var accountId = Guid.Parse("b9daa419-8a0b-0431-ef0b-5c431f8937c3");
             //Guid relId = CreateRelation(scsmClient, accountId, ben);
 
-            
+
             //var ch = CreateChange(scsmClient);
             //var rel = scsmClient.Relations().CreateRelation( person, ch);
 
@@ -82,7 +118,7 @@ namespace ScsmClientTestCmd
             //scsmClient.Object().UpdateObject(person);
 
             //var template = "BMI Create Person ChangeRequest";
-            //var ch = new ChangeRequestDto();
+            //var ch = new ChangeRequest();
             //ch.Title = $"TestChange from Template - '{template}'";
 
             //scsmClient.ChangeRequest().CreateFromTemplate(template, ch);
@@ -90,12 +126,18 @@ namespace ScsmClientTestCmd
 
             //var sr = scsmClient.ServiceRequest().GetById("112");
 
+           
 
-
-
-            var nsr = new ServiceRequestDto();
+            var nsr = new ServiceRequest();
             nsr.Title = "Test SR";
-            nsr.UserInput = "<UserInputs><UserInput Question=\"Password\" Answer=\"ABC12abc\" Type=\"string\" /></UserInputs>";
+            nsr.UserInput = new UserInput()
+            {
+                ["Password"] = "ABC12abc",
+                ["Age"] = 123,
+                ["Timestamp"] = DateTime.UtcNow
+            };
+                
+                //"<UserInputs><UserInput Question=\"Password\" Answer=\"ABC12abc\" Type=\"string\" /></UserInputs>";
             nsr["BMI.Account!Id"] = "A56";
 
             var srId = scsmClient.ServiceRequest().CreateFromTemplate("BMI Reset Password", nsr);
@@ -106,6 +148,9 @@ namespace ScsmClientTestCmd
             
 
             var _sr = scsmClient.ServiceRequest().GetByGenericId(srId);
+
+
+           
 
             return;
 
@@ -120,6 +165,8 @@ namespace ScsmClientTestCmd
 
         }
 
+        
+
         public static string XmlString(string text)
         {
             return new XElement("t", text).LastNode.ToString();
@@ -127,7 +174,7 @@ namespace ScsmClientTestCmd
 
         private static Guid CreateChange(SCSMClient scsmclient)
         {
-            var cr = new ScsmClient.SharedModels.Models.ChangeRequestDto();
+            var cr = new ScsmClient.SharedModels.Models.ChangeRequest();
             cr.Title = $"Neue Person erstellen - Mit Attachment";
             cr.Description =
                 $"Automatisiertes erstellen von folgender Person inkl. etwaiger Abhängigkeiten";
@@ -248,7 +295,7 @@ namespace ScsmClientTestCmd
             var tt = tid.TargetType;
             var type = temp.GetType();
 
-            var inc = new IncidentDto();
+            var inc = new Incident();
             inc.Title = "Test Incident 123";
             inc.Impact = WellKnown.Incident.Impact.High;
             inc["Description"] = "TestDescription";
@@ -260,8 +307,8 @@ namespace ScsmClientTestCmd
 
             var isEqual = json == jsondic;
 
-            var inc2 = Json.Converter.ToObject<IncidentDto>(json);
-            var in3 = Json.Converter.ToObject<IncidentDto>(jsondic);
+            var inc2 = Json.Converter.ToObject<Incident>(json);
+            var in3 = Json.Converter.ToObject<Incident>(jsondic);
 
 
             scsmclient.Incident().CreateFromTemplate("Networking Issue Incident Template", inc);

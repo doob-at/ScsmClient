@@ -14,30 +14,30 @@ namespace ScsmClient.Operations
         {
         }
 
-        public ChangeRequestDto GetByGenericId(Guid id)
+        public ChangeRequest GetByGenericId(Guid id)
         {
             var entObj = _client.ScsmObject().GetObjectById(id);
-            return new ChangeRequestDto(entObj);
+            return new ChangeRequest(entObj);
         }
 
-        public ChangeRequestDto GetById(string id)
+        public ChangeRequest GetById(string id)
         {
             return GetByCriteria($"Id == '{id}'", 1).FirstOrDefault();
         }
 
-        public List<ChangeRequestDto> GetByCriteria(string criteria, int? maxResults = null, int? levels = null)
+        public List<ChangeRequest> GetByCriteria(string criteria, int? maxResults = null, int? levels = null)
         {
             var srObjs = _client.ScsmObject().GetObjectsByTypeId(WellKnown.ChangeRequest.ProjectionType, criteria, maxResults, levels).ToList();
-            return srObjs.Select(e => new ChangeRequestDto(e)).ToList();
+            return srObjs.Select(e => new ChangeRequest(e)).ToList();
         }
 
-        public Guid Create(ChangeRequestDto changeReuest)
+        public Guid Create(ChangeRequest changeReuest)
         {
             var id = _client.Object().CreateObjectByClassId(WellKnown.ChangeRequest.ClassId, changeReuest.AsDictionary());
             return id;
         }
 
-        public Guid CreateFromTemplate(string templateName, ChangeRequestDto changeReuest)
+        public Guid CreateFromTemplate(string templateName, ChangeRequest changeReuest)
         {
             var template = _client.Template().GetObjectTemplateByName(templateName);
 

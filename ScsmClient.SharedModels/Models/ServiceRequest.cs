@@ -4,7 +4,7 @@ using Reflectensions.HelperClasses;
 
 namespace ScsmClient.SharedModels.Models
 {
-    public class ServiceRequestDto: WorkItemDto
+    public class ServiceRequest: WorkItem
     {
         public string Status { get; set; }
         public string TemplateId { get; set; }
@@ -18,17 +18,17 @@ namespace ScsmClient.SharedModels.Models
         public string Area { get; set; }
         public string SupportGroup { get; set; }
 
-        public ServiceRequestDto() : base()
+        public ServiceRequest() : base()
         {
 
         }
 
-        public ServiceRequestDto(IDictionary<string, object> dictionary): base(dictionary)
+        public ServiceRequest(IDictionary<string, object> dictionary): base(dictionary)
         {
             
         }
 
-        public ServiceRequestDto(ExpandableObject expandableObject) : base(expandableObject)
+        public ServiceRequest(ExpandableObject expandableObject) : base(expandableObject)
         {
 
         }

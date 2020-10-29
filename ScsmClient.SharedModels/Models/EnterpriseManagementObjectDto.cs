@@ -26,6 +26,8 @@ namespace ScsmClient.SharedModels.Models
         public DateTime LastModified { get; set; }
         public DateTime TimeAdded { get; set; }
 
+        public string DisplayName { get; set; }
+
         public ScsmObject(): base()
         {
             

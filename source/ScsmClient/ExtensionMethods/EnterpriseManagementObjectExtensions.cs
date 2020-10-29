@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EnterpriseManagement.Common;
 using Microsoft.EnterpriseManagement.Configuration;
+using ScsmClient.SharedModels;
 using ScsmClient.SharedModels.Models;
 
 namespace ScsmClient.ExtensionMethods
@@ -182,6 +184,13 @@ namespace ScsmClient.ExtensionMethods
 
                 if (!scsmObject.ContainsKey(enterpriseManagementSimpleObject.Type.Name))
                 {
+                    if (enterpriseManagementSimpleObject.Type.ParentElement.Id == WellKnown.WorkItem.ClassId &&
+                        enterpriseManagementSimpleObject.Type.Name.Equals("UserInput", StringComparison.OrdinalIgnoreCase))
+                    {
+
+                        scsmObject[enterpriseManagementSimpleObject.Type.Name] = UserInput.FromXml(value.ToString());
+                        continue;
+                    }
                     scsmObject[enterpriseManagementSimpleObject.Type.Name] = value;
                 }
             }

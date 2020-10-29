@@ -4,8 +4,9 @@ using Reflectensions.HelperClasses;
 
 namespace ScsmClient.SharedModels.Models
 {
-    public class WorkItemDto: ScsmObject
+    public class WorkItem: ScsmObject
     {
+        
         public string Title { get; set; }
         public string Description { get; set; }
         public string ContactMethod { get; set; }
@@ -25,21 +26,21 @@ namespace ScsmClient.SharedModels.Models
         public double ActualCost { get; set; }
         public double PlannedWork { get; set; }
         public double ActualWork { get; set; }
-        public string UserInput { get; set; }
+        public UserInput UserInput { get; set; }
         public DateTime? FirstAssignedDate { get; set; }
         public DateTime? FirstResponseDate { get; set; }
 
-        public WorkItemDto() : base()
+        public WorkItem() : base()
         {
 
         }
 
-        public WorkItemDto(IDictionary<string, object> dictionary) : base(dictionary)
+        public WorkItem(IDictionary<string, object> dictionary) : base(dictionary)
         {
 
         }
 
-        public WorkItemDto(ExpandableObject expandableObject) : base(expandableObject)
+        public WorkItem(ExpandableObject expandableObject) : base(expandableObject)
         {
 
         }

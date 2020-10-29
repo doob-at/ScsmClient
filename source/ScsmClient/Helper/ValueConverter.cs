@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.EnterpriseManagement.Configuration;
 using Reflectensions.ExtensionMethods;
 using ScsmClient.ExtensionMethods;
+using ScsmClient.SharedModels.Models;
 
 namespace ScsmClient.Helper
 {
@@ -22,6 +23,11 @@ namespace ScsmClient.Helper
 
         public object NormalizeValue(object value, ManagementPackProperty property)
         {
+            if (value is UserInput userInput)
+            {
+                return userInput.ToXml();
+            }
+
             switch (property.Type)
             {
                 case ManagementPackEntityPropertyTypes.@enum:

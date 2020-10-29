@@ -1,6 +1,8 @@
 ﻿using System.Net;
 using Microsoft.EnterpriseManagement;
+using Reflectensions;
 using ScsmClient.Helper;
+using ScsmClient.JsonConverters;
 using ScsmClient.Operations;
 
 namespace ScsmClient
@@ -45,6 +47,7 @@ namespace ScsmClient
 
         private void Init()
         {
+            Json.Converter.RegisterJsonConverter<ManagementGroupConverter>();
 
             var settings = new EnterpriseManagementConnectionSettings(ServerName);
             
