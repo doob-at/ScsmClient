@@ -14,15 +14,14 @@ namespace ScsmClient.Operations
         {
         }
 
-        public ChangeRequest GetByGenericId(Guid id)
+        public ChangeRequest GetByGenericId(Guid id, int? levels = null)
         {
-            var entObj = _client.ScsmObject().GetObjectById(id);
-            return new ChangeRequest(entObj);
+            return GetByCriteria($"G:System.WorkItem.ChangeRequest!Id == '{id}'", 1, levels).FirstOrDefault();
         }
 
-        public ChangeRequest GetById(string id)
+        public ChangeRequest GetById(string id, int? levels = null)
         {
-            return GetByCriteria($"Id == '{id}'", 1).FirstOrDefault();
+            return GetByCriteria($"Id == '{id}'", 1, levels).FirstOrDefault();
         }
 
         public List<ChangeRequest> GetByCriteria(string criteria, int? maxResults = null, int? levels = null)
