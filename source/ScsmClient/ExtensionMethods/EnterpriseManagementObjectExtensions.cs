@@ -188,7 +188,7 @@ namespace ScsmClient.ExtensionMethods
                         enterpriseManagementSimpleObject.Type.Name.Equals("UserInput", StringComparison.OrdinalIgnoreCase))
                     {
 
-                        scsmObject[enterpriseManagementSimpleObject.Type.Name] = UserInput.FromXml(value.ToString());
+                        scsmObject[enterpriseManagementSimpleObject.Type.Name] = UserInput.FromXml(value?.ToString());
                         continue;
                     }
                     scsmObject[enterpriseManagementSimpleObject.Type.Name] = value;

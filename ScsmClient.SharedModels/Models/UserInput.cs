@@ -37,6 +37,9 @@ namespace ScsmClient.SharedModels.Models
         public static UserInput FromXml(string xmlString)
         {
             var usrI = new UserInput();
+            if (String.IsNullOrWhiteSpace(xmlString))
+                return usrI;
+
             var xml = XDocument.Parse(xmlString);
             var uis = xml.XPathSelectElements("//UserInput").ToList();
 

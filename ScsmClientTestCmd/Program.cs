@@ -27,41 +27,6 @@ namespace ScsmClientTestCmd
         {
 
 
-
-           
-
-            var ui = new UserInput();
-            ui["Password"] = "Test";
-            ui["Special"] = new UserInputValue("[...123]", "xml");
-
-
-            var json = Json.Converter.ToJson(ui);
-
-            var uii = Json.Converter.ToObject<UserInput>(json);
-
-
-            var nJson = @"
-{
-    ""Password"":""Test@<>!"",
-    ""Special"": {
-        ""Value"": ""[...123]"",
-        ""Type"": ""xml""
-    },
-    ""Ok"": true,
-    ""Age"": {
-        ""Value"": ""39"",
-        ""Type"": ""int""
-    },
-
-}
-";
-            var uii2 = Json.Converter.ToObject<UserInput>(nJson);
-
-
-            var xml = uii2.ToXml();
-
-            var uii3 = UserInput.FromXml(xml);
-
             var creds = new NetworkCredential("BWLAB\\admin", "ABC12abc");
             var scsmClient = new SCSMClient("192.168.75.121", creds);
 
@@ -128,30 +93,41 @@ namespace ScsmClientTestCmd
 
            
 
-            var nsr = new ServiceRequest();
-            nsr.Title = "Test SR";
-            nsr.UserInput = new UserInput()
-            {
-                ["Password"] = "ABC12abc",
-                ["Age"] = 123,
-                ["Timestamp"] = DateTime.UtcNow
-            };
+           // var nsr = new ServiceRequest();
+           // nsr.Title = "Test SR";
+           // nsr.UserInput = new UserInput()
+           // {
+           //     ["Password"] = "ABC12abc",
+           //     ["Age"] = 123,
+           //     ["Timestamp"] = DateTime.UtcNow
+           // };
                 
-                //"<UserInputs><UserInput Question=\"Password\" Answer=\"ABC12abc\" Type=\"string\" /></UserInputs>";
-            nsr["BMI.Account!Id"] = "A56";
+           //     //"<UserInputs><UserInput Question=\"Password\" Answer=\"ABC12abc\" Type=\"string\" /></UserInputs>";
+           // nsr["BMI.Account!Id"] = "A56";
 
-            var srId = scsmClient.ServiceRequest().CreateFromTemplate("BMI Reset Password", nsr);
+           // var srId = scsmClient.ServiceRequest().CreateFromTemplate("BMI Reset Password", nsr);
 
-            nsr.Title = "öauksbfdöasöbdgiua";
+           // nsr.Title = "öauksbfdöasöbdgiua";
 
-           scsmClient.Object().UpdateObject(srId, nsr.AsDictionary());
+           //scsmClient.Object().UpdateObject(srId, nsr.AsDictionary());
             
 
-            var _sr = scsmClient.ServiceRequest().GetByGenericId(srId);
+           // var _sr = scsmClient.ServiceRequest().GetByGenericId(srId);
+           //var changeMp = scsmClient.Types().GetClassById(WellKnown.ChangeRequest.ClassId);
+           //var axtMP = scsmClient.Types().GetClassByName("System.WorkItem.Activity");
 
+           //var tps = scsmClient.Types().GetTypeProjections().OrderBy(tp => tp.Name).ToList();
+
+           //var rel = scsmClient.Relations().FindRelationship(changeMp, axtMP);
+
+           var ch = scsmClient.ChangeRequest().GetByGenericId(Guid.Parse("5797ad96-27f0-6bbe-8d5b-3a0e6453a5fa"));
 
            
+           //var act = scsmClient.ScsmObject().GetObjectById(Guid.Parse("cd9eec23-ceaf-89e1-b9a6-d17c1f646da1"));
 
+           //var act1 = scsmClient.ScsmObject().GetObjectsByTypeId(WellKnown.ChangeRequest.ProjectionType, "Id -eq '137'").ToList();
+
+           
             return;
 
 

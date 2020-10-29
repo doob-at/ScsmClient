@@ -143,6 +143,10 @@ namespace ScsmClient.Operations
         {
             return _client.ManagementGroup.EntityTypes.GetTypeProjections(criteria);
         }
+        public IList<ManagementPackTypeProjection> GetTypeProjections()
+        {
+            return _client.ManagementGroup.EntityTypes.GetTypeProjections();
+        }
         #endregion
 
 
