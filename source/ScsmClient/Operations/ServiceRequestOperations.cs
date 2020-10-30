@@ -18,30 +18,33 @@ namespace ScsmClient.Operations
         {
         }
 
-        public ServiceRequest GetByGenericId(Guid id)
+        public ServiceRequest GetByGenericId(Guid id, int? levels = null)
         {
-            var entObj = _client.ScsmObject().GetObjectById(id);
-            return new ServiceRequest(entObj);
+            if (levels.HasValue && levels.Value == 0)
+            {
+                return _client.ScsmObject().GetObjectById(id).SwitchType<ServiceRequest>();
+            }
+            return GetByCriteria($"G:System.WorkItem.ServiceRequest!Id == '{id}'", 1, levels).FirstOrDefault();
         }
 
-        public ServiceRequest GetById(string id)
+        public ServiceRequest GetById(string id, int? levels = null)
         {
-            return GetByCriteria($"Id == '{id}'", 1).FirstOrDefault();
+            return GetByCriteria($"Id == '{id}'", 1, levels).FirstOrDefault();
         }
 
-        public List<ServiceRequest> GetByCriteria(string criteria, int? maxResults = null)
+        public List<ServiceRequest> GetByCriteria(string criteria, int? maxResults = null, int? levels = null)
         {
-            var srObjs = _client.ScsmObject().GetObjectsByTypeId(WellKnown.ServiceRequest.ProjectionType, criteria, maxResults).ToList();
-            return srObjs.Select(e => new ServiceRequest(e)).ToList();
+            var srObjs = _client.ScsmObject().GetObjectsByTypeId(WellKnown.ServiceRequest.ProjectionType, criteria, maxResults, levels);
+            return srObjs.SwitchType<ServiceRequest>().ToList();
         }
 
-        public Guid Create(ServiceRequest serviceReuest)
+        public Guid Create(ServiceRequest serviceRequest)
         {
-            var id = _client.Object().CreateObjectByClassId(WellKnown.ServiceRequest.ClassId, serviceReuest.AsDictionary());
+            var id = _client.Object().CreateObjectByClassId(WellKnown.ServiceRequest.ClassId, serviceRequest.AsDictionary());
             return id;
         }
 
-        public Guid CreateFromTemplate(string templateName, ServiceRequest serviceReuest)
+        public Guid CreateFromTemplate(string templateName, ServiceRequest serviceRequest)
         {
             var template = _client.Template().GetObjectTemplateByName(templateName);
 
@@ -53,7 +56,7 @@ namespace ScsmClient.Operations
                     throw new Exception($"Template '{templateName}' is not a ServiceRequest Template!");
                 }
 
-                var id = _client.Object().CreateObjectFromTemplate(template, serviceReuest.AsDictionary());
+                var id = _client.Object().CreateObjectFromTemplate(template, serviceRequest.AsDictionary());
                 return id;
             }
             else

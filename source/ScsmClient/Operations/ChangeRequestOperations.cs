@@ -16,6 +16,10 @@ namespace ScsmClient.Operations
 
         public ChangeRequest GetByGenericId(Guid id, int? levels = null)
         {
+            if (levels.HasValue && levels.Value == 0)
+            {
+                return _client.ScsmObject().GetObjectById(id).SwitchType<ChangeRequest>();
+            }
             return GetByCriteria($"G:System.WorkItem.ChangeRequest!Id == '{id}'", 1, levels).FirstOrDefault();
         }
 
@@ -26,8 +30,8 @@ namespace ScsmClient.Operations
 
         public List<ChangeRequest> GetByCriteria(string criteria, int? maxResults = null, int? levels = null)
         {
-            var srObjs = _client.ScsmObject().GetObjectsByTypeId(WellKnown.ChangeRequest.ProjectionType, criteria, maxResults, levels).ToList();
-            return srObjs.Select(e => new ChangeRequest(e)).ToList();
+            var srObjs = _client.ScsmObject().GetObjectsByTypeId(WellKnown.ChangeRequest.ProjectionType, criteria, maxResults, levels);
+            return srObjs.SwitchType<ChangeRequest>().ToList();
         }
 
         public Guid Create(ChangeRequest changeReuest)
