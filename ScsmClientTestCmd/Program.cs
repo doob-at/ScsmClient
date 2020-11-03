@@ -131,16 +131,36 @@ namespace ScsmClientTestCmd
 
             var per = CreatePersonWithRelations(scsmClient);
 
-            var persons = scsmClient.ScsmObject().GetObjectsByTypeName("BMI.Person.Projection", "Id -eq 'P253340'").ToList();
+            var person = scsmClient.ScsmObject().GetObjectsByTypeName("BMI.Person.Projection",$"G:Id -eq '{per}'").FirstOrDefault();
 
-            var person = persons.FirstOrDefault();
+            var currentAccounts = person.GetValuesOrDefault<ScsmObject>("BMI.Account!");
+
+            var acc1 = new Dictionary<string, object>();
+            acc1["Username"] = "windis11";
+            acc1["InitialPassword"] = "ABC12abc";
+            acc1["Beschreibung"] = "Nested Account";
+
             var upd = new Dictionary<string, object>();
-            //upd["BMI.Organisationseinheit!OKZ-"] = "BMI-PI_ST_RATTEN"; 
-            //upd["BMI.Organisationseinheit!PLZ-"] = "8673"; 
-            upd["BMI.Organisationseinheit!OKZ"] = new List<object>() {"BMI-PI_ST_RATTEN", "BMI-PI_V_FELDKIRCH" };
-            scsmClient.Object().UpdateObject(person.ObjectId, upd );
 
-            var after = scsmClient.ScsmObject().GetObjectsByTypeName("BMI.Person.Projection", "Id -eq 'P253340'").FirstOrDefault();
+            var nAccounts = currentAccounts.Select(a => (object)a.ObjectId).ToList();
+
+            nAccounts.Add(acc1);
+
+
+            upd["BMI.Account!"] = nAccounts;
+
+            scsmClient.Object().UpdateObject(per, upd);
+
+            //var persons = scsmClient.ScsmObject().GetObjectsByTypeName("BMI.Person.Projection", "Id -eq 'P253340'").ToList();
+
+            //var person = persons.FirstOrDefault();
+            //var upd = new Dictionary<string, object>();
+            ////upd["BMI.Organisationseinheit!OKZ-"] = "BMI-PI_ST_RATTEN"; 
+            ////upd["BMI.Organisationseinheit!PLZ-"] = "8673"; 
+            //upd["BMI.Organisationseinheit!OKZ"] = new List<object>() {"BMI-PI_ST_RATTEN", "BMI-PI_V_FELDKIRCH" };
+            //scsmClient.Object().UpdateObject(person.ObjectId, upd );
+
+            //var after = scsmClient.ScsmObject().GetObjectsByTypeName("BMI.Person.Projection", "Id -eq 'P253340'").FirstOrDefault();
 
             return;
 
