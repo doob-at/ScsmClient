@@ -30,7 +30,13 @@ namespace ScsmClientTestCmd
             var creds = new NetworkCredential("BWLAB\\admin", "ABC12abc");
             var scsmClient = new SCSMClient("192.168.75.121", creds);
 
+            //var or = scsmClient.Object().DeleteObjectsByClassName("BMI.Organisationseinheit", "");
 
+            //scsmClient.Object().DeleteObjectsByClassName("BMI.Account", "");
+            //scsmClient.Object().DeleteObjectsByClassName("BMI.Benutzer", "");
+
+
+            //var z = 1;
 
             //var relClasses = scsmClient.Relations().FindRelationShip("BMI.Person", "BMI.Organisationseinheit");
 
@@ -129,27 +135,33 @@ namespace ScsmClientTestCmd
 
             //var act1 = scsmClient.ScsmObject().GetObjectsByTypeId(WellKnown.ChangeRequest.ProjectionType, "Id -eq '137'").ToList();
 
-            var per = CreatePersonWithRelations(scsmClient);
+            //var per = CreatePersonWithRelations(scsmClient);
 
-            var person = scsmClient.ScsmObject().GetObjectsByTypeName("BMI.Person.Projection",$"G:Id -eq '{per}'").FirstOrDefault();
-
-            var currentAccounts = person.GetValuesOrDefault<ScsmObject>("BMI.Account!");
-
-            var acc1 = new Dictionary<string, object>();
-            acc1["Username"] = "windis11";
-            acc1["InitialPassword"] = "ABC12abc";
-            acc1["Beschreibung"] = "Nested Account";
-
+            var person = scsmClient.ScsmObject().GetObjectsByTypeName("BMI.Person",$"Id -eq 'P292317'").FirstOrDefault();
             var upd = new Dictionary<string, object>();
+            upd["Bundesdienst"] = false;
+            upd["Personalnummer-"] = null;
 
-            var nAccounts = currentAccounts.Select(a => (object)a.ObjectId).ToList();
-
-            nAccounts.Add(acc1);
+            scsmClient.Object().UpdateObject(person.ObjectId, upd);
 
 
-            upd["BMI.Account!"] = nAccounts;
+            //var currentAccounts = person.GetValuesOrDefault<ScsmObject>("BMI.Account!");
 
-            scsmClient.Object().UpdateObject(per, upd);
+            //var acc1 = new Dictionary<string, object>();
+            //acc1["Username"] = "windis11";
+            //acc1["InitialPassword"] = "ABC12abc";
+            //acc1["Beschreibung"] = "Nested Account";
+
+            //var upd = new Dictionary<string, object>();
+
+            //var nAccounts = currentAccounts.Select(a => (object)a.ObjectId).ToList();
+
+            //nAccounts.Add(acc1);
+
+
+            //upd["BMI.Account!"] = nAccounts;
+
+            //scsmClient.Object().UpdateObject(per, upd);
 
             //var persons = scsmClient.ScsmObject().GetObjectsByTypeName("BMI.Person.Projection", "Id -eq 'P253340'").ToList();
 

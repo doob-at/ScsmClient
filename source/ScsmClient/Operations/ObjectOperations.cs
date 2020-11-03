@@ -742,7 +742,15 @@ namespace ScsmClient.Operations
 
                     if (mode == UpdateMode.Remove)
                     {
-                        entObj[objectClass, name].SetToDefault();
+                        if (String.IsNullOrWhiteSpace(prop.DefaultValue))
+                        {
+                            entObj[objectClass, name].Value = null;
+                        }
+                        else
+                        {
+                            entObj[objectClass, name].SetToDefault();
+                        }
+                        
                     }
                     else
                     {
