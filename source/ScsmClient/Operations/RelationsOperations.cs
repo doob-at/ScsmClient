@@ -156,19 +156,42 @@ namespace ScsmClient.Operations
         }
         public IEnumerable<EnterpriseManagementObject> GetRelatedObjectsByClass(Guid sourceId, ManagementPackClass managementPackClass)
         {
-            _client.Types().GetClassByName("System.FileAttachment");
             return GetRelatedObjectsByClassId(sourceId, managementPackClass.Id);
         }
         public IEnumerable<EnterpriseManagementObject> GetRelatedObjectsByClassId(Guid sourceId, Guid managementPackClassId)
         {
+            return GetRelationshipObjectsByClassId(sourceId, managementPackClassId).Select(ro => ro.TargetObject);
+        }
+
+        public IEnumerable<EnterpriseManagementRelationshipObject<EnterpriseManagementObject>> GetAllRelationshipObjects(Guid sourceId)
+        {
+            return GetRelationshipObjectsByClassId(sourceId, Guid.Empty);
+        }
+        public IEnumerable<EnterpriseManagementRelationshipObject<EnterpriseManagementObject>> GetRelationshipObjectsByClassName(Guid sourceId, string className)
+        {
+            var managementPackClass = _client.Types().GetClassByName(className);
+            return GetRelationshipObjectsByClassId(sourceId, managementPackClass.Id);
+        }
+
+        public IEnumerable<EnterpriseManagementRelationshipObject<EnterpriseManagementObject>> GetRelationshipObjectsByClass(Guid sourceId,
+            ManagementPackClass managementPackClass)
+        {
+            return GetRelationshipObjectsByClassId(sourceId, managementPackClass.Id);
+        }
+        public IEnumerable<EnterpriseManagementRelationshipObject<EnterpriseManagementObject>> GetRelationshipObjectsByClassId(Guid sourceId, Guid managementPackClassId)
+        {
             var query = _client.ManagementGroup.EntityObjects
                 .GetRelationshipObjects<EnterpriseManagementObject>(sourceId, ObjectQueryOptions.Default)
-                .OrderBy(ro => ro.LastModified)
-                .Select(ro => ro.TargetObject);
+                .OrderBy(ro => ro.LastModified).ToList();
 
             if (managementPackClassId != Guid.Empty)
             {
-                query = query.Where(ro => ro.GetManagementPackClass().Id == managementPackClassId);
+                query = query.Where(ro =>
+                {
+                    var isTargetClass = ro.TargetObject.GetManagementPackClass().Id == managementPackClassId;
+                    var isSourceClass = ro.SourceObject.GetManagementPackClass().Id == managementPackClassId;
+                    return isSourceClass || isTargetClass;
+                }).ToList();
             }
 
             return query;

@@ -75,7 +75,7 @@ namespace ScsmClientTestCmd
             //var rels = scsmClient.Relations().GetAllRelatedObjects(ch);
 
 
-            //var person = scsmClient.ScsmObject().GetObjectsByTypeName("BMI.Person", "Id -eq 'P253319'").FirstOrDefault();
+
 
             //person["Nachname"] = "Windisch";
             //person.LastModified = DateTime.Now.AddYears(1);
@@ -91,45 +91,57 @@ namespace ScsmClientTestCmd
 
             //var sr = scsmClient.ServiceRequest().GetById("112");
 
-           
 
-           // var nsr = new ServiceRequest();
-           // nsr.Title = "Test SR";
-           // nsr.UserInput = new UserInput()
-           // {
-           //     ["Password"] = "ABC12abc",
-           //     ["Age"] = 123,
-           //     ["Timestamp"] = DateTime.UtcNow
-           // };
-                
-           //     //"<UserInputs><UserInput Question=\"Password\" Answer=\"ABC12abc\" Type=\"string\" /></UserInputs>";
-           // nsr["BMI.Account!Id"] = "A56";
 
-           // var srId = scsmClient.ServiceRequest().CreateFromTemplate("BMI Reset Password", nsr);
+            // var nsr = new ServiceRequest();
+            // nsr.Title = "Test SR";
+            // nsr.UserInput = new UserInput()
+            // {
+            //     ["Password"] = "ABC12abc",
+            //     ["Age"] = 123,
+            //     ["Timestamp"] = DateTime.UtcNow
+            // };
 
-           // nsr.Title = "öauksbfdöasöbdgiua";
+            //     //"<UserInputs><UserInput Question=\"Password\" Answer=\"ABC12abc\" Type=\"string\" /></UserInputs>";
+            // nsr["BMI.Account!Id"] = "A56";
 
-           //scsmClient.Object().UpdateObject(srId, nsr.AsDictionary());
-            
+            // var srId = scsmClient.ServiceRequest().CreateFromTemplate("BMI Reset Password", nsr);
 
-           // var _sr = scsmClient.ServiceRequest().GetByGenericId(srId);
-           //var changeMp = scsmClient.Types().GetClassById(WellKnown.ChangeRequest.ClassId);
-           //var axtMP = scsmClient.Types().GetClassByName("System.WorkItem.Activity");
+            // nsr.Title = "öauksbfdöasöbdgiua";
 
-           //var tps = scsmClient.Types().GetTypeProjections().OrderBy(tp => tp.Name).ToList();
+            //scsmClient.Object().UpdateObject(srId, nsr.AsDictionary());
 
-           //var rel = scsmClient.Relations().FindRelationship(changeMp, axtMP);
 
-           var ch = scsmClient.ChangeRequest().GetByGenericId(Guid.Parse("5797ad96-27f0-6bbe-8d5b-3a0e6453a5fa"));
+            // var _sr = scsmClient.ServiceRequest().GetByGenericId(srId);
+            //var changeMp = scsmClient.Types().GetClassById(WellKnown.ChangeRequest.ClassId);
+            //var axtMP = scsmClient.Types().GetClassByName("System.WorkItem.Activity");
 
-           var workitems = ch.GetValuesOrDefault<WorkItem>("System.WorkItem.Activity.ManualActivity!").ToList();
+            //var tps = scsmClient.Types().GetTypeProjections().OrderBy(tp => tp.Name).ToList();
 
-           
-           //var act = scsmClient.ScsmObject().GetObjectById(Guid.Parse("cd9eec23-ceaf-89e1-b9a6-d17c1f646da1"));
+            //var rel = scsmClient.Relations().FindRelationship(changeMp, axtMP);
 
-           //var act1 = scsmClient.ScsmObject().GetObjectsByTypeId(WellKnown.ChangeRequest.ProjectionType, "Id -eq '137'").ToList();
+            //var ch = scsmClient.ChangeRequest().GetByGenericId(Guid.Parse("5797ad96-27f0-6bbe-8d5b-3a0e6453a5fa"));
 
-           
+            //var workitems = ch.GetValuesOrDefault<WorkItem>("System.WorkItem.Activity.ManualActivity!").ToList();
+
+
+            //var act = scsmClient.ScsmObject().GetObjectById(Guid.Parse("cd9eec23-ceaf-89e1-b9a6-d17c1f646da1"));
+
+            //var act1 = scsmClient.ScsmObject().GetObjectsByTypeId(WellKnown.ChangeRequest.ProjectionType, "Id -eq '137'").ToList();
+
+            var per = CreatePersonWithRelations(scsmClient);
+
+            var persons = scsmClient.ScsmObject().GetObjectsByTypeName("BMI.Person.Projection", "Id -eq 'P253340'").ToList();
+
+            var person = persons.FirstOrDefault();
+            var upd = new Dictionary<string, object>();
+            //upd["BMI.Organisationseinheit!OKZ-"] = "BMI-PI_ST_RATTEN"; 
+            //upd["BMI.Organisationseinheit!PLZ-"] = "8673"; 
+            upd["BMI.Organisationseinheit!OKZ"] = new List<object>() {"BMI-PI_ST_RATTEN", "BMI-PI_V_FELDKIRCH" };
+            scsmClient.Object().UpdateObject(person.ObjectId, upd );
+
+            var after = scsmClient.ScsmObject().GetObjectsByTypeName("BMI.Person.Projection", "Id -eq 'P253340'").FirstOrDefault();
+
             return;
 
 

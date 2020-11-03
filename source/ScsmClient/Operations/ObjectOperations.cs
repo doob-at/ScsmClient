@@ -63,17 +63,17 @@ namespace ScsmClient.Operations
 
 
             var critOptions = new ObjectQueryOptions();
-            
+
             critOptions.DefaultPropertyRetrievalBehavior = ObjectPropertyRetrievalBehavior.All;
             if (maxResult.HasValue && maxResult.Value != int.MaxValue)
             {
                 critOptions.MaxResultCount = maxResult.Value;
                 critOptions.ObjectRetrievalMode = ObjectRetrievalOptions.Buffered;
             }
-            
+
             var sortprop = new EnterpriseManagementObjectGenericProperty(EnterpriseManagementObjectGenericPropertyName.TimeAdded);
             critOptions.AddSortProperty(sortprop, SortingOrder.Ascending);
-            
+
 
             var reader = _client.ManagementGroup.EntityObjects.GetObjectReader<EnterpriseManagementObject>(crit, critOptions);
 
@@ -102,10 +102,10 @@ namespace ScsmClient.Operations
 
         public Guid CreateObjectByClass(ManagementPackClass objectClass, Dictionary<string, object> properties)
         {
-            return CreateObjectsByClass(objectClass, new[] {properties}, CancellationToken.None).FirstOrDefault().Value;
+            return CreateObjectsByClass(objectClass, new[] { properties }, CancellationToken.None).FirstOrDefault().Value;
         }
 
-       
+
         public Dictionary<int, Guid> CreateObjectsByClassId(Guid id, IEnumerable<Dictionary<string, object>> objects, CancellationToken cancellationToken = default)
         {
 
@@ -135,10 +135,10 @@ namespace ScsmClient.Operations
                 var idd = new IncrementalDiscoveryData();
                 foreach (var dictionary in enumerable)
                 {
-                    
+
                     var obj = BuildEnterpriseManagementObjectWithRelations(objectClass, dictionary);
                     var rootId = AddIncremental(obj, ref idd);
-                    
+
                     _list.Add(rootId);
                 }
                 idd.Commit(_client.ManagementGroup);
@@ -171,7 +171,7 @@ namespace ScsmClient.Operations
         public Guid CreateObjectFromTemplate(ManagementPackObjectTemplate template, Dictionary<string, object> properties)
         {
 
-            return CreateObjectsFromTemplate(template, new[] {properties}, CancellationToken.None).First().Value;
+            return CreateObjectsFromTemplate(template, new[] { properties }, CancellationToken.None).First().Value;
         }
 
         public Dictionary<int, Guid> CreateObjectsFromTemplateId(Guid id, IEnumerable<Dictionary<string, object>> objects, CancellationToken cancellationToken = default)
@@ -258,7 +258,7 @@ namespace ScsmClient.Operations
             return count;
         }
 
-       
+
         public void UpdateObject(Guid id, Dictionary<string, object> properties)
         {
             var enterpriseManagementObject = GetEnterpriseManagementObjectById(id);
@@ -267,7 +267,7 @@ namespace ScsmClient.Operations
 
         public void UpdateObject(EnterpriseManagementObject enterpriseManagementObject, Dictionary<string, object> properties)
         {
-            UpdateObject(new []{enterpriseManagementObject}, properties);
+            UpdateObject(new[] { enterpriseManagementObject }, properties);
         }
         public void UpdateObject(IEnumerable<EnterpriseManagementObject> enterpriseManagementObjects, Dictionary<string, object> properties, CancellationToken cancellationToken = default)
         {
@@ -283,10 +283,12 @@ namespace ScsmClient.Operations
                     var obj = UpdateEnterpriseManagementObjectWithRelations(dictionary, properties);
                     obj.EnterpriseManagementObject.Overwrite();
                     var rootId = AddRelatedObjects(obj, ref idd);
+                    RemoveRelatedObjects(obj, ref idd);
+                    RemoveRelationship(obj, ref idd);
                 }
                 idd.Commit(_client.ManagementGroup);
             }
-            
+
         }
 
         private Dictionary<string, ManagementPackProperty> GetObjectPropertyDictionary(ManagementPackClass objectClass)
@@ -329,22 +331,22 @@ namespace ScsmClient.Operations
             switch (obj)
             {
                 case EnterpriseManagementObjectWithRelations enterpriseManagementObjectWithRelations:
-                {
-                    incrementalDiscoveryData.Add(enterpriseManagementObjectWithRelations.EnterpriseManagementObject);
-                    break;
-                }
+                    {
+                        incrementalDiscoveryData.Add(enterpriseManagementObjectWithRelations.EnterpriseManagementObject);
+                        break;
+                    }
                 case EnterpriseManagementObjectProjectionWithRelations enterpriseManagementObjectProjectionWithRelations:
-                {
-                    incrementalDiscoveryData.Add(enterpriseManagementObjectProjectionWithRelations.EnterpriseManagementObjectProjection);
-                    break;
-                }
+                    {
+                        incrementalDiscoveryData.Add(enterpriseManagementObjectProjectionWithRelations.EnterpriseManagementObjectProjection);
+                        break;
+                    }
                 default:
-                {
-                    throw new NotSupportedException($"Type '{obj.GetType()}' not supported!");
-                }
+                    {
+                        throw new NotSupportedException($"Type '{obj.GetType()}' not supported!");
+                    }
             }
-            
-            
+
+
             if (obj.RelatedObjects != null)
             {
                 foreach (var child in obj.RelatedObjects)
@@ -373,6 +375,32 @@ namespace ScsmClient.Operations
             }
 
             return obj.EnterpriseManagementObject.Id;
+        }
+
+        private void RemoveRelatedObjects(EnterpriseManagementObjectWithRelations obj, ref IncrementalDiscoveryData incrementalDiscoveryData)
+        {
+            if (obj.RemoveRelatedObjects != null)
+            {
+                foreach (var child in obj.RemoveRelatedObjects)
+                {
+                    incrementalDiscoveryData.Remove(child);
+                }
+            }
+
+
+        }
+
+        private void RemoveRelationship(EnterpriseManagementObjectWithRelations obj, ref IncrementalDiscoveryData incrementalDiscoveryData)
+        {
+            if (obj.RemoveRelationShip != null)
+            {
+                foreach (var child in obj.RemoveRelationShip)
+                {
+                    incrementalDiscoveryData.Remove(child);
+                }
+            }
+
+
         }
 
         private EnterpriseManagementObjectWithRelations BuildEnterpriseManagementObjectWithRelations(
@@ -426,16 +454,35 @@ namespace ScsmClient.Operations
 
         private void AddProperties(IWithRelations objWithRelations, ManagementPackClass objectClass, Dictionary<string, object> properties, bool skipKeyProperties = false)
         {
+            var entObj = objWithRelations.GetCoreEnterpriseManagementObject();
             var objectProperties = GetObjectPropertyDictionary(objectClass);
             var normalizer = new ValueConverter(_client);
-            
+
             foreach (var kv in properties)
             {
                 var name = kv.Key;
                 var value = kv.Value;
 
-                if (value == null)
-                    continue;
+                var mode = UpdateMode.Set;
+
+                if (name.EndsWith("--"))
+                {
+                    mode = UpdateMode.ForceRemove;
+                    name = name.Substring(0, name.Length - 2);
+                }
+                else if (name.EndsWith("-"))
+                {
+                    mode = UpdateMode.Remove;
+                    name = name.Substring(0, name.Length - 1);
+                }
+                else if (name.EndsWith("+"))
+                {
+                    mode = UpdateMode.Add;
+                    name = name.Substring(0, name.Length - 1);
+                }
+
+                
+
 
                 if (name.Contains("!"))
                 {
@@ -449,84 +496,255 @@ namespace ScsmClient.Operations
                         propertyName = splittedName[1]?.Trim().ToNull();
                     }
 
-                    if (!value.GetType().IsEnumerableType(false))
+                    if (value?.GetType().IsEnumerableType(false) != true)
                     {
                         value = new List<object> { value };
                     }
 
-                    if (value.GetType().IsEnumerableType(false))
+                    var enu = value as IEnumerable;
+
+                    var relationsBefore = _client.Relations().GetRelationshipObjectsByClassName(entObj.Id, className).ToList();
+                   
+                    foreach (var o in enu)
                     {
-                        var enu = value as IEnumerable;
+                        var oVal = o;
+                        var itemClassName = className;
 
-                        foreach (var o in enu)
+                        if (mode == UpdateMode.Remove && oVal == null)
                         {
-                            var oVal = o;
-                            var itemClassName = className;
-
-                            if (!String.IsNullOrWhiteSpace(propertyName))
+                            foreach (var rel in relationsBefore)
                             {
-                                var foundobj = GetEnterpriseManagementObjectsByClassName(itemClassName, $"{propertyName} -eq '{oVal}'", 1).FirstOrDefault();
-                                if (foundobj != null)
-                                {
-                                    var related = new EnterpriseManagementObjectWithRelations(foundobj);
-                                    objWithRelations.AddRelatedObject(related);
+                                objWithRelations.RemoveRelationship(rel);
+                            }
+                            continue;
+                        }
 
-                                }
+                        if (!String.IsNullOrWhiteSpace(propertyName))
+                        {
+                            var foundobj = GetEnterpriseManagementObjectsByClassName(itemClassName, $"{propertyName} -eq '{oVal}'", 1).FirstOrDefault();
+                            if (foundobj == null)
+                            {
                                 continue;
                             }
+                            oVal = foundobj.Id;
+                        }
 
-                            if (oVal is JObject jObject)
+
+                        if (oVal is JObject jObject)
+                        {
+                            if (mode == UpdateMode.Remove)
                             {
-                                oVal = Json.Converter.ToDictionary(jObject);
+                                throw new NotSupportedException("Object for Removing is not supported!");
                             }
+                            oVal = Json.Converter.ToDictionary(jObject);
+                        }
 
-                            switch (oVal)
-                            {
+                        switch (oVal)
+                        {
 
-                                case Dictionary<string, object> dict:
+                            case Dictionary<string, object> dict:
+                                {
+                                    if (mode == UpdateMode.Remove || mode == UpdateMode.ForceRemove)
                                     {
-                                        if (dict.ContainsKey("~type"))
+                                        throw new NotSupportedException("Object for Removing is not supported!");
+                                    }
+                                    
+                                    if (dict.ContainsKey("~type"))
+                                    {
+                                        itemClassName = dict["~type"].ToString();
+                                    }
+
+                                    var newRelation = BuildEnterpriseManagementObjectWithRelations(itemClassName, dict);
+                                    objWithRelations.AddRelatedObject(newRelation);
+                                    relationsBefore = relationsBefore
+                                        .Where(r => r.Id != newRelation.EnterpriseManagementObject?.Id).ToList();
+                                    break;
+                                }
+                            case Guid guid:
+                                {
+
+
+                                    switch (mode)
+                                    {
+                                        case UpdateMode.Remove:
+                                            {
+
+                                                var rel = relationsBefore.FirstOrDefault(r =>
+                                                    {
+                                                        if (r.SourceObject.Id == entObj.Id)
+                                                        {
+                                                            return r.TargetObject.Id == guid;
+                                                        }
+                                                        else
+                                                        {
+                                                            return r.SourceObject.Id == guid;
+                                                        }
+
+                                                    });
+
+                                                if (rel != null)
+                                                {
+                                                    objWithRelations.RemoveRelationship(rel);
+                                                }
+                                                
+                                                break;
+                                            }
+                                        case UpdateMode.ForceRemove:
+                                            {
+                                                var existingObject = GetEnterpriseManagementObjectById(guid);
+                                                objWithRelations.RemoveRelatedObject(existingObject);
+                                                break;
+                                            }
+                                        case UpdateMode.Add:
+                                            {
+                                                var existingObject = GetEnterpriseManagementObjectById(guid);
+                                                var related = new EnterpriseManagementObjectWithRelations(existingObject);
+                                                objWithRelations.AddRelatedObject(related);
+                                                relationsBefore = relationsBefore
+                                                    .Where(r => r.Id != related.EnterpriseManagementObject?.Id).ToList();
+                                                break;
+                                            }
+                                        case UpdateMode.Set:
+
                                         {
-                                            itemClassName = dict["~type"].ToString();
+                                            var rel = relationsBefore.FirstOrDefault(r =>
+                                            {
+                                                if (r.SourceObject.Id == entObj.Id)
+                                                {
+                                                    return r.TargetObject.Id == guid;
+                                                }
+                                                else
+                                                {
+                                                    return r.SourceObject.Id == guid;
+                                                }
+
+                                            });
+
+                                            if (rel == null)
+                                            {
+                                                var existingObject = GetEnterpriseManagementObjectById(guid);
+                                                var related = new EnterpriseManagementObjectWithRelations(existingObject);
+                                                objWithRelations.AddRelatedObject(related);
+                                            }
+                                            else
+                                            {
+                                                relationsBefore = relationsBefore
+                                                    .Where(r => r.Id != rel?.Id).ToList();
+                                            }
+
+
+                                            break;
                                         }
 
-                                        objWithRelations.AddRelatedObject(BuildEnterpriseManagementObjectWithRelations(itemClassName, dict));
-                                        break;
                                     }
-                                case Guid guid:
-                                    {
-                                        var existingObject = GetEnterpriseManagementObjectById(guid);
-                                        var related = new EnterpriseManagementObjectWithRelations(existingObject);
-                                        objWithRelations.AddRelatedObject(related);
-                                        break;
-                                    }
-                                case string str:
-                                    {
-                                        var g = str.ToGuid();
-                                        var existingObject = GetEnterpriseManagementObjectById(g);
-                                        var related = new EnterpriseManagementObjectWithRelations(existingObject);
-                                        objWithRelations.AddRelatedObject(related);
-                                        break;
-                                    }
-                            }
 
+                                    break;
+                                }
+                            case string str:
+                                {
+                                    var g = str.ToGuid();
+
+                                    switch (mode)
+                                    {
+                                        case UpdateMode.Remove:
+                                            {
+                                                var rel = _client.Relations()
+                                                    .GetRelationshipObjectsByClassName(entObj.Id, className).FirstOrDefault(r => r.TargetObject.Id == g);
+
+                                                objWithRelations.RemoveRelationship(rel);
+                                                break;
+                                            }
+                                        case UpdateMode.ForceRemove:
+                                            {
+                                                var existingObject = GetEnterpriseManagementObjectById(g);
+                                                objWithRelations.RemoveRelatedObject(existingObject);
+                                                break;
+                                            }
+                                        
+                                        case UpdateMode.Add:
+                                            {
+                                                var existingObject = GetEnterpriseManagementObjectById(g);
+                                                var related = new EnterpriseManagementObjectWithRelations(existingObject);
+                                                objWithRelations.AddRelatedObject(related);
+                                                relationsBefore = relationsBefore
+                                                    .Where(r => r.Id != related.EnterpriseManagementObject?.Id).ToList();
+                                                break;
+                                            }
+                                        case UpdateMode.Set:
+                                        
+                                        {
+                                            var rel = relationsBefore.FirstOrDefault(r =>
+                                            {
+                                                if (r.SourceObject.Id == entObj.Id)
+                                                {
+                                                    return r.TargetObject.Id == g;
+                                                }
+                                                else
+                                                {
+                                                    return r.SourceObject.Id == g;
+                                                }
+
+                                            });
+
+                                            if (rel == null)
+                                            {
+                                                var existingObject = GetEnterpriseManagementObjectById(g);
+                                                var related = new EnterpriseManagementObjectWithRelations(existingObject);
+                                                objWithRelations.AddRelatedObject(related);
+                                            }
+                                            else
+                                            {
+                                                relationsBefore = relationsBefore
+                                                    .Where(r => r.Id != rel?.Id).ToList();
+                                            }
+                                                
+                                            
+                                            break;
+                                        }
+                                    }
+                                    break;
+                                }
                         }
+
                     }
 
 
+                    if (mode == UpdateMode.Set)
+                    {
+                        foreach (var enterpriseManagementRelationshipObject in relationsBefore)
+                        {
+                            objWithRelations.RemoveRelationship(enterpriseManagementRelationshipObject);
+                        }
+                    }
 
+                    continue;
                 }
 
-                var entObj = objWithRelations.GetCoreEnterpriseManagementObject();
+
                 if (objectProperties.TryGetValue(name, out var prop))
                 {
                     if (skipKeyProperties && prop.Key)
                         continue;
 
-                    var val = normalizer.NormalizeValue(kv.Value, prop);
-                    entObj[objectClass, name].Value = val;
+                    if (mode == UpdateMode.Remove)
+                    {
+                        entObj[objectClass, name].SetToDefault();
+                    }
+                    else
+                    {
+                        if (value == null)
+                            continue;
+
+                        var val = normalizer.NormalizeValue(kv.Value, prop);
+                        entObj[objectClass, name].Value = val;
+
+                    }
+
 
                 }
+
+
+
             }
         }
 
