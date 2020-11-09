@@ -229,7 +229,7 @@ namespace ScsmClient.CriteriaParser.Syntax
                     ReadWhiteSpace();
                     break;
                 default:
-                    if (char.IsLetter(Current))
+                    if (char.IsLetter(Current) || Current == '@')
                     {
                         ReadIdentifierOrKeyword();
                     }
@@ -297,7 +297,7 @@ namespace ScsmClient.CriteriaParser.Syntax
 
         private void ReadIdentifierOrKeyword()
         {
-            while (char.IsLetter(Current) || Current == '.' || Current == ':' || Current == '!')
+            while (char.IsLetter(Current) || Current == '.' || Current == ':' || Current == '!' | Current == '@')
                 _position++;
 
             var length = _position - _start;

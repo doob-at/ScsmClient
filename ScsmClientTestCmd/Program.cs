@@ -8,6 +8,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Microsoft.EnterpriseManagement;
 using Microsoft.EnterpriseManagement.Common;
 using Microsoft.EnterpriseManagement.Configuration;
 using Reflectensions;
@@ -137,12 +138,12 @@ namespace ScsmClientTestCmd
 
             //var per = CreatePersonWithRelations(scsmClient);
 
-            var person = scsmClient.ScsmObject().GetObjectsByTypeName("BMI.Person",$"Id -eq 'P292317'").FirstOrDefault();
-            var upd = new Dictionary<string, object>();
-            upd["Bundesdienst"] = false;
-            upd["Personalnummer-"] = null;
+            //var person = scsmClient.ScsmObject().GetObjectsByTypeName("BMI.Person",$"Vorname -eq 'Bernhard' -and Nachname -eq 'Bernhard'").FirstOrDefault();
+            //var upd = new Dictionary<string, object>();
+            //upd["Bundesdienst"] = false;
+            //upd["Personalnummer-"] = null;
 
-            scsmClient.Object().UpdateObject(person.ObjectId, upd);
+            //scsmClient.Object().UpdateObject(person.ObjectId, upd);
 
 
             //var currentAccounts = person.GetValuesOrDefault<ScsmObject>("BMI.Account!");
@@ -174,6 +175,8 @@ namespace ScsmClientTestCmd
 
             //var after = scsmClient.ScsmObject().GetObjectsByTypeName("BMI.Person.Projection", "Id -eq 'P253340'").FirstOrDefault();
 
+            //CreatePersonWithRelations(scsmClient);
+            SearchProperty(scsmClient);
             return;
 
 
@@ -187,6 +190,21 @@ namespace ScsmClientTestCmd
 
         }
 
+
+        public static void SearchProperty(SCSMClient scsmClient)
+        {
+
+            //var criteria = "<Criteria xmlns=\"http://Microsoft.EnterpriseManagement.Core.Criteria/\">\r\n  <Reference Id=\"BMI.Benutzerverwaltung\" PublicKeyToken=\"2d046bf38cf96dc8\" Version=\"1.0.0.107\" Alias=\"Ac39803be44cb4cde892380257eed033f\" />\r\n      <Expression>\r\n        <SimpleExpression>\r\n          <ValueExpressionLeft>\r\n            <Property>$Context/Property[Type='Ac39803be44cb4cde892380257eed033f!BMI.Person']/Vorname$</Property>\r\n          </ValueExpressionLeft>\r\n          <Operator>Equal</Operator>\r\n          <ValueExpressionRight>\r\n            <Property>$Context/Property[Type='Ac39803be44cb4cde892380257eed033f!BMI.Person']/Nachname$</Property>\r\n          </ValueExpressionRight>\r\n        </SimpleExpression>\r\n      </Expression>\r\n</Criteria>";
+            //var criteria = "(@LastSync -eq null) -or (@LastSync -ne null -and (@LastSync -lt @NextSync))";
+
+
+            var criteria = "@G:LastModified -gt '9.11.2020 17:00' -and @G:LastModified -lt '9.11.2020 17:10'";
+            var p = scsmClient.ScsmObject().GetObjectsByTypeName("BMI.Benutzer", criteria).ToList();
+
+            var t = p.Count();
+
+
+        }
         
 
         public static string XmlString(string text)
@@ -230,8 +248,8 @@ namespace ScsmClientTestCmd
         {
             var person = new Dictionary<string, object>();
             person["Geburtsdatum"] = new DateTime(1981,6,6);
-            person["Nachname"] = "Windisch-r4";
-            person["Vorname"] = "Bernhard-r4";
+            person["Nachname"] = "Bernhard";
+            person["Vorname"] = "Bernhard";
             person["Geschlecht"] = "Männlich";
             person["BPK"] = "LLMPuM6U4GraXjbcD7ChSrVotaQ=";
             person["Bundesdienst"] = false;
@@ -250,14 +268,14 @@ namespace ScsmClientTestCmd
             acc1["BMI.Benutzer.Stammportal!"] = ben1;
 
             var acc2 = new Dictionary<string, object>();
-            acc2["Username"] = "windis02";
+            acc2["Username"] = "Bernhard";
             acc2["InitialPassword"] = "ABC12abc";
             acc2["Beschreibung"] = "Nested Account";
 
             var ben2 = new Dictionary<string, object>();
             ben2["~type"] = "BMI.Benutzer.Stammportal";
             ben2["Type"] = "Stammportal2";
-            ben2["GiltAb"] = new DateTime(2021, 1, 1);
+            ben2["GiltAb"] = new DateTime(1981, 6, 6);
             ben2["GiltBis"] = new DateTime(2021, 12, 31);
             acc2["BMI.Benutzer!"] = ben2;
 

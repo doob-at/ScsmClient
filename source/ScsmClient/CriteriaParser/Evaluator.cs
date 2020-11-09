@@ -169,31 +169,51 @@ namespace ScsmClient.CriteriaParser
 
         private string SimpleExpression(object left, string @operator, object right)
         {
-
             var propertyName = left.ToString();
+            if (propertyName.StartsWith("@"))
+            {
+                propertyName = propertyName.Substring(1);
+            }
             var propertyElement = BuildPropertyElement(propertyName);
 
-            string value = right.ToString();
 
-            if (propertyName.StartsWith("G:", StringComparison.OrdinalIgnoreCase))
+
+            string value = right.ToString();
+            if (value.StartsWith("@"))
             {
-                value = ValueConverter.NormalizeGenericValueForCriteria(value, propertyName);
+                value = value.Substring(1);
+                value = BuildPropertyElement(value).path;
+                var expr = $"<SimpleExpression><ValueExpressionLeft>{propertyElement.path}</ValueExpressionLeft><Operator>{@operator}</Operator><ValueExpressionRight>{value}</ValueExpressionRight></SimpleExpression>";
+                return expr;
             }
             else
             {
-                value = propertyElement.property != null
-                    ? ValueConverter.NormalizeValueForCriteria(right, propertyElement.property)
-                    : right.ToString();
+                if (propertyName.StartsWith("G:", StringComparison.OrdinalIgnoreCase))
+                {
+                    value = ValueConverter.NormalizeGenericValueForCriteria(value, propertyName);
+                }
+                else
+                {
+                    value = propertyElement.property != null
+                        ? ValueConverter.NormalizeValueForCriteria(right, propertyElement.property)
+                        : right.ToString();
+                }
+                var expr = $"<SimpleExpression><ValueExpressionLeft>{propertyElement.path}</ValueExpressionLeft><Operator>{@operator}</Operator><ValueExpressionRight><Value>{value}</Value></ValueExpressionRight></SimpleExpression>";
+                return expr;
             }
 
 
-            var expr = $"<SimpleExpression><ValueExpressionLeft>{propertyElement.path}</ValueExpressionLeft><Operator>{@operator}</Operator><ValueExpressionRight><Value>{value}</Value></ValueExpressionRight></SimpleExpression>";
-            return expr;
         }
+
+        
 
         private string UnaryExpression(object left, string @operator)
         {
             var propertyName = left.ToString();
+            if (propertyName.StartsWith("@"))
+            {
+                propertyName = propertyName.Substring(1);
+            }
             var propertyElement = BuildPropertyElement(propertyName);
 
             return $"<UnaryExpression><ValueExpression>{propertyElement.path}</ValueExpression><Operator>{@operator}</Operator></UnaryExpression>";
@@ -255,7 +275,8 @@ namespace ScsmClient.CriteriaParser
                 var part = parts[i];
                 var isLast = i == parts.Count -1;
 
-                var relation = FindRelationEndpoint(_managementPackTypeProjection, part);
+                var mClass = _scsmClient.Types().GetClassByName(part);
+                var relation = FindRelationEndpoint(_managementPackTypeProjection, mClass);
                 if (relation == null)
                 {
                     throw new Exception($"Relation for Types '{part}' not found!");
@@ -327,11 +348,11 @@ namespace ScsmClient.CriteriaParser
             return (value, prop);
         }
 
-        private KeyValuePair<ManagementPackRelationshipEndpoint, ITypeProjectionComponent>? FindRelationEndpoint(ITypeProjectionComponent managementPackTypeProjection, string relationClass)
+        private KeyValuePair<ManagementPackRelationshipEndpoint, ITypeProjectionComponent>? FindRelationEndpoint(ITypeProjectionComponent managementPackTypeProjection, ManagementPackClass relationClass)
         {
             foreach (var keyValuePair in managementPackTypeProjection)
             {
-                if (keyValuePair.Value.TargetType.Name == relationClass)
+                if (keyValuePair.Value.TargetType.Id == relationClass.Id)
                 {
                     return keyValuePair;
                 }
@@ -342,6 +363,11 @@ namespace ScsmClient.CriteriaParser
                     return found;
                 }
 
+            }
+
+            if (relationClass.Base?.GetElement() != null)
+            {
+                return FindRelationEndpoint(managementPackTypeProjection, relationClass.Base.GetElement());
             }
             return null;
         }

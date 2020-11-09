@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EnterpriseManagement;
 using Microsoft.EnterpriseManagement.Configuration;
 using Reflectensions.ExtensionMethods;
 using ScsmClient.ExtensionMethods;
@@ -113,14 +114,26 @@ namespace ScsmClient.Helper
                 propertyname = propertyname.Substring(2);
             }
 
-            switch (propertyname.ToLower())
+            var gProp = GenericProperty.GetGenericProperties().FirstOrDefault(gp =>
+                gp.PropertyName.Equals(propertyname, StringComparison.OrdinalIgnoreCase));
+
+            var gType = gProp.SystemType;
+
+            if (gType == typeof(DateTime))
             {
-                case "lastmodified":
-                case "timeadded":
-                {
-                    return NormalizeDate(value);
-                }
+                return NormalizeDate(value);
             }
+
+            
+
+            //switch (propertyname.ToLower())
+            //{
+            //    case "lastmodified":
+            //    case "timeadded":
+            //    {
+            //        return NormalizeDate(value);
+            //    }
+            //}
 
             return value;
         }
