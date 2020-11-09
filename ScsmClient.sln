@@ -5,13 +5,13 @@ VisualStudioVersion = 16.0.30104.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScsmClient", "source\ScsmClient\ScsmClient.csproj", "{5A3E2987-8407-4D66-8AAF-FE1C209290DB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScsmClientTestCmd", "ScsmClientTestCmd\ScsmClientTestCmd.csproj", "{280C4F70-B5F8-4E8D-BDC8-4DA72B555686}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScsmClientTestCmd", "tests\ScsmClientTestCmd\ScsmClientTestCmd.csproj", "{280C4F70-B5F8-4E8D-BDC8-4DA72B555686}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "build\_build.csproj", "{D512CDC4-BE3F-40E1-BBE8-662C8DF77A99}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScsmClient.SharedModels", "ScsmClient.SharedModels\ScsmClient.SharedModels.csproj", "{40202038-DE19-49B5-BE4A-DF598A9CC6E5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScsmClient.SharedModels", "source\ScsmClient.SharedModels\ScsmClient.SharedModels.csproj", "{40202038-DE19-49B5-BE4A-DF598A9CC6E5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestScsmCriteriaBuilder", "TestScsmCriteriaBuilder\TestScsmCriteriaBuilder.csproj", "{805C6C43-BD93-4933-8E65-F2D11486C331}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestScsmCriteriaBuilder", "tests\TestScsmCriteriaBuilder\TestScsmCriteriaBuilder.csproj", "{805C6C43-BD93-4933-8E65-F2D11486C331}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
