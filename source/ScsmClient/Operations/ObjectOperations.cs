@@ -462,7 +462,7 @@ namespace ScsmClient.Operations
             {
                 var name = kv.Key;
                 var value = kv.Value;
-                
+
                 var mode = UpdateMode.Set;
 
                 if (name.EndsWith("--"))
@@ -481,7 +481,7 @@ namespace ScsmClient.Operations
                     name = name.Substring(0, name.Length - 1);
                 }
 
-                
+
 
 
                 if (name.Contains("!"))
@@ -504,7 +504,7 @@ namespace ScsmClient.Operations
                     var enu = value as IEnumerable;
 
                     var relationsBefore = _client.Relations().GetRelationshipObjectsByClassName(entObj.Id, className).ToList();
-                   
+
                     foreach (var o in enu)
                     {
                         var oVal = o;
@@ -551,7 +551,7 @@ namespace ScsmClient.Operations
                                 oVal = str.ToGuid();
                             }
                         }
-                       
+
                         switch (oVal)
                         {
 
@@ -561,12 +561,12 @@ namespace ScsmClient.Operations
                                     {
                                         throw new NotSupportedException("Object for Removing is not supported!");
                                     }
-                                    
+
                                     if (dict.ContainsKey("~type"))
                                     {
                                         itemClassName = dict["~type"].ToString();
                                     }
-                                    
+
 
                                     var newRelation = BuildEnterpriseManagementObjectWithRelations(itemClassName, dict);
                                     objWithRelations.AddRelatedObject(newRelation);
@@ -600,7 +600,7 @@ namespace ScsmClient.Operations
                                                 {
                                                     objWithRelations.RemoveRelationship(rel);
                                                 }
-                                                
+
                                                 break;
                                             }
                                         case UpdateMode.ForceRemove:
@@ -620,104 +620,40 @@ namespace ScsmClient.Operations
                                             }
                                         case UpdateMode.Set:
 
-                                        {
-                                            var rel = relationsBefore.FirstOrDefault(r =>
                                             {
-                                                if (r.SourceObject.Id == entObj.Id)
+                                                var rel = relationsBefore.FirstOrDefault(r =>
                                                 {
-                                                    return r.TargetObject.Id == guid;
+                                                    if (r.SourceObject.Id == entObj.Id)
+                                                    {
+                                                        return r.TargetObject.Id == guid;
+                                                    }
+                                                    else
+                                                    {
+                                                        return r.SourceObject.Id == guid;
+                                                    }
+
+                                                });
+
+                                                if (rel == null)
+                                                {
+                                                    var existingObject = GetEnterpriseManagementObjectById(guid);
+                                                    var related = new EnterpriseManagementObjectWithRelations(existingObject);
+                                                    objWithRelations.AddRelatedObject(related);
                                                 }
                                                 else
                                                 {
-                                                    return r.SourceObject.Id == guid;
+                                                    relationsBefore = relationsBefore
+                                                        .Where(r => r.Id != rel?.Id).ToList();
                                                 }
 
-                                            });
 
-                                            if (rel == null)
-                                            {
-                                                var existingObject = GetEnterpriseManagementObjectById(guid);
-                                                var related = new EnterpriseManagementObjectWithRelations(existingObject);
-                                                objWithRelations.AddRelatedObject(related);
+                                                break;
                                             }
-                                            else
-                                            {
-                                                relationsBefore = relationsBefore
-                                                    .Where(r => r.Id != rel?.Id).ToList();
-                                            }
-
-
-                                            break;
-                                        }
 
                                     }
 
                                     break;
                                 }
-                            //case string str:
-                            //    {
-                            //        var g = str.ToGuid();
-
-                            //        switch (mode)
-                            //        {
-                            //            case UpdateMode.Remove:
-                            //                {
-                            //                    var rel = _client.Relations()
-                            //                        .GetRelationshipObjectsByClassName(entObj.Id, className).FirstOrDefault(r => r.TargetObject.Id == g);
-
-                            //                    objWithRelations.RemoveRelationship(rel);
-                            //                    break;
-                            //                }
-                            //            case UpdateMode.ForceRemove:
-                            //                {
-                            //                    var existingObject = GetEnterpriseManagementObjectById(g);
-                            //                    objWithRelations.RemoveRelatedObject(existingObject);
-                            //                    break;
-                            //                }
-                                        
-                            //            case UpdateMode.Add:
-                            //                {
-                            //                    var existingObject = GetEnterpriseManagementObjectById(g);
-                            //                    var related = new EnterpriseManagementObjectWithRelations(existingObject);
-                            //                    objWithRelations.AddRelatedObject(related);
-                            //                    relationsBefore = relationsBefore
-                            //                        .Where(r => r.Id != related.EnterpriseManagementObject?.Id).ToList();
-                            //                    break;
-                            //                }
-                            //            case UpdateMode.Set:
-                                        
-                            //            {
-                            //                var rel = relationsBefore.FirstOrDefault(r =>
-                            //                {
-                            //                    if (r.SourceObject.Id == entObj.Id)
-                            //                    {
-                            //                        return r.TargetObject.Id == g;
-                            //                    }
-                            //                    else
-                            //                    {
-                            //                        return r.SourceObject.Id == g;
-                            //                    }
-
-                            //                });
-
-                            //                if (rel == null)
-                            //                {
-                            //                    var existingObject = GetEnterpriseManagementObjectById(g);
-                            //                    var related = new EnterpriseManagementObjectWithRelations(existingObject);
-                            //                    objWithRelations.AddRelatedObject(related);
-                            //                }
-                            //                else
-                            //                {
-                            //                    relationsBefore = relationsBefore
-                            //                        .Where(r => r.Id != rel?.Id).ToList();
-                            //                }
-                                                
-                                            
-                            //                break;
-                            //            }
-                            //        }
-                            //        break;
-                            //    }
                         }
 
                     }
@@ -750,7 +686,7 @@ namespace ScsmClient.Operations
                         {
                             entObj[objectClass, name].SetToDefault();
                         }
-                        
+
                     }
                     else
                     {

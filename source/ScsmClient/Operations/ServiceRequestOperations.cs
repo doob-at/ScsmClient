@@ -24,12 +24,12 @@ namespace ScsmClient.Operations
             {
                 return _client.ScsmObject().GetObjectById(id).SwitchType<ServiceRequest>();
             }
-            return GetByCriteria($"G:System.WorkItem.ServiceRequest!Id == '{id}'", 1, levels).FirstOrDefault();
+            return GetByCriteria($"@G:System.WorkItem.ServiceRequest!Id == '{id}'", 1, levels).FirstOrDefault();
         }
 
         public ServiceRequest GetById(string id, int? levels = null)
         {
-            return GetByCriteria($"Id == '{id}'", 1, levels).FirstOrDefault();
+            return GetByCriteria($"@Id == '{id}'", 1, levels).FirstOrDefault();
         }
 
         public List<ServiceRequest> GetByCriteria(string criteria, int? maxResults = null, int? levels = null)

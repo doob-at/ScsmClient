@@ -18,20 +18,24 @@ namespace ScsmClient.Operations
         {
         }
 
-        public Incident GetByGenericId(Guid id)
+       
+        public Incident GetByGenericId(Guid id, int? levels = null)
         {
-            var entObj = _client.ScsmObject().GetObjectById(id);
-            return new Incident(entObj);
+            if (levels.HasValue && levels.Value == 0)
+            {
+                return _client.ScsmObject().GetObjectById(id).SwitchType<Incident>();
+            }
+            return GetByCriteria($"@G:System.WorkItem.Incident!Id == '{id}'", 1, levels).FirstOrDefault();
         }
 
-        public Incident GetById(string id)
+        public Incident GetById(string id, int? levels = null)
         {
-            return GetByCriteria($"Id == '{id}'", 1).FirstOrDefault();
+            return GetByCriteria($"@Id == '{id}'", 1, levels).FirstOrDefault();
         }
 
-        public List<Incident> GetByCriteria(string criteria, int? maxResults = null)
+        public List<Incident> GetByCriteria(string criteria, int? maxResults = null, int? levels = null)
         {
-            var incObjs = _client.ScsmObject().GetObjectsByTypeId(WellKnown.Incident.ProjectionType, criteria, maxResults).ToList();
+            var incObjs = _client.ScsmObject().GetObjectsByTypeId(WellKnown.Incident.ProjectionType, criteria, maxResults, levels).ToList();
             return incObjs.Select(e => new Incident(e)).ToList();
         }
 

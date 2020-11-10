@@ -20,12 +20,12 @@ namespace ScsmClient.Operations
             {
                 return _client.ScsmObject().GetObjectById(id).SwitchType<ChangeRequest>();
             }
-            return GetByCriteria($"G:System.WorkItem.ChangeRequest!Id == '{id}'", 1, levels).FirstOrDefault();
+            return GetByCriteria($"@G:System.WorkItem.ChangeRequest!Id == '{id}'", 1, levels).FirstOrDefault();
         }
 
         public ChangeRequest GetById(string id, int? levels = null)
         {
-            return GetByCriteria($"Id == '{id}'", 1, levels).FirstOrDefault();
+            return GetByCriteria($"@Id == '{id}'", 1, levels).FirstOrDefault();
         }
 
         public List<ChangeRequest> GetByCriteria(string criteria, int? maxResults = null, int? levels = null)
