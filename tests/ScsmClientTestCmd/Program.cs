@@ -31,6 +31,13 @@ namespace ScsmClientTestCmd
             var creds = new NetworkCredential("BWLAB\\admin", "ABC12abc");
             var scsmClient = new SCSMClient("192.168.75.121", creds);
 
+
+            
+
+            //var mpc = scsmClient.Types().GetClassByName("BMI.Benutzer");
+            //var crit = scsmClient.Criteria().CreateCriteriaXmlFromFilterString("'14.5.2020 20:12' -lt '14.5.2020 20:13'", mpc);
+
+            //var t = crit;
             //var or = scsmClient.Object().DeleteObjectsByClassName("BMI.Organisationseinheit", "");
 
             //scsmClient.Object().DeleteObjectsByClassName("BMI.Account", "");
@@ -198,8 +205,14 @@ namespace ScsmClientTestCmd
             //var criteria = "(@LastSync -eq null) -or (@LastSync -ne null -and (@LastSync -lt @NextSync))";
 
 
-            var criteria = "@G:LastModified -gt '9.11.2020 17:00' -and @G:LastModified -lt '9.11.2020 17:10'";
-            var p = scsmClient.ScsmObject().GetObjectsByTypeName("BMI.Benutzer", criteria).ToList();
+            //var criteria = "@G:LastModified -gt '9.11.2020 17:00' -and @G:LastModified -lt '9.11.2020 17:10'";
+            //var criteria = "'6.6.1981' -eq @Geburtsdatum";
+            var criteria = "@G:LastModified -eq @BMI.Account!TimeAdded";
+
+             var mpc = scsmClient.Types().GetTypeProjectionByName("BMI.Benutzer.Projection");
+            var crit = scsmClient.Criteria().CreateCriteriaXmlFromFilterString(criteria, mpc);
+
+            var p = scsmClient.ScsmObject().GetObjectsByTypeName("BMI.Benutzer.Projection", criteria).ToList();
 
             var t = p.Count();
 

@@ -60,6 +60,8 @@ namespace ScsmClient.CriteriaParser
             {
                 case BoundNodeKind.LiteralExpression:
                     return EvaluateLiteralExpression((BoundLiteralExpression)node);
+                case BoundNodeKind.PropertyExpression:
+                    return EvaluatePropertyExpression((BoundPropertyExpression)node);
                 case BoundNodeKind.NullExpression:
                     return EvaluateNullExpression((BoundNullExpression)node);
                 //case BoundNodeKind.VariableExpression:
@@ -78,6 +80,13 @@ namespace ScsmClient.CriteriaParser
         private static object EvaluateLiteralExpression(BoundLiteralExpression n)
         {
             return n.Value;
+        }
+
+        private EvaluatorPropertyInfo EvaluatePropertyExpression(BoundPropertyExpression n)
+        {
+            var propertyName = n.Value.ToString().Substring(1);
+            var propertyElement = BuildPropertyElement(propertyName);
+            return propertyElement;
         }
 
         private static object EvaluateNullExpression(BoundNullExpression n)
@@ -169,54 +178,136 @@ namespace ScsmClient.CriteriaParser
 
         private string SimpleExpression(object left, string @operator, object right)
         {
-            var propertyName = left.ToString();
-            if (propertyName.StartsWith("@"))
-            {
-                propertyName = propertyName.Substring(1);
-            }
-            var propertyElement = BuildPropertyElement(propertyName);
+
+            EvaluatorPropertyInfo leftPropertyInfo = left is EvaluatorPropertyInfo lpi ? lpi : new EvaluatorPropertyInfo(left.ToString());
+            EvaluatorPropertyInfo rightPropertyInfo = right is EvaluatorPropertyInfo rpi ? rpi : new EvaluatorPropertyInfo(right.ToString());
 
 
+            string leftExpression = String.Empty;
+            switch (leftPropertyInfo.Type)
+            {
+                case PropertyInfoType.Value:
+                    {
+                        throw new Exception("The Left Side of an Expression has to be a Property or a GenericProperty!");
+                    }
+                case PropertyInfoType.GenericProperty:
+                    {
+                        leftExpression = leftPropertyInfo.Path;
+                        break;
+                    }
+                case PropertyInfoType.Property:
+                    {
+                        leftExpression = leftPropertyInfo.Path;
+                        break;
+                    }
+            }
 
-            string value = right.ToString();
-            if (value.StartsWith("@"))
+
+            string rightExpression = String.Empty;
+            switch (rightPropertyInfo.Type)
             {
-                value = value.Substring(1);
-                value = BuildPropertyElement(value).path;
-                var expr = $"<SimpleExpression><ValueExpressionLeft>{propertyElement.path}</ValueExpressionLeft><Operator>{@operator}</Operator><ValueExpressionRight>{value}</ValueExpressionRight></SimpleExpression>";
-                return expr;
+                case PropertyInfoType.Value:
+                    {
+                        switch (leftPropertyInfo.Type)
+                        {
+                            case PropertyInfoType.Property:
+                                {
+                                    rightExpression = ValueConverter.NormalizeValueForCriteria(rightPropertyInfo.Path, leftPropertyInfo.Property);
+                                    break;
+                                }
+                            case PropertyInfoType.GenericProperty:
+                                {
+                                    rightExpression = ValueConverter.NormalizeGenericValueForCriteria(rightPropertyInfo.Path, leftPropertyInfo.GenericProperty);
+                                    break;
+                                }
+                            case PropertyInfoType.Value:
+                                {
+                                    rightExpression = rightPropertyInfo.Path;
+                                    break;
+                                }
+                        }
+
+                        rightExpression = $"<Value>{rightExpression}</Value>";
+                        break;
+                    }
+                case PropertyInfoType.GenericProperty:
+                    {
+                        rightExpression = rightPropertyInfo.Path;
+                        break;
+                    }
+                case PropertyInfoType.Property:
+                    {
+                        rightExpression = rightPropertyInfo.Path;
+                        break;
+                    }
             }
-            else
-            {
-                if (propertyName.StartsWith("G:", StringComparison.OrdinalIgnoreCase))
-                {
-                    value = ValueConverter.NormalizeGenericValueForCriteria(value, propertyName);
-                }
-                else
-                {
-                    value = propertyElement.property != null
-                        ? ValueConverter.NormalizeValueForCriteria(right, propertyElement.property)
-                        : right.ToString();
-                }
-                var expr = $"<SimpleExpression><ValueExpressionLeft>{propertyElement.path}</ValueExpressionLeft><Operator>{@operator}</Operator><ValueExpressionRight><Value>{value}</Value></ValueExpressionRight></SimpleExpression>";
-                return expr;
-            }
+
+
+            var expression = $"<SimpleExpression><ValueExpressionLeft>{leftExpression}</ValueExpressionLeft><Operator>{@operator}</Operator><ValueExpressionRight>{rightExpression}</ValueExpressionRight></SimpleExpression>";
+
+            return expression;
+            //string value = right.ToString();
+            //if (value.StartsWith("@"))
+            //{
+            //    value = value.Substring(1);
+            //    value = BuildPropertyElement(value).Path;
+            //    var expr = $"<SimpleExpression><ValueExpressionLeft>{leftExpression}</ValueExpressionLeft><Operator>{@operator}</Operator><ValueExpressionRight>{value}</ValueExpressionRight></SimpleExpression>";
+            //    return expr;
+            //}
+            //else
+            //{
+            //    if (propertyName.StartsWith("G:", StringComparison.OrdinalIgnoreCase))
+            //    {
+            //        value = ValueConverter.NormalizeGenericValueForCriteria(value, propertyName);
+            //    }
+            //    else
+            //    {
+            //        value = propertyElement.Property != null
+            //            ? ValueConverter.NormalizeValueForCriteria(right, propertyElement.Property)
+            //            : right.ToString();
+            //    }
+            //    var expr = $"<SimpleExpression><ValueExpressionLeft>{propertyElement.Path}</ValueExpressionLeft><Operator>{@operator}</Operator><ValueExpressionRight><Value>{value}</Value></ValueExpressionRight></SimpleExpression>";
+            //    return expr;
+            //}
 
 
         }
 
-        
+
 
         private string UnaryExpression(object left, string @operator)
         {
-            var propertyName = left.ToString();
-            if (propertyName.StartsWith("@"))
-            {
-                propertyName = propertyName.Substring(1);
-            }
-            var propertyElement = BuildPropertyElement(propertyName);
+            EvaluatorPropertyInfo leftPropertyInfo = left is EvaluatorPropertyInfo lpi ? lpi : new EvaluatorPropertyInfo(left.ToString());
 
-            return $"<UnaryExpression><ValueExpression>{propertyElement.path}</ValueExpression><Operator>{@operator}</Operator></UnaryExpression>";
+
+            string leftExpression = String.Empty;
+            switch (leftPropertyInfo.Type)
+            {
+                case PropertyInfoType.Value:
+                    {
+
+                        throw new Exception("The Left Side of an Expression has to be a Property or a GenericProperty!");
+                    }
+                case PropertyInfoType.GenericProperty:
+                    {
+                        leftExpression = leftPropertyInfo.Path;
+                        break;
+                    }
+                case PropertyInfoType.Property:
+                    {
+                        leftExpression = leftPropertyInfo.Path;
+                        break;
+                    }
+            }
+
+            //var propertyName = left.ToString();
+            //if (propertyName.StartsWith("@"))
+            //{
+            //    propertyName = propertyName.Substring(1);
+            //}
+            //var propertyElement = BuildPropertyElement(propertyName);
+
+            return $"<UnaryExpression><ValueExpression>{leftExpression}</ValueExpression><Operator>{@operator}</Operator></UnaryExpression>";
         }
 
         private string Expression(string simpleExpression)
@@ -224,7 +315,7 @@ namespace ScsmClient.CriteriaParser
             return $"<Expression>{simpleExpression}</Expression>";
         }
 
-        private (string path, ManagementPackProperty property) BuildPropertyElement(string propertyName)
+        private EvaluatorPropertyInfo BuildPropertyElement(string propertyName)
         {
             var regMatch = new Regex(@"^((?<type>[G|P]):)?(?<class>.+!)?(?<property>.+)?$", RegexOptions.IgnoreCase).Match(propertyName);
             if (!regMatch.Success)
@@ -232,17 +323,19 @@ namespace ScsmClient.CriteriaParser
                 throw new Exception("Can't parse PropertyName!");
             }
 
-            var type = regMatch.Groups["type"]?.Value?.ToNull()?.ToUpper() ?? "P";
+            var type = regMatch.Groups["type"]?.Value?.ToNull()?.ToUpper() ?? "";
             var pClass = regMatch.Groups["class"]?.Value;
             var property = regMatch.Groups["property"].Value;
 
+            ManagementPackClass managementPackClass = (_baseIsTypeProjection ? _managementPackTypeProjection.TargetType : _baseManagementPackClass);
+
             switch (type)
             {
-                case "P":
+                case "":
                     {
                         StringBuilder propertyElement = new StringBuilder();
                         propertyElement.Append("<Property>$Context");
-                        ManagementPackClass managementPackClass = null;
+                        
                         if (!String.IsNullOrWhiteSpace(pClass))
                         {
                             var projectionPart = BuildProjectionPathPart(pClass);
@@ -251,12 +344,47 @@ namespace ScsmClient.CriteriaParser
                         }
 
                         var propertyPart = BuildPropertyPathPart(property, managementPackClass);
-                        propertyElement.Append(propertyPart.path);
-                        propertyElement.Append("</Property>");
-                        return (propertyElement.ToString(), propertyPart.property);
+                        if (propertyPart != null)
+                        {
+                            propertyElement.Append(propertyPart.Path);
+                            propertyElement.Append("</Property>");
+                            return new EvaluatorPropertyInfo(propertyElement.ToString(), propertyPart.Property);
+                        }
+
+                        var prop = GenericProperty.GetGenericProperties().FirstOrDefault(p => p.PropertyName.Equals(property, StringComparison.OrdinalIgnoreCase));
+                        if (prop != null)
+                        {
+                            return new EvaluatorPropertyInfo($"<GenericProperty>{property}</GenericProperty>", prop);
+                        }
+
+                        throw new Exception($"Can't find property '{property}' for type '{managementPackClass?.Name}', nor a GenericProperty named '{property}'");
+                    }
+                case "P":
+                    {
+                        StringBuilder propertyElement = new StringBuilder();
+                        propertyElement.Append("<Property>$Context");
+                        if (!String.IsNullOrWhiteSpace(pClass))
+                        {
+                            var projectionPart = BuildProjectionPathPart(pClass);
+                            propertyElement.Append(projectionPart.path);
+                            managementPackClass = projectionPart.properyClass;
+                        }
+
+                        var propertyPart = BuildPropertyPathPart(property, managementPackClass);
+                        if (propertyPart != null)
+                        {
+                            propertyElement.Append(propertyPart.Path);
+                            propertyElement.Append("</Property>");
+                            return new EvaluatorPropertyInfo(propertyElement.ToString(), propertyPart.Property);
+                        }
+                        throw new Exception($"Can't find property '{property}' for type '{managementPackClass?.Name}'");
                     }
                 case "G":
-                    return ($"<GenericProperty>{property}</GenericProperty>", null);
+                    {
+                        var prop = GenericProperty.GetGenericProperties().FirstOrDefault(p => p.PropertyName.Equals(property, StringComparison.OrdinalIgnoreCase));
+                        return new EvaluatorPropertyInfo($"<GenericProperty>{property}</GenericProperty>", prop);
+                    }
+
                 default:
                     throw new Exception($"Prefix '{type}' not valid!");
             }
@@ -273,7 +401,7 @@ namespace ScsmClient.CriteriaParser
             for (var i = 0; i < parts.Count; i++)
             {
                 var part = parts[i];
-                var isLast = i == parts.Count -1;
+                var isLast = i == parts.Count - 1;
 
                 var mClass = _scsmClient.Types().GetClassByName(part);
                 var relation = FindRelationEndpoint(_managementPackTypeProjection, mClass);
@@ -288,7 +416,7 @@ namespace ScsmClient.CriteriaParser
                     propertyClass = rel.Key.Type.GetElement();
                 }
 
-                
+
                 var managementPack = rel.Key.GetManagementPack();
 
                 string mpAlias = null;
@@ -321,14 +449,15 @@ namespace ScsmClient.CriteriaParser
             return (relationshipPath.ToString(), propertyClass);
         }
 
-        private (string path, ManagementPackProperty property) BuildPropertyPathPart(string propertyName, ManagementPackClass managementPackClass)
+        private EvaluatorPropertyInfo BuildPropertyPathPart(string propertyName, ManagementPackClass managementPackClass)
         {
             managementPackClass = managementPackClass ?? (_baseIsTypeProjection ? _managementPackTypeProjection.TargetType : _baseManagementPackClass);
 
             var prop = FindProperty(propertyName, managementPackClass);
             if (prop == null)
             {
-                throw new Exception($"Can't find property '{propertyName}' for type '{managementPackClass.Name}'");
+                return null;
+                //throw new Exception($"Can't find property '{propertyName}' for type '{managementPackClass.Name}'");
             }
             var managementPack = prop.GetManagementPack();
             string mpAlias = null;
@@ -345,7 +474,7 @@ namespace ScsmClient.CriteriaParser
 
             var value = $"/Property[Type='{mpAlias}!{prop.ParentElement.Name}']/{prop.Name}$";
 
-            return (value, prop);
+            return new EvaluatorPropertyInfo(value, prop);
         }
 
         private KeyValuePair<ManagementPackRelationshipEndpoint, ITypeProjectionComponent>? FindRelationEndpoint(ITypeProjectionComponent managementPackTypeProjection, ManagementPackClass relationClass)

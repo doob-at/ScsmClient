@@ -25,6 +25,8 @@ namespace ScsmClient.CriteriaParser.Binding
                     return BindNullExpression((NullExpressionSyntax)syntax);
                 case SyntaxKind.LiteralExpression:
                     return BindLiteralExpression((LiteralExpressionSyntax)syntax);
+                case SyntaxKind.PropertyExpression:
+                    return BindPropertyExpression((PropertyExpressionSyntax)syntax);
                 //case SyntaxKind.NameExpression:
                 //    return BindNameExpression((NameExpressionSyntax)syntax);
                 //case SyntaxKind.AssignmentExpression:
@@ -47,6 +49,12 @@ namespace ScsmClient.CriteriaParser.Binding
         {
             var value = syntax.Value ?? 0;
             return new BoundLiteralExpression(value);
+        }
+
+        private BoundExpression BindPropertyExpression(PropertyExpressionSyntax syntax)
+        {
+            var value = syntax.Value ?? 0;
+            return new BoundPropertyExpression(value);
         }
 
         private BoundExpression BindNullExpression(NullExpressionSyntax syntax)

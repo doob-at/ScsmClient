@@ -22,6 +22,7 @@ namespace ScsmClient.CriteriaParser.Syntax
         OpenParenthesisToken,
         CloseParenthesisToken,
         IdentifierToken,
+        PropertyToken,
         StringToken,
         LikeToken,
         BangLikeToken,
@@ -37,6 +38,7 @@ namespace ScsmClient.CriteriaParser.Syntax
 
         // Expressions
         LiteralExpression,
+        PropertyExpression,
         UnaryExpression,
         BinaryExpression,
         ParenthesizedExpression,

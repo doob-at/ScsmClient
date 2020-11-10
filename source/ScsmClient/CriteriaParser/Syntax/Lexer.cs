@@ -228,8 +228,11 @@ namespace ScsmClient.CriteriaParser.Syntax
                 case '\r':
                     ReadWhiteSpace();
                     break;
+                case '@':
+                    ReadProperty();
+                    break;
                 default:
-                    if (char.IsLetter(Current) || Current == '@')
+                    if (char.IsLetter(Current))
                     {
                         ReadIdentifierOrKeyword();
                     }
@@ -247,6 +250,19 @@ namespace ScsmClient.CriteriaParser.Syntax
                     break;
             }
 
+        }
+
+        private void ReadProperty()
+        {
+            _position++;
+
+            while (char.IsLetter(Current) ||char.IsNumber(Current) || Current == '.' || Current == ':' || Current == '!')
+                _position++;
+
+            var length = _position - _start;
+            var text = _text.ToString(_start, length);
+            _kind = SyntaxKind.PropertyToken;
+            _value = text;
         }
 
         private bool ContinueWith(string value)
@@ -297,7 +313,7 @@ namespace ScsmClient.CriteriaParser.Syntax
 
         private void ReadIdentifierOrKeyword()
         {
-            while (char.IsLetter(Current) || Current == '.' || Current == ':' || Current == '!' | Current == '@')
+            while (char.IsLetter(Current) || Current == '.' || Current == ':' || Current == '!')
                 _position++;
 
             var length = _position - _start;

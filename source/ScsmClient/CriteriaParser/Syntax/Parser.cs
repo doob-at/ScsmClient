@@ -123,7 +123,11 @@ namespace ScsmClient.CriteriaParser.Syntax
                 case SyntaxKind.StringToken:
                     return ParseStringLiteral();
 
+                case SyntaxKind.PropertyToken:
+                    return ParsePropertyExpression();
+
                 case SyntaxKind.IdentifierToken:
+                
                 default:
                     return ParseNameExpression();
             }
@@ -167,6 +171,12 @@ namespace ScsmClient.CriteriaParser.Syntax
         {
             var identifierToken = MatchToken(SyntaxKind.IdentifierToken);
             return new LiteralExpressionSyntax(_text, identifierToken);
+        }
+
+        private ExpressionSyntax ParsePropertyExpression()
+        {
+            var propertyToken = MatchToken(SyntaxKind.PropertyToken);
+            return new PropertyExpressionSyntax(_text, propertyToken);
         }
     }
 }

@@ -106,6 +106,15 @@ namespace ScsmClient.Helper
             return dt.ToString("yyyy-MM-ddTHH:mm:ss.FFFFF");
         }
 
+        public string NormalizeGenericValueForCriteria(string value, GenericProperty property)
+        {
+            if (property.SystemType == typeof(DateTime))
+            {
+                return NormalizeDate(value);
+            }
+
+            return value;
+        }
 
         public string NormalizeGenericValueForCriteria(string value, string propertyname)
         {
@@ -117,25 +126,8 @@ namespace ScsmClient.Helper
             var gProp = GenericProperty.GetGenericProperties().FirstOrDefault(gp =>
                 gp.PropertyName.Equals(propertyname, StringComparison.OrdinalIgnoreCase));
 
-            var gType = gProp.SystemType;
+            return NormalizeGenericValueForCriteria(value, gProp);
 
-            if (gType == typeof(DateTime))
-            {
-                return NormalizeDate(value);
-            }
-
-            
-
-            //switch (propertyname.ToLower())
-            //{
-            //    case "lastmodified":
-            //    case "timeadded":
-            //    {
-            //        return NormalizeDate(value);
-            //    }
-            //}
-
-            return value;
         }
 
         public DateTime ToNullableDateTime(string value)
