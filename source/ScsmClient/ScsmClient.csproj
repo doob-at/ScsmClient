@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="Reflectensions.Json" Version="4.7" />
+    <PackageReference Include="Reflectensions.Json" Version="4.8.1" />
     <PackageReference Include="SCSM-Microsoft.EnterpriseManagement.Core" Version="10.19.1035" />
     <PackageReference Include="System.Collections.Immutable" Version="1.7.1" />
   </ItemGroup>

@@ -4,29 +4,36 @@ using Reflectensions.HelperClasses;
 
 namespace ScsmClient.SharedModels.Models
 {
-    public class EnterpriseManagementObjectDto
-    {
-        public Guid Id { get; set; }
-
-        public string Name { get; set; }
-        public string Path { get; set; }
-        public string DisplayName { get; set; }
-        public string FullName { get; set; }
-        public List<Guid> ManagementPackClassIds { get; set; }
-        public Guid LeastDerivedNonAbstractManagementPackClassId { get; set; }
-        public DateTime TimeAdded { get; set; }
-        public virtual Guid? LastModifiedBy { get; set; }
-        public DateTime LastModified { get; set; }
-        public Dictionary<string, object> Values { get; set; }
-    }
-
+    
     public class ScsmObject : ExpandableObject
     {
-        public Guid ObjectId { get; set; }
-        public DateTime LastModified { get; set; }
-        public DateTime TimeAdded { get; set; }
+        private Guid _objectId;
+        public Guid ObjectId
+        {
+            get => _objectId;
+            set => SetPropertyChanged(ref _objectId, value);
+        }
 
-        public string DisplayName { get; set; }
+        private DateTime _lastModified;
+        public DateTime LastModified
+        {
+            get => _lastModified;
+            set => SetPropertyChanged(ref _lastModified, value);
+        }
+
+        private DateTime _timeAdded;
+        public DateTime TimeAdded
+        {
+            get => _timeAdded;
+            set => SetPropertyChanged(ref _timeAdded, value);
+        }
+
+        private string _displayName;
+        public string DisplayName
+        {
+            get => _displayName;
+            set => SetPropertyChanged(ref _displayName, value);
+        }
 
         public ScsmObject(): base()
         {
@@ -44,19 +51,4 @@ namespace ScsmClient.SharedModels.Models
         }
     }
 
-    //public class EnterpriseManagementObjectProjectionDto: EnterpriseManagementObjectDto
-    //{
-    //    public Dictionary<string, List<EnterpriseManagementObjectProjectionDto>> RelatedObjects { get; set; } = new Dictionary<string, List<EnterpriseManagementObjectProjectionDto>>();
-    //}
-
-    //public class RelatedObjects
-    //{
-    //    public RelationShip RelationShip { get; set; }
-    //    public List<EnterpriseManagementObjectProjectionDto> Objects { get; set; } = new List<EnterpriseManagementObjectProjectionDto>();
-    //}
-
-    //public class RelationShip
-    //{
-    //    public string Name { get; set; }
-    //}
 }

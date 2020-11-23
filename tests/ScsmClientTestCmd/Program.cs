@@ -31,8 +31,10 @@ namespace ScsmClientTestCmd
             var creds = new NetworkCredential("BWLAB\\admin", "ABC12abc");
             var scsmClient = new SCSMClient("192.168.75.121", creds);
 
-
+            scsmClient.Object().DeleteObjectsByClassId(WellKnown.ServiceRequest.ClassId, "");
+            scsmClient.Object().DeleteObjectsByClassId(WellKnown.ChangeRequest.ClassId, "");
             
+
 
             //var mpc = scsmClient.Types().GetClassByName("BMI.Benutzer");
             //var crit = scsmClient.Criteria().CreateCriteriaXmlFromFilterString("'14.5.2020 20:12' -lt '14.5.2020 20:13'", mpc);
@@ -42,6 +44,7 @@ namespace ScsmClientTestCmd
 
             //scsmClient.Object().DeleteObjectsByClassName("BMI.Account", "");
             //scsmClient.Object().DeleteObjectsByClassName("BMI.Benutzer", "");
+            //scsmClient.Object().DeleteObjectsByClassName("BMI.Person", "");
 
 
             //var z = 1;
@@ -183,7 +186,7 @@ namespace ScsmClientTestCmd
             //var after = scsmClient.ScsmObject().GetObjectsByTypeName("BMI.Person.Projection", "Id -eq 'P253340'").FirstOrDefault();
 
             //CreatePersonWithRelations(scsmClient);
-            SearchProperty(scsmClient);
+            //SearchProperty(scsmClient);
             return;
 
 
@@ -207,7 +210,7 @@ namespace ScsmClientTestCmd
 
             //var criteria = "@G:LastModified -gt '9.11.2020 17:00' -and @G:LastModified -lt '9.11.2020 17:10'";
             //var criteria = "'6.6.1981' -eq @Geburtsdatum";
-            var criteria = "@G:LastModified -eq @BMI.Account!TimeAdded";
+            var criteria = "@ObjectStatus -eq 'Active' -and @GiltAb  '06.06.1981'";
 
              var mpc = scsmClient.Types().GetTypeProjectionByName("BMI.Benutzer.Projection");
             var crit = scsmClient.Criteria().CreateCriteriaXmlFromFilterString(criteria, mpc);
