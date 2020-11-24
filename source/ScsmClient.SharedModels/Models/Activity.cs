@@ -7,15 +7,69 @@ namespace ScsmClient.SharedModels.Models
 {
     public class Activity: WorkItem
     {
-        public int SequenceId { get; set; }
-        public string ChildId { get; set; }
-        public string Notes { get; set; }
-        public string Status { get; set; }
-        public string Priority { get; set; }
-        public string Area { get; set; }
-        public string Stage { get; set; }
-        public string Documentation { get; set; }
-        public bool Skip { get; set; }
+        private int _sequenceId;
+        private string _childId;
+        private string _notes;
+        private string _status;
+        private string _priority;
+        private string _area;
+        private string _stage;
+        private string _documentation;
+        private bool _skip;
+
+        public int SequenceId
+        {
+            get => _sequenceId;
+            set => SetPropertyChanged(ref _sequenceId, value);
+        }
+
+        public string ChildId
+        {
+            get => _childId;
+            set => SetPropertyChanged(ref _childId, value);
+        }
+
+        public string Notes
+        {
+            get => _notes;
+            set => SetPropertyChanged(ref _notes, value);
+        }
+
+        public string Status
+        {
+            get => _status;
+            set => SetPropertyChanged(ref _status, value);
+        }
+
+        public string Priority
+        {
+            get => _priority;
+            set => SetPropertyChanged(ref _priority, value);
+        }
+
+        public string Area
+        {
+            get => _area;
+            set => SetPropertyChanged(ref _area, value);
+        }
+
+        public string Stage
+        {
+            get => _stage;
+            set => SetPropertyChanged(ref _stage, value);
+        }
+
+        public string Documentation
+        {
+            get => _documentation;
+            set => SetPropertyChanged(ref _documentation, value);
+        }
+
+        public bool Skip
+        {
+            get => _skip;
+            set => SetPropertyChanged(ref _skip, value);
+        }
 
         public Activity() : base()
         {
