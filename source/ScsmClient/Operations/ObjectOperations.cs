@@ -43,6 +43,16 @@ namespace ScsmClient.Operations
             return _client.ManagementGroup.EntityObjects.GetObject<EnterpriseManagementObject>(id, critOptions);
         }
 
+        public IEnumerable<EnterpriseManagementObject> GetEnterpriseManagementObjectsByIds(IEnumerable<Guid> ids)
+        {
+            var critOptions = new ObjectQueryOptions();
+            critOptions.DefaultPropertyRetrievalBehavior = ObjectPropertyRetrievalBehavior.All;
+            critOptions.ObjectRetrievalMode = ObjectRetrievalOptions.NonBuffered;
+
+            return _client.ManagementGroup.EntityObjects
+                .GetObjectReader<EnterpriseManagementObject>(ids.ToList(), critOptions).ToList();
+        }
+
         public IEnumerable<EnterpriseManagementObject> GetEnterpriseManagementObjectsByClassName(string className, string criteria, int? maxResult = null)
         {
             var objectClass = _client.Types().GetClassByName(className);
@@ -236,6 +246,13 @@ namespace ScsmClient.Operations
             var obj = GetEnterpriseManagementObjectsByClass(objectClass, criteria);
             return DeleteObjects(obj, cancellationToken);
         }
+
+        public int DeleteObjectsById(IEnumerable<Guid> objectIds, CancellationToken cancellationToken = default)
+        {
+            var objs = GetEnterpriseManagementObjectsByIds(objectIds);
+
+            return DeleteObjects(objs, cancellationToken);
+        }
         public int DeleteObjects(IEnumerable<EnterpriseManagementObject> objects, CancellationToken cancellationToken = default)
         {
             var result = new Dictionary<int, Guid>();
@@ -291,6 +308,34 @@ namespace ScsmClient.Operations
 
         }
 
+        public void UpdateObject(Dictionary<Guid, Dictionary<string, object>> updateObjects, CancellationToken cancellationToken = default)
+        {
+
+            
+            var enterpriseObjects = GetEnterpriseManagementObjectsByIds(updateObjects.Keys.ToList())
+                .ToDictionary(o => o, o => updateObjects[o.Id]);
+
+            var groups = GroupIn10(enterpriseObjects);
+
+            foreach (var enumerable in groups)
+            {
+                
+                cancellationToken.ThrowIfCancellationRequested();
+                var idd = new IncrementalDiscoveryData();
+                foreach (var dictionary in enumerable)
+                {
+                    var obj = UpdateEnterpriseManagementObjectWithRelations(dictionary.Key, dictionary.Value);
+                    obj.EnterpriseManagementObject.Overwrite();
+                    var rootId = AddRelatedObjects(obj, ref idd);
+                    RemoveRelatedObjects(obj, ref idd);
+                    RemoveRelationship(obj, ref idd);
+                }
+                idd.Commit(_client.ManagementGroup);
+            }
+
+        }
+
+
         private Dictionary<string, ManagementPackProperty> GetObjectPropertyDictionary(ManagementPackClass objectClass)
         {
             return _objectPropertyDictionary.GetOrAdd(objectClass.Id, guid =>
@@ -325,6 +370,9 @@ namespace ScsmClient.Operations
 
             return groups;
         }
+
+
+
 
         private Guid AddIncremental(IWithRelations obj, ref IncrementalDiscoveryData incrementalDiscoveryData)
         {
