@@ -123,11 +123,25 @@ namespace ScsmClient.Operations
             return CreateObjectsByClass(objectClass, objects, cancellationToken);
         }
 
+        public Dictionary<int, Guid> CreateObjectsByClassId(Guid id, IEnumerable<Dictionary<string, object>> objects, int maxItemsPerTransaction, CancellationToken cancellationToken = default)
+        {
+
+            var objectClass = _client.Types().GetClassById(id);
+            return CreateObjectsByClass(objectClass, objects, maxItemsPerTransaction, cancellationToken);
+        }
+
         public Dictionary<int, Guid> CreateObjectsByClassName(string className, IEnumerable<Dictionary<string, object>> objects, CancellationToken cancellationToken = default)
         {
 
             var objectClass = _client.Types().GetClassByName(className);
             return CreateObjectsByClass(objectClass, objects, cancellationToken);
+        }
+
+        public Dictionary<int, Guid> CreateObjectsByClassName(string className,
+            IEnumerable<Dictionary<string, object>> objects, int maxItemsPerTransaction, CancellationToken cancellationToken = default)
+        {
+            var objectClass = _client.Types().GetClassByName(className);
+            return CreateObjectsByClass(objectClass, objects, maxItemsPerTransaction, cancellationToken);
         }
 
         public Dictionary<int, Guid> CreateObjectsByClass(ManagementPackClass objectClass, IEnumerable<Dictionary<string, object>> objects, CancellationToken cancellationToken = default)
