@@ -132,31 +132,83 @@ namespace ScsmClient.Operations
 
         public Dictionary<int, Guid> CreateObjectsByClass(ManagementPackClass objectClass, IEnumerable<Dictionary<string, object>> objects, CancellationToken cancellationToken = default)
         {
+            return CreateObjectsByClass(objectClass, objects, 1000, cancellationToken);
+            //var result = new Dictionary<int, Guid>();
+            //var groups = GroupIn10(objects);
+
+            //var index = 0;
+            //foreach (var enumerable in groups)
+            //{
+            //    cancellationToken.ThrowIfCancellationRequested();
+
+            //    var _list = new List<Guid>();
+            //    var idd = new IncrementalDiscoveryData();
+            //    foreach (var dictionary in enumerable)
+            //    {
+
+            //        var obj = BuildEnterpriseManagementObjectWithRelations(objectClass, dictionary);
+            //        var rootId = AddIncremental(obj, ref idd);
+
+            //        _list.Add(rootId);
+            //    }
+            //    idd.Commit(_client.ManagementGroup);
+            //    foreach (var guid in _list)
+            //    {
+            //        result.Add(index++, guid);
+            //    }
+
+            //}
+
+            //return result;
+
+        }
+
+        public Dictionary<int, Guid> CreateObjectsByClass(ManagementPackClass objectClass, IEnumerable<Dictionary<string, object>> objects, int maxItemsPerTransaction, CancellationToken cancellationToken = default)
+        {
 
             var result = new Dictionary<int, Guid>();
-            var groups = GroupIn10(objects);
-
             var index = 0;
-            foreach (var enumerable in groups)
+            List<Guid> _list = null;
+            IncrementalDiscoveryData idd = null;
+            int currentCount = 0;
+            foreach (var dictionary in objects)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                var _list = new List<Guid>();
-                var idd = new IncrementalDiscoveryData();
-                foreach (var dictionary in enumerable)
+                if (idd == null)
                 {
-
-                    var obj = BuildEnterpriseManagementObjectWithRelations(objectClass, dictionary);
-                    var rootId = AddIncremental(obj, ref idd);
-
-                    _list.Add(rootId);
+                    _list = new List<Guid>();
+                    idd = new IncrementalDiscoveryData();
                 }
+
+                var obj = BuildEnterpriseManagementObjectWithRelations(objectClass, dictionary);
+                var rootId = AddIncremental(obj, ref idd);
+                _list.Add(rootId);
+                currentCount++;
+
+                if (currentCount >= maxItemsPerTransaction)
+                {
+                    currentCount = 0;
+                    idd.Commit(_client.ManagementGroup);
+                    foreach (var guid in _list)
+                    {
+                        result.Add(index++, guid);
+                    }
+
+                    _list = null;
+                    idd = null;
+                }
+
+
+            }
+
+            if (idd != null)
+            {
                 idd.Commit(_client.ManagementGroup);
                 foreach (var guid in _list)
                 {
                     result.Add(index++, guid);
                 }
-
             }
 
             return result;
@@ -198,27 +250,47 @@ namespace ScsmClient.Operations
             return CreateObjectsFromTemplate(template, objects, cancellationToken);
         }
 
-        public Dictionary<int, Guid> CreateObjectsFromTemplate(ManagementPackObjectTemplate template, IEnumerable<Dictionary<string, object>> objects, CancellationToken cancellationToken = default)
+        public Dictionary<int, Guid> CreateObjectsFromTemplate(ManagementPackObjectTemplate template, IEnumerable<Dictionary<string, object>> objects, int maxItemsPerTransaction, CancellationToken cancellationToken = default)
         {
 
             var result = new Dictionary<int, Guid>();
-            var groups = GroupIn10(objects);
             var index = 0;
-            foreach (var enumerable in groups)
+            List<Guid> _list = null;
+            IncrementalDiscoveryData idd = null;
+            int currentCount = 0;
+            foreach (var dictionary in objects)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                var _list = new List<Guid>();
-                var idd = new IncrementalDiscoveryData();
-
-                foreach (var dictionary in enumerable)
+                if (idd == null)
                 {
-
-                    var obj = BuildEnterpriseManagementObjectProjectionWithRelations(template, dictionary);
-                    var rootId = AddIncremental(obj, ref idd);
-
-                    _list.Add(rootId);
+                    _list = new List<Guid>();
+                    idd = new IncrementalDiscoveryData();
                 }
+
+                var obj = BuildEnterpriseManagementObjectProjectionWithRelations(template, dictionary);
+                var rootId = AddIncremental(obj, ref idd);
+                _list.Add(rootId);
+                currentCount++;
+
+                if (currentCount >= maxItemsPerTransaction)
+                {
+                    currentCount = 0;
+                    idd.Commit(_client.ManagementGroup);
+                    foreach (var guid in _list)
+                    {
+                        result.Add(index++, guid);
+                    }
+
+                    _list = null;
+                    idd = null;
+                }
+
+
+            }
+
+            if (idd != null)
+            {
                 idd.Commit(_client.ManagementGroup);
                 foreach (var guid in _list)
                 {
@@ -227,6 +299,39 @@ namespace ScsmClient.Operations
             }
 
             return result;
+
+        }
+
+
+        public Dictionary<int, Guid> CreateObjectsFromTemplate(ManagementPackObjectTemplate template, IEnumerable<Dictionary<string, object>> objects, CancellationToken cancellationToken = default)
+        {
+            return CreateObjectsFromTemplate(template, objects, 1000, cancellationToken);
+            //var result = new Dictionary<int, Guid>();
+            //var groups = GroupIn10(objects);
+            //var index = 0;
+            //foreach (var enumerable in groups)
+            //{
+            //    cancellationToken.ThrowIfCancellationRequested();
+
+            //    var _list = new List<Guid>();
+            //    var idd = new IncrementalDiscoveryData();
+
+            //    foreach (var dictionary in enumerable)
+            //    {
+
+            //        var obj = BuildEnterpriseManagementObjectProjectionWithRelations(template, dictionary);
+            //        var rootId = AddIncremental(obj, ref idd);
+
+            //        _list.Add(rootId);
+            //    }
+            //    idd.Commit(_client.ManagementGroup);
+            //    foreach (var guid in _list)
+            //    {
+            //        result.Add(index++, guid);
+            //    }
+            //}
+
+            //return result;
 
         }
 
@@ -253,24 +358,39 @@ namespace ScsmClient.Operations
 
             return DeleteObjects(objs, cancellationToken);
         }
+
         public int DeleteObjects(IEnumerable<EnterpriseManagementObject> objects, CancellationToken cancellationToken = default)
         {
+            return DeleteObjects(objects, 1000, cancellationToken);
+        }
+
+        public int DeleteObjects(IEnumerable<EnterpriseManagementObject> objects, int maxItemsPerTransaction, CancellationToken cancellationToken = default)
+        {
             var result = new Dictionary<int, Guid>();
-            var groups = GroupIn10(objects);
+            //var groups = GroupIn10(objects);
 
             var count = 0;
-            foreach (var enumerable in groups)
+            IncrementalDiscoveryData idd = null;
+            int currentCount = 0;
+            foreach (var mgmtObject in objects)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                var idd = new IncrementalDiscoveryData();
-                var enterpriseManagementObjects = enumerable as EnterpriseManagementObject[] ?? enumerable.ToArray();
-                foreach (var obj in enterpriseManagementObjects)
+
+                idd = idd ?? new IncrementalDiscoveryData();
+                idd.Remove(mgmtObject);
+
+                currentCount++;
+
+                if (currentCount >= maxItemsPerTransaction)
                 {
-                    idd.Remove(obj);
+                    idd.Commit(_client.ManagementGroup);
+                    idd = null;
                 }
-                idd.Commit(_client.ManagementGroup);
-                count = count + enterpriseManagementObjects.Count();
+
+                count++;
             }
+
+            idd?.Commit(_client.ManagementGroup);
 
             return count;
         }
@@ -279,59 +399,81 @@ namespace ScsmClient.Operations
         public void UpdateObject(Guid id, Dictionary<string, object> properties)
         {
             var enterpriseManagementObject = GetEnterpriseManagementObjectById(id);
-            UpdateObject(new[] { enterpriseManagementObject }, properties);
-        }
-
-        public void UpdateObject(EnterpriseManagementObject enterpriseManagementObject, Dictionary<string, object> properties)
-        {
-            UpdateObject(new[] { enterpriseManagementObject }, properties);
-        }
-        public void UpdateObject(IEnumerable<EnterpriseManagementObject> enterpriseManagementObjects, Dictionary<string, object> properties, CancellationToken cancellationToken = default)
-        {
-
-            var groups = GroupIn10(enterpriseManagementObjects);
-
-            foreach (var enumerable in groups)
+            var updDict = new Dictionary<Guid, Dictionary<string, object>>
             {
-                cancellationToken.ThrowIfCancellationRequested();
-                var idd = new IncrementalDiscoveryData();
-                foreach (var dictionary in enumerable)
-                {
-                    var obj = UpdateEnterpriseManagementObjectWithRelations(dictionary, properties);
-                    obj.EnterpriseManagementObject.Overwrite();
-                    var rootId = AddRelatedObjects(obj, ref idd);
-                    RemoveRelatedObjects(obj, ref idd);
-                    RemoveRelationship(obj, ref idd);
-                }
-                idd.Commit(_client.ManagementGroup);
-            }
-
+                [id] = properties
+            };
+            UpdateObjects(updDict);
         }
 
-        public void UpdateObject(Dictionary<Guid, Dictionary<string, object>> updateObjects, CancellationToken cancellationToken = default)
+        //public void UpdateObjects(EnterpriseManagementObject enterpriseManagementObject, Dictionary<string, object> properties)
+        //{
+        //    UpdateObjects(new[] { enterpriseManagementObject }, properties);
+        //}
+        //public void UpdateObjects(IEnumerable<EnterpriseManagementObject> enterpriseManagementObjects, Dictionary<string, object> properties, CancellationToken cancellationToken = default)
+        //{
+
+        //    var groups = GroupIn10(enterpriseManagementObjects);
+
+        //    foreach (var enumerable in groups)
+        //    {
+        //        cancellationToken.ThrowIfCancellationRequested();
+        //        var idd = new IncrementalDiscoveryData();
+        //        foreach (var dictionary in enumerable)
+        //        {
+        //            var obj = UpdateEnterpriseManagementObjectWithRelations(dictionary, properties);
+        //            obj.EnterpriseManagementObject.Overwrite();
+        //            var rootId = AddRelatedObjects(obj, ref idd);
+        //            RemoveRelatedObjects(obj, ref idd);
+        //            RemoveRelationship(obj, ref idd);
+        //        }
+        //        idd.Commit(_client.ManagementGroup);
+        //    }
+
+        //}
+
+        public void UpdateObjects(Dictionary<Guid, Dictionary<string, object>> updateObjects, CancellationToken cancellationToken = default)
+        {
+            UpdateObjects(updateObjects, 1000, cancellationToken);
+        }
+
+        public void UpdateObjects(Dictionary<Guid, Dictionary<string, object>> updateObjects, int maxItemsPerTransaction, CancellationToken cancellationToken = default)
         {
 
-            
+
             var enterpriseObjects = GetEnterpriseManagementObjectsByIds(updateObjects.Keys.ToList())
                 .ToDictionary(o => o, o => updateObjects[o.Id]);
 
-            var groups = GroupIn10(enterpriseObjects);
 
-            foreach (var enumerable in groups)
+
+
+            cancellationToken.ThrowIfCancellationRequested();
+            IncrementalDiscoveryData idd = null;
+            int currentCount = 0;
+            foreach (var dictionary in enterpriseObjects)
             {
-                
-                cancellationToken.ThrowIfCancellationRequested();
-                var idd = new IncrementalDiscoveryData();
-                foreach (var dictionary in enumerable)
+                if (idd == null)
                 {
-                    var obj = UpdateEnterpriseManagementObjectWithRelations(dictionary.Key, dictionary.Value);
-                    obj.EnterpriseManagementObject.Overwrite();
-                    var rootId = AddRelatedObjects(obj, ref idd);
-                    RemoveRelatedObjects(obj, ref idd);
-                    RemoveRelationship(obj, ref idd);
+                    idd = new IncrementalDiscoveryData();
                 }
-                idd.Commit(_client.ManagementGroup);
+
+                var obj = UpdateEnterpriseManagementObjectWithRelations(dictionary.Key, dictionary.Value);
+                obj.EnterpriseManagementObject.Overwrite();
+                var rootId = AddRelatedObjects(obj, ref idd);
+                RemoveRelatedObjects(obj, ref idd);
+                RemoveRelationship(obj, ref idd);
+
+                currentCount++;
+
+                if (currentCount >= maxItemsPerTransaction)
+                {
+                    idd.Commit(_client.ManagementGroup);
+                    idd = null;
+                }
+
             }
+
+            idd?.Commit(_client.ManagementGroup);
 
         }
 
@@ -355,21 +497,21 @@ namespace ScsmClient.Operations
 
         }
 
-        private IEnumerable<IEnumerable<T>> GroupIn10<T>(IEnumerable<T> enumerable)
-        {
-            var dictionaries = enumerable.ToList();
-            var dictCount = dictionaries.Count;
-            if (dictCount % 10 != 0)
-                dictCount = (dictCount - dictCount % 10) + 10;
+        //private IEnumerable<IEnumerable<T>> GroupIn10<T>(IEnumerable<T> enumerable)
+        //{
+        //    var dictionaries = enumerable.ToList();
+        //    var dictCount = dictionaries.Count;
+        //    if (dictCount % 10 != 0)
+        //        dictCount = (dictCount - dictCount % 10) + 10;
 
-            var batchsize = dictCount >= 100 ? dictCount / 10 : 10;
+        //    var batchsize = dictCount >= 100 ? dictCount / 10 : 10;
 
-            var groups = dictionaries.Select((x, idx) => new { x, idx })
-                .GroupBy(x => x.idx / batchsize)
-                .Select(g => g.Select(a => a.x));
+        //    var groups = dictionaries.Select((x, idx) => new { x, idx })
+        //        .GroupBy(x => x.idx / batchsize)
+        //        .Select(g => g.Select(a => a.x));
 
-            return groups;
-        }
+        //    return groups;
+        //}
 
 
 
@@ -755,4 +897,5 @@ namespace ScsmClient.Operations
         }
 
     }
+
 }

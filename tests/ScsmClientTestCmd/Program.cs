@@ -31,9 +31,9 @@ namespace ScsmClientTestCmd
             var creds = new NetworkCredential("BWLAB\\admin", "ABC12abc");
             var scsmClient = new SCSMClient("192.168.75.121", creds);
 
-            scsmClient.Object().DeleteObjectsByClassId(WellKnown.ServiceRequest.ClassId, "");
-            scsmClient.Object().DeleteObjectsByClassId(WellKnown.ChangeRequest.ClassId, "");
-            
+            //scsmClient.Object().DeleteObjectsByClassId(WellKnown.ServiceRequest.ClassId, "");
+            //scsmClient.Object().DeleteObjectsByClassId(WellKnown.ChangeRequest.ClassId, "");
+
 
 
             //var mpc = scsmClient.Types().GetClassByName("BMI.Benutzer");
@@ -42,9 +42,10 @@ namespace ScsmClientTestCmd
             //var t = crit;
             //var or = scsmClient.Object().DeleteObjectsByClassName("BMI.Organisationseinheit", "");
 
-            //scsmClient.Object().DeleteObjectsByClassName("BMI.Account", "");
-            //scsmClient.Object().DeleteObjectsByClassName("BMI.Benutzer", "");
-            //scsmClient.Object().DeleteObjectsByClassName("BMI.Person", "");
+            //scsmClient.Object().DeleteObjectsByClassName("BMI.Stammportal.Anwendung", "");
+            //scsmClient.Object().DeleteObjectsByClassName("BMI.Stammportal.AnwendungsRecht", "");
+            //scsmClient.Object().DeleteObjectsByClassName("BMI.Stammportal.AnwendungsRecht.Parameter", "");
+            var del4 = scsmClient.Object().DeleteObjectsByClassName("BMI.Stammportal.Berechtigung", "");
 
 
             //var z = 1;
