@@ -640,11 +640,12 @@ namespace ScsmClient.Operations
             var obj = new CreatableEnterpriseManagementObject(_client.ManagementGroup, objectClass);
             var result = new EnterpriseManagementObjectWithRelations(obj);
 
-            AddProperties(result, objectClass, properties);
+            AddPropertiesForCreate(result, objectClass, properties);
 
             return result;
         }
 
+       
 
         private EnterpriseManagementObjectWithRelations UpdateEnterpriseManagementObjectWithRelations(EnterpriseManagementObject enterpriseManagementObject, Dictionary<string, object> properties)
         {
@@ -670,11 +671,12 @@ namespace ScsmClient.Operations
             var obj = new EnterpriseManagementObjectProjection(_client.ManagementGroup, template);
             var result = new EnterpriseManagementObjectProjectionWithRelations(obj);
 
-            AddProperties(result, managementPackTypeProjection.TargetType, properties);
+            AddPropertiesForCreate(result, managementPackTypeProjection.TargetType, properties);
 
             return result;
         }
 
+        
         private void AddProperties(IWithRelations objWithRelations, ManagementPackClass objectClass, Dictionary<string, object> properties, bool skipKeyProperties = false)
         {
             var entObj = objWithRelations.GetCoreEnterpriseManagementObject();
@@ -920,6 +922,119 @@ namespace ScsmClient.Operations
                         entObj[objectClass, name].Value = val;
 
                     }
+
+
+                }
+
+
+
+            }
+        }
+
+        private void AddPropertiesForCreate(IWithRelations objWithRelations, ManagementPackClass objectClass, Dictionary<string, object> properties, bool skipKeyProperties = false)
+        {
+            var entObj = objWithRelations.GetCoreEnterpriseManagementObject();
+            var objectProperties = GetObjectPropertyDictionary(objectClass);
+            var normalizer = new ValueConverter(_client);
+
+            foreach (var kv in properties)
+            {
+                var name = kv.Key;
+                var value = kv.Value;
+
+                if (name.Contains("!"))
+                {
+                    string className = null;
+                    string propertyName = null;
+
+                    var splittedName = name.Split("!".ToCharArray(), 2);
+                    className = splittedName[0];
+                    if (splittedName.Length > 1)
+                    {
+                        propertyName = splittedName[1]?.Trim().ToNull();
+                    }
+
+                    if (value?.GetType().IsEnumerableType(false) != true)
+                    {
+                        value = new List<object> { value };
+                    }
+
+                    var enu = value as IEnumerable;
+
+                    foreach (var o in enu)
+                    {
+                        var oVal = o;
+                        var itemClassName = className;
+
+                        if (!String.IsNullOrWhiteSpace(propertyName))
+                        {
+                            var foundobj = GetEnterpriseManagementObjectsByClassName(itemClassName, $"{propertyName} -eq '{oVal}'", 1).FirstOrDefault();
+                            if (foundobj == null)
+                            {
+                                continue;
+                            }
+                            oVal = foundobj.Id;
+                        }
+
+
+                        if (oVal is JObject jObject)
+                        {
+                            oVal = Json.Converter.ToDictionary(jObject);
+                        }
+
+                        if (oVal is JToken jt)
+                        {
+                            oVal = Json.Converter.ToBasicDotNetObject(jt);
+                        }
+
+                        if (oVal is string str)
+                        {
+                            if (str.IsGuid())
+                            {
+                                oVal = str.ToGuid();
+                            }
+                        }
+
+                        switch (oVal)
+                        {
+
+                            case Dictionary<string, object> dict:
+                                {
+                                    if (dict.ContainsKey("~type"))
+                                    {
+                                        itemClassName = dict["~type"].ToString();
+                                    }
+
+
+                                    var newRelation = BuildEnterpriseManagementObjectWithRelations(itemClassName, dict);
+                                    objWithRelations.AddRelatedObject(newRelation);
+                                    break;
+                                }
+                            case Guid guid:
+                                {
+                                    var existingObject = GetEnterpriseManagementObjectById(guid);
+                                    var related = new EnterpriseManagementObjectWithRelations(existingObject);
+                                    objWithRelations.AddRelatedObject(related);
+                                    break;
+                                }
+                        }
+
+                    }
+
+                    continue;
+                }
+
+
+                if (objectProperties.TryGetValue(name, out var prop))
+                {
+                    if (skipKeyProperties && prop.Key)
+                        continue;
+
+                    if (value == null)
+                        continue;
+
+                    var val = normalizer.NormalizeValue(kv.Value, prop);
+                    entObj[objectClass, name].Value = val;
 
 
                 }
