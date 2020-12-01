@@ -22,7 +22,7 @@ namespace ScsmClient.Operations
 
         public EnterpriseManagementObjectCriteria BuildObjectCriteria(string criteria, ManagementPackClass managementPackClass)
         {
-
+            criteria = criteria ?? "";
             if (!SimpleXml.TryParse(criteria, out var xmlCriteria))
             {
                 xmlCriteria = CreateCriteriaXmlFromFilterString(criteria, managementPackClass);
@@ -35,6 +35,7 @@ namespace ScsmClient.Operations
 
         public ObjectProjectionCriteria BuildObjectProjectionCriteria(string criteria, ManagementPackTypeProjection typeProjection)
         {
+            criteria = criteria ?? "";
             if (!SimpleXml.TryParse(criteria, out var xmlCriteria))
             {
                 xmlCriteria = CreateCriteriaXmlFromFilterString(criteria, typeProjection);

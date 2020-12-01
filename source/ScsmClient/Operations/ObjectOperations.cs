@@ -352,32 +352,49 @@ namespace ScsmClient.Operations
 
         public int DeleteObjectsByClassName(string className, string criteria, CancellationToken cancellationToken = default)
         {
-            var obj = GetEnterpriseManagementObjectsByClassName(className, criteria);
-            return DeleteObjects(obj, cancellationToken);
+            return DeleteObjectsByClassName(className, criteria, 1000, cancellationToken);
         }
+        public int DeleteObjectsByClassName(string className, string criteria, int maxItemsPerTransaction, CancellationToken cancellationToken = default)
+        {
+            var obj = GetEnterpriseManagementObjectsByClassName(className, criteria);
+            return DeleteObjects(obj, maxItemsPerTransaction, cancellationToken);
+        }
+
         public int DeleteObjectsByClassId(Guid classId, string criteria, CancellationToken cancellationToken = default)
         {
-            var obj = GetEnterpriseManagementObjectsByClassId(classId, criteria);
-            return DeleteObjects(obj, cancellationToken);
+            return DeleteObjectsByClassId(classId, criteria, 1000, cancellationToken);
         }
+        public int DeleteObjectsByClassId(Guid classId, string criteria, int maxItemsPerTransaction, CancellationToken cancellationToken = default)
+        {
+            var obj = GetEnterpriseManagementObjectsByClassId(classId, criteria);
+            return DeleteObjects(obj, maxItemsPerTransaction, cancellationToken);
+        }
+
         public int DeleteObjectsByClass(ManagementPackClass objectClass, string criteria, CancellationToken cancellationToken = default)
         {
+            return DeleteObjectsByClass(objectClass, criteria, 1000, cancellationToken);
+        }
+        public int DeleteObjectsByClass(ManagementPackClass objectClass, string criteria, int maxItemsPerTransaction, CancellationToken cancellationToken = default)
+        {
             var obj = GetEnterpriseManagementObjectsByClass(objectClass, criteria);
-            return DeleteObjects(obj, cancellationToken);
+            return DeleteObjects(obj, maxItemsPerTransaction, cancellationToken);
         }
 
         public int DeleteObjectsById(IEnumerable<Guid> objectIds, CancellationToken cancellationToken = default)
         {
+            return DeleteObjectsById(objectIds, 1000, cancellationToken);
+        }
+        public int DeleteObjectsById(IEnumerable<Guid> objectIds, int maxItemsPerTransaction, CancellationToken cancellationToken = default)
+        {
             var objs = GetEnterpriseManagementObjectsByIds(objectIds);
 
-            return DeleteObjects(objs, cancellationToken);
+            return DeleteObjects(objs, maxItemsPerTransaction, cancellationToken);
         }
 
         public int DeleteObjects(IEnumerable<EnterpriseManagementObject> objects, CancellationToken cancellationToken = default)
         {
             return DeleteObjects(objects, 1000, cancellationToken);
         }
-
         public int DeleteObjects(IEnumerable<EnterpriseManagementObject> objects, int maxItemsPerTransaction, CancellationToken cancellationToken = default)
         {
             var result = new Dictionary<int, Guid>();
@@ -397,6 +414,7 @@ namespace ScsmClient.Operations
 
                 if (currentCount >= maxItemsPerTransaction)
                 {
+                    currentCount = 0;
                     idd.Commit(_client.ManagementGroup);
                     idd = null;
                 }
@@ -481,6 +499,7 @@ namespace ScsmClient.Operations
 
                 if (currentCount >= maxItemsPerTransaction)
                 {
+                    currentCount = 0;
                     idd.Commit(_client.ManagementGroup);
                     idd = null;
                 }
