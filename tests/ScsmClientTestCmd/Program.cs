@@ -16,6 +16,7 @@ using Reflectensions.ExtensionMethods;
 using ScsmClient;
 using ScsmClient.ExtensionMethods;
 using ScsmClient.Helper;
+using ScsmClient.Model;
 using ScsmClient.SharedModels;
 using ScsmClient.SharedModels.Models;
 
@@ -45,7 +46,7 @@ namespace ScsmClientTestCmd
             //scsmClient.Object().DeleteObjectsByClassName("BMI.Stammportal.Anwendung", "");
             //scsmClient.Object().DeleteObjectsByClassName("BMI.Stammportal.AnwendungsRecht", "");
             //scsmClient.Object().DeleteObjectsByClassName("BMI.Stammportal.AnwendungsRecht.Parameter", "");
-            var del4 = scsmClient.Object().DeleteObjectsByClassName("BMI.Stammportal.Berechtigung", null, 10000);
+            //var del4 = scsmClient.Object().DeleteObjectsByClassName("BMI.Stammportal.Berechtigung", null, 10000);
 
 
             //var z = 1;
@@ -188,6 +189,19 @@ namespace ScsmClientTestCmd
 
             //CreatePersonWithRelations(scsmClient);
             //SearchProperty(scsmClient);
+
+            var cl = scsmClient.Types().GetClassByName("BMI.Stammportal.Berechtigung");
+            var retOptions = new RetrievalOptions();
+            retOptions.PropertiesToLoad = new List<string> {"ReferenceId"};
+            //retOptions.MaxResultCount = 100;
+
+            var sw = new Stopwatch();
+            sw.Start();
+            var res = scsmClient.Object().GetEnterpriseManagementObjectsByClass(cl, "", retOptions).ToList();
+            sw.Stop();
+
+            Console.WriteLine(sw.Elapsed);
+            Console.ReadLine();
             return;
 
 
@@ -405,10 +419,10 @@ namespace ScsmClientTestCmd
             //var bens = scsmClient.TypeProjection()
             //    .GetObjectProjectionObjects("BMI.Benutzer.Projection", "Type -like 'stamm%'", null).ToList();
 
-            var org = scsmClient.ScsmObject().GetObjectsByTypeName("BMI.Organisationseinheit", "Name -like '%Polizei%'", 1).ToList();
+            var org = scsmClient.ScsmObject().GetObjectsByTypeName("BMI.Organisationseinheit", "Name -like '%Polizei%'", new RetrievalOptions() {MaxResultCount = 1}).ToList();
 
             var pers = scsmClient.TypeProjection()
-                .GetTypeProjectionObjects("BMI.PErson.Projection", "vorname -like 'Bernhard%' -and Nachname -like 'Wind%'",1, 1).ToList();
+                .GetTypeProjectionObjects("BMI.PErson.Projection", "vorname -like 'Bernhard%' -and Nachname -like 'Wind%'", new RetrievalOptions() {MaxResultCount = 1, ReferenceLevels = 1}).ToList();
 
             //var per = pers.Where(p => p.ContainsKey("!BMI.Account")).ToList();
 

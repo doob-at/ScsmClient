@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.EnterpriseManagement.Configuration;
 using Reflectensions.ExtensionMethods;
 using ScsmClient.ExtensionMethods;
+using ScsmClient.Model;
 using ScsmClient.SharedModels;
 using ScsmClient.SharedModels.Models;
 
@@ -25,17 +26,23 @@ namespace ScsmClient.Operations
             {
                 return _client.ScsmObject().GetObjectById(id).SwitchType<Incident>();
             }
-            return GetByCriteria($"@G:System.WorkItem.Incident!Id == '{id}'", 1, levels).FirstOrDefault();
+            var retOptions = new RetrievalOptions();
+            retOptions.ReferenceLevels = levels;
+            retOptions.MaxResultCount = 1;
+            return GetByCriteria($"@G:System.WorkItem.Incident!Id == '{id}'", retOptions).FirstOrDefault();
         }
 
         public Incident GetById(string id, int? levels = null)
         {
-            return GetByCriteria($"@Id == '{id}'", 1, levels).FirstOrDefault();
+            var retOptions = new RetrievalOptions();
+            retOptions.ReferenceLevels = levels;
+            retOptions.MaxResultCount = 1;
+            return GetByCriteria($"@Id == '{id}'", retOptions).FirstOrDefault();
         }
 
-        public List<Incident> GetByCriteria(string criteria, int? maxResults = null, int? levels = null)
+        public List<Incident> GetByCriteria(string criteria, RetrievalOptions retrievalOptions = null)
         {
-            var incObjs = _client.ScsmObject().GetObjectsByTypeId(WellKnown.Incident.ProjectionType, criteria, maxResults, levels).ToList();
+            var incObjs = _client.ScsmObject().GetObjectsByTypeId(WellKnown.Incident.ProjectionType, criteria, retrievalOptions).ToList();
             return incObjs.Select(e => new Incident(e)).ToList();
         }
 

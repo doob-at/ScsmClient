@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EnterpriseManagement.Configuration;
 using Reflectensions.ExtensionMethods;
+using ScsmClient.Model;
 using ScsmClient.SharedModels;
 using ScsmClient.SharedModels.Models;
 
@@ -20,17 +21,23 @@ namespace ScsmClient.Operations
             {
                 return _client.ScsmObject().GetObjectById(id).SwitchType<ChangeRequest>();
             }
-            return GetByCriteria($"@G:System.WorkItem.ChangeRequest!Id == '{id}'", 1, levels).FirstOrDefault();
+            var retOptions = new RetrievalOptions();
+            retOptions.ReferenceLevels = levels;
+            retOptions.MaxResultCount = 1;
+            return GetByCriteria($"@G:System.WorkItem.ChangeRequest!Id == '{id}'", retOptions).FirstOrDefault();
         }
 
         public ChangeRequest GetById(string id, int? levels = null)
         {
-            return GetByCriteria($"@Id == '{id}'", 1, levels).FirstOrDefault();
+            var retOptions = new RetrievalOptions();
+            retOptions.ReferenceLevels = levels;
+            retOptions.MaxResultCount = 1;
+            return GetByCriteria($"@Id == '{id}'", retOptions).FirstOrDefault();
         }
 
-        public List<ChangeRequest> GetByCriteria(string criteria, int? maxResults = null, int? levels = null)
+        public List<ChangeRequest> GetByCriteria(string criteria, RetrievalOptions retrievalOptions = null)
         {
-            var srObjs = _client.ScsmObject().GetObjectsByTypeId(WellKnown.ChangeRequest.ProjectionType, criteria, maxResults, levels);
+            var srObjs = _client.ScsmObject().GetObjectsByTypeId(WellKnown.ChangeRequest.ProjectionType, criteria, retrievalOptions);
             return srObjs.SwitchType<ChangeRequest>().ToList();
         }
 

@@ -32,49 +32,49 @@ namespace ScsmClient.Operations
             return _client.Object().GetEnterpriseManagementObjectById(id).ToScsmObject();
         }
 
-        public IEnumerable<ScsmObject> GetObjectsByTypeName(string typeName, string criteria, int? maxResult = null, int? levels = null)
+        public IEnumerable<ScsmObject> GetObjectsByTypeName(string typeName, string criteria, RetrievalOptions retrievalOptions = null)
         {
             var objectClass = _client.Types().GetClassByName(typeName);
             if (objectClass != null)
             {
-                return GetObjectsByType(objectClass, criteria, maxResult);
+                return GetObjectsByType(objectClass, criteria, retrievalOptions);
             }
 
             var typeProjectionClass = _client.Types().GetTypeProjectionByName(typeName);
             if (typeProjectionClass != null)
             {
-                return GetObjectsByType(typeProjectionClass, criteria, maxResult, levels);
+                return GetObjectsByType(typeProjectionClass, criteria, retrievalOptions);
             }
 
             throw new ObjectNotFoundException($"Can't find a ManagementPackClass nor a TypeProjection with the name '{typeName}'");
         }
 
-        public IEnumerable<ScsmObject> GetObjectsByTypeId(Guid classId, string criteria, int? maxResult = null, int? levels = null)
+        public IEnumerable<ScsmObject> GetObjectsByTypeId(Guid classId, string criteria, RetrievalOptions retrievalOptions = null)
         {
             var objectClass = _client.Types().GetClassById(classId);
             if (objectClass != null)
             {
-                return GetObjectsByType(objectClass, criteria, maxResult);
+                return GetObjectsByType(objectClass, criteria, retrievalOptions);
             }
 
             var typeProjectionClass = _client.Types().GetTypeProjectionById(classId);
             if (typeProjectionClass != null)
             {
-                return GetObjectsByType(typeProjectionClass, criteria, maxResult, levels);
+                return GetObjectsByType(typeProjectionClass, criteria, retrievalOptions);
             }
 
             throw new ObjectNotFoundException($"Can't find a ManagementPackClass nor a TypeProjection with the id '{classId}'");
         }
 
-        public IEnumerable<ScsmObject> GetObjectsByType(ManagementPackClass objectClass, string criteria, int? maxResult = null)
+        public IEnumerable<ScsmObject> GetObjectsByType(ManagementPackClass objectClass, string criteria, RetrievalOptions retrievalOptions = null)
         {
-            return _client.Object().GetEnterpriseManagementObjectsByClass(objectClass, criteria, maxResult)
+            return _client.Object().GetEnterpriseManagementObjectsByClass(objectClass, criteria, retrievalOptions)
                 .Select(obj => obj.ToScsmObject());
         }
 
-        public IEnumerable<ScsmObject> GetObjectsByType(ManagementPackTypeProjection typeProjection, string criteria, int? maxResult = null, int? levels = null)
+        public IEnumerable<ScsmObject> GetObjectsByType(ManagementPackTypeProjection typeProjection, string criteria, RetrievalOptions retrievalOptions = null)
         {
-            return _client.TypeProjection().GetTypeProjectionObjects(typeProjection, criteria, maxResult, levels).Select(obj => obj.ToScsmObject(levels));
+            return _client.TypeProjection().GetTypeProjectionObjects(typeProjection, criteria, retrievalOptions).Select(obj => obj.ToScsmObject(retrievalOptions?.ReferenceLevels));
 
         }
         #endregion

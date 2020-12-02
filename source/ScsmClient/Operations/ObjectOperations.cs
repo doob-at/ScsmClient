@@ -39,7 +39,7 @@ namespace ScsmClient.Operations
             var critOptions = new ObjectQueryOptions();
             critOptions.DefaultPropertyRetrievalBehavior = ObjectPropertyRetrievalBehavior.All;
             critOptions.ObjectRetrievalMode = ObjectRetrievalOptions.NonBuffered;
-
+            
             return _client.ManagementGroup.EntityObjects.GetObject<EnterpriseManagementObject>(id, critOptions);
         }
 
@@ -53,32 +53,85 @@ namespace ScsmClient.Operations
                 .GetObjectReader<EnterpriseManagementObject>(ids.ToList(), critOptions).ToList();
         }
 
-        public IEnumerable<EnterpriseManagementObject> GetEnterpriseManagementObjectsByClassName(string className, string criteria, int? maxResult = null)
+        public IEnumerable<EnterpriseManagementObject> GetEnterpriseManagementObjectsByClassName(string className, string criteria, RetrievalOptions retrievalOptions = null)
         {
             var objectClass = _client.Types().GetClassByName(className);
-            return GetEnterpriseManagementObjectsByClass(objectClass, criteria, maxResult);
+            return GetEnterpriseManagementObjectsByClass(objectClass, criteria, retrievalOptions);
         }
 
-        public IEnumerable<EnterpriseManagementObject> GetEnterpriseManagementObjectsByClassId(Guid classId, string criteria, int? maxResult = null)
+        public IEnumerable<EnterpriseManagementObject> GetEnterpriseManagementObjectsByClassId(Guid classId, string criteria, RetrievalOptions retrievalOptions = null)
         {
             var objectClass = _client.Types().GetClassById(classId);
-            return GetEnterpriseManagementObjectsByClass(objectClass, criteria, maxResult);
+            return GetEnterpriseManagementObjectsByClass(objectClass, criteria, retrievalOptions);
         }
 
-        public IEnumerable<EnterpriseManagementObject> GetEnterpriseManagementObjectsByClass(ManagementPackClass objectClass, string criteria, int? maxResult = null)
+        //public IEnumerable<EnterpriseManagementObject> GetEnterpriseManagementObjectsByClass(ManagementPackClass objectClass, string criteria, int? maxResult = null)
+        //{
+
+
+        //    var crit = _client.Criteria().BuildObjectCriteria(criteria, objectClass);
+
+
+        //    var critOptions = new ObjectQueryOptions();
+
+        //    critOptions.DefaultPropertyRetrievalBehavior = ObjectPropertyRetrievalBehavior.All;
+        //    if (maxResult.HasValue && maxResult.Value != int.MaxValue)
+        //    {
+        //        critOptions.MaxResultCount = maxResult.Value;
+        //        critOptions.ObjectRetrievalMode = ObjectRetrievalOptions.Buffered;
+        //    }
+
+        //    var sortprop = new EnterpriseManagementObjectGenericProperty(EnterpriseManagementObjectGenericPropertyName.TimeAdded);
+        //    critOptions.AddSortProperty(sortprop, SortingOrder.Ascending);
+
+
+        //    var reader = _client.ManagementGroup.EntityObjects.GetObjectReader<EnterpriseManagementObject>(crit, critOptions);
+
+
+        //    foreach (EnterpriseManagementObject enterpriseManagementObject in reader)
+        //    {
+        //        yield return enterpriseManagementObject;
+        //    }
+
+        //}
+
+        public IEnumerable<EnterpriseManagementObject> GetEnterpriseManagementObjectsByClass(ManagementPackClass objectClass, string criteria, RetrievalOptions retrievalOptions = null)
         {
 
+            retrievalOptions = retrievalOptions ?? new RetrievalOptions();
 
             var crit = _client.Criteria().BuildObjectCriteria(criteria, objectClass);
 
 
             var critOptions = new ObjectQueryOptions();
+            critOptions.ObjectRetrievalMode = ObjectRetrievalOptions.Buffered;
 
-            critOptions.DefaultPropertyRetrievalBehavior = ObjectPropertyRetrievalBehavior.All;
-            if (maxResult.HasValue && maxResult.Value != int.MaxValue)
+            if (retrievalOptions.PropertiesToLoad != null)
             {
-                critOptions.MaxResultCount = maxResult.Value;
-                critOptions.ObjectRetrievalMode = ObjectRetrievalOptions.Buffered;
+                critOptions.DefaultPropertyRetrievalBehavior = ObjectPropertyRetrievalBehavior.None;
+                if (retrievalOptions.PropertiesToLoad.Any())
+                {
+                    var objectClassProperties = objectClass.GetProperties(BaseClassTraversalDepth.Recursive);
+                    foreach (var s in retrievalOptions.PropertiesToLoad)
+                    {
+                        var prop = objectClassProperties.FirstOrDefault(ocp => ocp.Name.Equals(s));
+                        if (prop != null)
+                        {
+                            critOptions.AddPropertyToRetrieve(objectClass, prop);
+
+                        }
+                    }
+                }
+            }
+            else
+            {
+                critOptions.DefaultPropertyRetrievalBehavior = ObjectPropertyRetrievalBehavior.All;
+            }
+
+            
+            if (retrievalOptions.MaxResultCount.HasValue && retrievalOptions.MaxResultCount.Value != int.MaxValue)
+            {
+                critOptions.MaxResultCount = retrievalOptions.MaxResultCount.Value;
             }
 
             var sortprop = new EnterpriseManagementObjectGenericProperty(EnterpriseManagementObjectGenericPropertyName.TimeAdded);
@@ -90,8 +143,6 @@ namespace ScsmClient.Operations
 
             foreach (EnterpriseManagementObject enterpriseManagementObject in reader)
             {
-                //if (count == critOptions.MaxResultCount)
-                //    break;
                 yield return enterpriseManagementObject;
             }
 
@@ -746,7 +797,7 @@ namespace ScsmClient.Operations
 
                         if (!String.IsNullOrWhiteSpace(propertyName))
                         {
-                            var foundobj = GetEnterpriseManagementObjectsByClassName(itemClassName, $"{propertyName} -eq '{oVal}'", 1).FirstOrDefault();
+                            var foundobj = GetEnterpriseManagementObjectsByClassName(itemClassName, $"{propertyName} -eq '{oVal}'", new RetrievalOptions() {MaxResultCount = 1}).FirstOrDefault();
                             if (foundobj == null)
                             {
                                 continue;
@@ -968,7 +1019,7 @@ namespace ScsmClient.Operations
 
                         if (!String.IsNullOrWhiteSpace(propertyName))
                         {
-                            var foundobj = GetEnterpriseManagementObjectsByClassName(itemClassName, $"{propertyName} -eq '{oVal}'", 1).FirstOrDefault();
+                            var foundobj = GetEnterpriseManagementObjectsByClassName(itemClassName, $"{propertyName} -eq '{oVal}'", new RetrievalOptions() {MaxResultCount = 1}).FirstOrDefault();
                             if (foundobj == null)
                             {
                                 continue;
