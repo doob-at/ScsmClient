@@ -41,7 +41,7 @@ namespace ScsmClientTestCmd
             //var crit = scsmClient.Criteria().CreateCriteriaXmlFromFilterString("'14.5.2020 20:12' -lt '14.5.2020 20:13'", mpc);
 
             //var t = crit;
-            //var or = scsmClient.Object().DeleteObjectsByClassName("BMI.Organisationseinheit", "");
+            var or = scsmClient.Object().DeleteObjectsByClassName("BMI.Organisationseinheit", "");
 
             //scsmClient.Object().DeleteObjectsByClassName("BMI.Stammportal.Anwendung", "");
             //scsmClient.Object().DeleteObjectsByClassName("BMI.Stammportal.AnwendungsRecht", "");
@@ -190,18 +190,18 @@ namespace ScsmClientTestCmd
             //CreatePersonWithRelations(scsmClient);
             //SearchProperty(scsmClient);
 
-            var cl = scsmClient.Types().GetClassByName("BMI.Stammportal.Berechtigung");
-            var retOptions = new RetrievalOptions();
-            retOptions.PropertiesToLoad = new List<string> {"ReferenceId"};
-            //retOptions.MaxResultCount = 100;
+            //var cl = scsmClient.Types().GetClassByName("BMI.Stammportal.Berechtigung");
+            //var retOptions = new RetrievalOptions();
+            //retOptions.PropertiesToLoad = new List<string> {"ReferenceId"};
+            ////retOptions.MaxResultCount = 100000;
 
-            var sw = new Stopwatch();
-            sw.Start();
-            var res = scsmClient.Object().GetEnterpriseManagementObjectsByClass(cl, "", retOptions).ToList();
-            sw.Stop();
+            //var sw = new Stopwatch();
+            //sw.Start();
+            //var res = scsmClient.ScsmObject().GetObjectsByTypeName("BMI.Stammportal.Berechtigung", null, retOptions).ToList();
+            //sw.Stop();
 
-            Console.WriteLine(sw.Elapsed);
-            Console.ReadLine();
+            //Console.WriteLine(sw.Elapsed);
+            //Console.ReadLine();
             return;
 
 
