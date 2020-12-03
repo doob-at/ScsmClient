@@ -9,6 +9,5 @@ namespace ScsmClient.SharedModels.Models
 
         public Dictionary<string, string> BuildCacheForObjects { get; set; }
 
-        public CancellationToken CancellationToken { get; set; } = default;
     }
 }

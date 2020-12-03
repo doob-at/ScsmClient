@@ -171,22 +171,22 @@ namespace ScsmClient.Operations
         }
 
 
-        public Dictionary<int, Guid> CreateObjectsByClassId(Guid id, IEnumerable<Dictionary<string, object>> objects, CreateOptions createOptions = null)
+        public Dictionary<int, Guid> CreateObjectsByClassId(Guid id, IEnumerable<Dictionary<string, object>> objects, CreateOptions createOptions = null, CancellationToken cancellationToken = default)
         {
 
             var objectClass = _client.Types().GetClassById(id);
-            return CreateObjectsByClass(objectClass, objects, createOptions);
+            return CreateObjectsByClass(objectClass, objects, createOptions, cancellationToken);
         }
 
 
-        public Dictionary<int, Guid> CreateObjectsByClassName(string className, IEnumerable<Dictionary<string, object>> objects, CreateOptions createOptions = null)
+        public Dictionary<int, Guid> CreateObjectsByClassName(string className, IEnumerable<Dictionary<string, object>> objects, CreateOptions createOptions = null, CancellationToken cancellationToken = default)
         {
             var objectClass = _client.Types().GetClassByName(className);
-            return CreateObjectsByClass(objectClass, objects, createOptions);
+            return CreateObjectsByClass(objectClass, objects, createOptions, cancellationToken);
         }
 
         
-        public Dictionary<int, Guid> CreateObjectsByClass(ManagementPackClass objectClass, IEnumerable<Dictionary<string, object>> objects, CreateOptions createOptions = null)
+        public Dictionary<int, Guid> CreateObjectsByClass(ManagementPackClass objectClass, IEnumerable<Dictionary<string, object>> objects, CreateOptions createOptions = null, CancellationToken cancellationToken = default)
         {
 
             createOptions = createOptions ?? new CreateOptions();
@@ -210,7 +210,7 @@ namespace ScsmClient.Operations
             int currentCount = 0;
             foreach (var dictionary in objects)
             {
-                createOptions.CancellationToken.ThrowIfCancellationRequested();
+                cancellationToken.ThrowIfCancellationRequested();
 
                 if (idd == null)
                 {
@@ -273,21 +273,21 @@ namespace ScsmClient.Operations
             return CreateObjectsFromTemplate(template, new[] { properties }).First().Value;
         }
 
-        public Dictionary<int, Guid> CreateObjectsFromTemplateId(Guid id, IEnumerable<Dictionary<string, object>> objects, CreateOptions createOptions = null)
+        public Dictionary<int, Guid> CreateObjectsFromTemplateId(Guid id, IEnumerable<Dictionary<string, object>> objects, CreateOptions createOptions = null, CancellationToken cancellationToken = default)
         {
 
             var template = _client.Template().GetObjectTemplateById(id);
-            return CreateObjectsFromTemplate(template, objects, createOptions);
+            return CreateObjectsFromTemplate(template, objects, createOptions, cancellationToken);
         }
 
-        public Dictionary<int, Guid> CreateObjectsFromTemplateName(string templateName, IEnumerable<Dictionary<string, object>> objects, CreateOptions createOptions = null)
+        public Dictionary<int, Guid> CreateObjectsFromTemplateName(string templateName, IEnumerable<Dictionary<string, object>> objects, CreateOptions createOptions = null, CancellationToken cancellationToken = default)
         {
 
             var template = _client.Template().GetObjectTemplateByName(templateName);
-            return CreateObjectsFromTemplate(template, objects, createOptions);
+            return CreateObjectsFromTemplate(template, objects, createOptions, cancellationToken);
         }
 
-        public Dictionary<int, Guid> CreateObjectsFromTemplate(ManagementPackObjectTemplate template, IEnumerable<Dictionary<string, object>> objects, CreateOptions createOptions = null)
+        public Dictionary<int, Guid> CreateObjectsFromTemplate(ManagementPackObjectTemplate template, IEnumerable<Dictionary<string, object>> objects, CreateOptions createOptions = null, CancellationToken cancellationToken = default)
         {
             createOptions = createOptions ?? new CreateOptions();
             createOptions.BatchSize = createOptions.BatchSize ?? 1000;
@@ -310,7 +310,7 @@ namespace ScsmClient.Operations
             int currentCount = 0;
             foreach (var dictionary in objects)
             {
-                createOptions.CancellationToken.ThrowIfCancellationRequested();
+                cancellationToken.ThrowIfCancellationRequested();
 
                 if (idd == null)
                 {
