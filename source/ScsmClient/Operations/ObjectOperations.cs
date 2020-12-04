@@ -47,7 +47,7 @@ namespace ScsmClient.Operations
             return _client.ManagementGroup.EntityObjects.GetObject<EnterpriseManagementObject>(id, critOptions);
         }
 
-        public IEnumerable<EnterpriseManagementObject> GetEnterpriseManagementObjectsByIds(IEnumerable<Guid> ids)
+        public List<EnterpriseManagementObject> GetEnterpriseManagementObjectsByIds(IEnumerable<Guid> ids)
         {
             var critOptions = new ObjectQueryOptions();
             critOptions.DefaultPropertyRetrievalBehavior = ObjectPropertyRetrievalBehavior.All;
@@ -57,13 +57,13 @@ namespace ScsmClient.Operations
                 .GetObjectReader<EnterpriseManagementObject>(ids.ToList(), critOptions).ToList();
         }
 
-        public IEnumerable<EnterpriseManagementObject> GetEnterpriseManagementObjectsByClassName(string className, string criteria, RetrievalOptions retrievalOptions = null)
+        public List<EnterpriseManagementObject> GetEnterpriseManagementObjectsByClassName(string className, string criteria, RetrievalOptions retrievalOptions = null)
         {
             var objectClass = _client.Types().GetClassByName(className);
             return GetEnterpriseManagementObjectsByClass(objectClass, criteria, retrievalOptions);
         }
 
-        public IEnumerable<EnterpriseManagementObject> GetEnterpriseManagementObjectsByClassId(Guid classId, string criteria, RetrievalOptions retrievalOptions = null)
+        public List<EnterpriseManagementObject> GetEnterpriseManagementObjectsByClassId(Guid classId, string criteria, RetrievalOptions retrievalOptions = null)
         {
             var objectClass = _client.Types().GetClassById(classId);
             return GetEnterpriseManagementObjectsByClass(objectClass, criteria, retrievalOptions);
@@ -99,7 +99,7 @@ namespace ScsmClient.Operations
 
         //}
 
-        public IEnumerable<EnterpriseManagementObject> GetEnterpriseManagementObjectsByClass(ManagementPackClass objectClass, string criteria, RetrievalOptions retrievalOptions = null)
+        public List<EnterpriseManagementObject> GetEnterpriseManagementObjectsByClass(ManagementPackClass objectClass, string criteria, RetrievalOptions retrievalOptions = null)
         {
 
             retrievalOptions = retrievalOptions ?? new RetrievalOptions();
@@ -141,15 +141,9 @@ namespace ScsmClient.Operations
             var sortprop = new EnterpriseManagementObjectGenericProperty(EnterpriseManagementObjectGenericPropertyName.TimeAdded);
             critOptions.AddSortProperty(sortprop, SortingOrder.Ascending);
 
-
+            
             var reader = _client.ManagementGroup.EntityObjects.GetObjectReader<EnterpriseManagementObject>(crit, critOptions);
-
-
-            foreach (EnterpriseManagementObject enterpriseManagementObject in reader)
-            {
-                yield return enterpriseManagementObject;
-            }
-
+            return reader.ToList();
         }
 
 
@@ -361,7 +355,10 @@ namespace ScsmClient.Operations
         }
         public int DeleteObjectsByClassName(string className, string criteria, int maxItemsPerTransaction, CancellationToken cancellationToken = default)
         {
-            var obj = GetEnterpriseManagementObjectsByClassName(className, criteria);
+            var obj = GetEnterpriseManagementObjectsByClassName(className, criteria, new RetrievalOptions
+            {
+                PropertiesToLoad = new List<string> { "Id" }
+            });
             return DeleteObjects(obj, maxItemsPerTransaction, cancellationToken);
         }
 
@@ -406,13 +403,11 @@ namespace ScsmClient.Operations
             //var groups = GroupIn10(objects);
 
             var count = 0;
-            IncrementalDiscoveryData idd = null;
+            IncrementalDiscoveryData idd = new IncrementalDiscoveryData();
             int currentCount = 0;
             foreach (var mgmtObject in objects)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-
-                idd = idd ?? new IncrementalDiscoveryData();
                 idd.Remove(mgmtObject);
 
                 currentCount++;
@@ -421,7 +416,7 @@ namespace ScsmClient.Operations
                 {
                     currentCount = 0;
                     idd.Commit(_client.ManagementGroup);
-                    idd = null;
+                    idd = new IncrementalDiscoveryData();
                 }
 
                 count++;
