@@ -21,9 +21,9 @@ namespace ScsmClient.Model
     {
         public EnterpriseManagementObject EnterpriseManagementObject { get; }
 
-        public List<EnterpriseManagementObjectWithRelations> RelatedObjects { get; set; }
-        public List<EnterpriseManagementObject> RemoveRelatedObjects { get; set; }
-        public List<EnterpriseManagementRelationshipObject<EnterpriseManagementObject>> RemoveRelationShip { get; set; }
+        public List<EnterpriseManagementObjectWithRelations> RelatedObjects { get; set; } = new List<EnterpriseManagementObjectWithRelations>();
+        public List<EnterpriseManagementObject> RemoveRelatedObjects { get; set; } = new List<EnterpriseManagementObject>();
+        public List<EnterpriseManagementRelationshipObject<EnterpriseManagementObject>> RemoveRelationShip { get; set; } = new List<EnterpriseManagementRelationshipObject<EnterpriseManagementObject>>();
 
         public EnterpriseManagementObjectWithRelations(EnterpriseManagementObject enterpriseManagementObject)
         {
@@ -32,35 +32,19 @@ namespace ScsmClient.Model
 
         public void AddRelatedObject(EnterpriseManagementObjectWithRelations enterpriseManagementObject)
         {
-            if (RelatedObjects == null)
-            {
-                RelatedObjects = new List<EnterpriseManagementObjectWithRelations>();
-            }
             RelatedObjects.Add(enterpriseManagementObject);
-            
         }
 
         public void RemoveRelatedObject(EnterpriseManagementObject enterpriseManagementObject)
         {
-            if (RemoveRelatedObjects == null)
-            {
-                RemoveRelatedObjects = new List<EnterpriseManagementObject>();
-            }
-
             if (!RemoveRelatedObjects.Contains(enterpriseManagementObject))
             {
                 RemoveRelatedObjects.Add(enterpriseManagementObject);
             }
-
         }
 
         public void RemoveRelationship(EnterpriseManagementRelationshipObject<EnterpriseManagementObject> relationship)
         {
-            if (RemoveRelationShip == null)
-            {
-                RemoveRelationShip = new List<EnterpriseManagementRelationshipObject<EnterpriseManagementObject>>();
-            }
-
             if (!RemoveRelationShip.Contains(relationship))
             {
                 RemoveRelationShip.Add(relationship);
@@ -80,9 +64,9 @@ namespace ScsmClient.Model
 
         
 
-        public List<EnterpriseManagementObjectWithRelations> RelatedObjects { get; set; }
-        public List<EnterpriseManagementObjectBaseWithProperties> RemoveRelatedObjects { get; set; }
-        public List<EnterpriseManagementRelationshipObject<EnterpriseManagementObject>> RemoveRelationShip { get; set; }
+        public List<EnterpriseManagementObjectWithRelations> RelatedObjects { get; set; } = new List<EnterpriseManagementObjectWithRelations>();
+        public List<EnterpriseManagementObjectBaseWithProperties> RemoveRelatedObjects { get; set; } = new List<EnterpriseManagementObjectBaseWithProperties>();
+        public List<EnterpriseManagementRelationshipObject<EnterpriseManagementObject>> RemoveRelationShip { get; set; } = new List<EnterpriseManagementRelationshipObject<EnterpriseManagementObject>>();
 
 
         public EnterpriseManagementObjectProjectionWithRelations(EnterpriseManagementObjectProjection enterpriseManagementObjectProjection)
@@ -92,20 +76,11 @@ namespace ScsmClient.Model
 
         public void AddRelatedObject(EnterpriseManagementObjectWithRelations enterpriseManagementObject)
         {
-            if (RelatedObjects == null)
-            {
-                RelatedObjects = new List<EnterpriseManagementObjectWithRelations>();
-            }
             RelatedObjects.Add(enterpriseManagementObject);
         }
 
         public void RemoveRelatedObject(EnterpriseManagementObject objectGuid)
         {
-            if (RemoveRelatedObjects == null)
-            {
-                RemoveRelatedObjects = new List<EnterpriseManagementObjectBaseWithProperties>();
-            }
-
             if (!RemoveRelatedObjects.Contains(objectGuid))
             {
                 RemoveRelatedObjects.Add(objectGuid);
@@ -115,11 +90,6 @@ namespace ScsmClient.Model
 
         public void RemoveRelationship(EnterpriseManagementRelationshipObject<EnterpriseManagementObject> relationship)
         {
-            if (RemoveRelationShip == null)
-            {
-                RemoveRelationShip = new List<EnterpriseManagementRelationshipObject<EnterpriseManagementObject>>();
-            }
-
             if (!RemoveRelationShip.Contains(relationship))
             {
                 RemoveRelationShip.Add(relationship);

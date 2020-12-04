@@ -199,19 +199,13 @@ namespace ScsmClient.Operations
 
             var result = new Dictionary<int, Guid>();
             var index = 0;
-            List<Guid> _list = null;
-            IncrementalDiscoveryData idd = null;
+            List<Guid> _list = new List<Guid>();
+            IncrementalDiscoveryData idd = new IncrementalDiscoveryData();
             int currentCount = 0;
             foreach (var dictionary in objects)
             {
-                cancellationToken.ThrowIfCancellationRequested();
-
-                if (idd == null)
-                {
-                    _list = new List<Guid>();
-                    idd = new IncrementalDiscoveryData();
-                }
-
+                
+                
                 var obj = BuildEnterpriseManagementObjectWithRelations(objectClass, dictionary);
                 var rootId = AddIncremental(obj, ref idd);
                 _list.Add(rootId);
@@ -219,6 +213,8 @@ namespace ScsmClient.Operations
 
                 if (currentCount >= createOptions.BatchSize)
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
+
                     currentCount = 0;
                     idd.Commit(_client.ManagementGroup);
                     foreach (var guid in _list)
@@ -226,8 +222,8 @@ namespace ScsmClient.Operations
                         result.Add(index++, guid);
                     }
 
-                    _list = null;
-                    idd = null;
+                    _list = new List<Guid>();
+                    idd = new IncrementalDiscoveryData();
                 }
 
 
@@ -241,6 +237,9 @@ namespace ScsmClient.Operations
                     result.Add(index++, guid);
                 }
             }
+
+            _list = null;
+            idd = null;
 
             return result;
 
@@ -570,8 +569,7 @@ namespace ScsmClient.Operations
             }
 
 
-            if (obj.RelatedObjects != null)
-            {
+            
                 foreach (var child in obj.RelatedObjects)
                 {
 
@@ -579,15 +577,14 @@ namespace ScsmClient.Operations
                     incrementalDiscoveryData.Add(_client.Relations().buildCreatableEnterpriseManagementRelationshipObject(
                         obj.GetCoreEnterpriseManagementObject(), child.EnterpriseManagementObject));
                 }
-            }
+            
 
             return obj.GetCoreEnterpriseManagementObject().Id;
         }
 
         private Guid AddRelatedObjects(EnterpriseManagementObjectWithRelations obj, ref IncrementalDiscoveryData incrementalDiscoveryData)
         {
-            if (obj.RelatedObjects != null)
-            {
+            
                 foreach (var child in obj.RelatedObjects)
                 {
 
@@ -595,33 +592,31 @@ namespace ScsmClient.Operations
                     incrementalDiscoveryData.Add(_client.Relations().buildCreatableEnterpriseManagementRelationshipObject(
                         obj.EnterpriseManagementObject, child.EnterpriseManagementObject));
                 }
-            }
+            
 
             return obj.EnterpriseManagementObject.Id;
         }
 
         private void RemoveRelatedObjects(EnterpriseManagementObjectWithRelations obj, ref IncrementalDiscoveryData incrementalDiscoveryData)
         {
-            if (obj.RemoveRelatedObjects != null)
-            {
+            
                 foreach (var child in obj.RemoveRelatedObjects)
                 {
                     incrementalDiscoveryData.Remove(child);
                 }
-            }
+            
 
 
         }
 
         private void RemoveRelationship(EnterpriseManagementObjectWithRelations obj, ref IncrementalDiscoveryData incrementalDiscoveryData)
         {
-            if (obj.RemoveRelationShip != null)
-            {
+            
                 foreach (var child in obj.RemoveRelationShip)
                 {
                     incrementalDiscoveryData.Remove(child);
                 }
-            }
+            
 
 
         }

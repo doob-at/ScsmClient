@@ -46,7 +46,7 @@ namespace ScsmClientTestCmd
             //scsmClient.Object().DeleteObjectsByClassName("BMI.Stammportal.Anwendung", "");
             //scsmClient.Object().DeleteObjectsByClassName("BMI.Stammportal.AnwendungsRecht", "");
             //scsmClient.Object().DeleteObjectsByClassName("BMI.Stammportal.AnwendungsRecht.Parameter", "");
-            var del4 = scsmClient.Object().DeleteObjectsByClassName("BMI.Stammportal.Berechtigung", null, 10000);
+            var del4 = scsmClient.Object().DeleteObjectsByClassName("BMI.Stammportal.Berechtigung", null, 5000);
 
 
             //var z = 1;
