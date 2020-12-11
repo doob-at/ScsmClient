@@ -398,7 +398,7 @@ namespace ScsmClient.Operations
         }
         public int DeleteObjects(IEnumerable<EnterpriseManagementObject> objects, int maxItemsPerTransaction, CancellationToken cancellationToken = default)
         {
-            var result = new Dictionary<int, Guid>();
+            //var result = new Dictionary<int, Guid>();
             //var groups = GroupIn10(objects);
 
             var count = 0;
@@ -429,8 +429,7 @@ namespace ScsmClient.Operations
 
         public void UpdateObject(Guid id, Dictionary<string, object> properties)
         {
-            var enterpriseManagementObject = GetEnterpriseManagementObjectById(id);
-            var updDict = new Dictionary<Guid, Dictionary<string, object>>
+           var updDict = new Dictionary<Guid, Dictionary<string, object>>
             {
                 [id] = properties
             };
@@ -463,12 +462,12 @@ namespace ScsmClient.Operations
 
         //}
 
-        public void UpdateObjects(Dictionary<Guid, Dictionary<string, object>> updateObjects, CancellationToken cancellationToken = default)
+        public int UpdateObjects(Dictionary<Guid, Dictionary<string, object>> updateObjects, CancellationToken cancellationToken = default)
         {
-            UpdateObjects(updateObjects, 1000, cancellationToken);
+            return UpdateObjects(updateObjects, 1000, cancellationToken);
         }
 
-        public void UpdateObjects(Dictionary<Guid, Dictionary<string, object>> updateObjects, int maxItemsPerTransaction, CancellationToken cancellationToken = default)
+        public int UpdateObjects(Dictionary<Guid, Dictionary<string, object>> updateObjects, int maxItemsPerTransaction, CancellationToken cancellationToken = default)
         {
 
 
@@ -478,11 +477,13 @@ namespace ScsmClient.Operations
 
 
 
-            cancellationToken.ThrowIfCancellationRequested();
+            
             IncrementalDiscoveryData idd = null;
             int currentCount = 0;
+            var allCount = 0;
             foreach (var dictionary in enterpriseObjects)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 if (idd == null)
                 {
                     idd = new IncrementalDiscoveryData();
@@ -495,7 +496,7 @@ namespace ScsmClient.Operations
                 RemoveRelationship(obj, ref idd);
 
                 currentCount++;
-
+                allCount++;
                 if (currentCount >= maxItemsPerTransaction)
                 {
                     currentCount = 0;
@@ -506,7 +507,7 @@ namespace ScsmClient.Operations
             }
 
             idd?.Commit(_client.ManagementGroup);
-
+            return allCount;
         }
 
 
