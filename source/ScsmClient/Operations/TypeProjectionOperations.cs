@@ -46,6 +46,8 @@ namespace ScsmClient.Operations
             var critOptions = new ObjectQueryOptions();
             critOptions.ObjectRetrievalMode = ObjectRetrievalOptions.Buffered;
 
+            retrievalOptions = retrievalOptions ?? new RetrievalOptions();
+
             if (retrievalOptions.PropertiesToLoad != null)
             {
                 critOptions.DefaultPropertyRetrievalBehavior = ObjectPropertyRetrievalBehavior.None;

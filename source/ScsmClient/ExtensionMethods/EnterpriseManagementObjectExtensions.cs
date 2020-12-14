@@ -201,7 +201,7 @@ namespace ScsmClient.ExtensionMethods
 
         public static ManagementPackClass GetManagementPackClass(this EnterpriseManagementObject enterpriseManagementObject)
         {
-            return enterpriseManagementObject.GetClasses(BaseClassTraversalDepth.None).First();
+            return enterpriseManagementObject.GetMostDerivedClasses().First();
         }
 
         public static string GetManagementPackClassName(this EnterpriseManagementObject enterpriseManagementObject)

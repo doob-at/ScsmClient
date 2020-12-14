@@ -49,13 +49,13 @@ namespace ScsmClientTestCmd
             //var del4 = scsmClient.Object().DeleteObjectsByClassName("BMI.Stammportal.Berechtigung", null, 10000);
 
 
-            var anwendungsrecht = scsmClient.ScsmObject().GetObjectsByTypeName("BMI.Stammportal.AnwendungsRecht", null).ToList();
-            var upd = anwendungsrecht.ToDictionary(a => a.ObjectId, o => new Dictionary<string, object>
-            {
-                ["BMI.Stammportal.Anwendung!-"] = null
-            });
+            //var anwendungsrecht = scsmClient.ScsmObject().GetObjectsByTypeName("BMI.Stammportal.AnwendungsRecht", null).ToList();
+            //var upd = anwendungsrecht.ToDictionary(a => a.ObjectId, o => new Dictionary<string, object>
+            //{
+            //    ["BMI.Stammportal.Anwendung!-"] = null
+            //});
 
-            scsmClient.Object().UpdateObjects(upd);
+            //scsmClient.Object().UpdateObjects(upd);
 
 
 
@@ -212,6 +212,13 @@ namespace ScsmClientTestCmd
 
             //Console.WriteLine(sw.Elapsed);
             //Console.ReadLine();
+
+
+            var stammportalRollen =
+                scsmClient.ScsmObject().GetObjectsByTypeName("BMI.Rolle.Stammportal", null).ToList();
+
+            var benutzer = scsmClient.ScsmObject().GetObjectsByTypeName("BMI.Benutzer.Stammportal.Projection",
+                $"@G:Id -eq '1f5fdf8f-f42b-5f26-4f76-c4fa78cd991f'").FirstOrDefault();
             return;
 
 
