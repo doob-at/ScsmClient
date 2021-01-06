@@ -213,12 +213,17 @@ namespace ScsmClientTestCmd
             //Console.WriteLine(sw.Elapsed);
             //Console.ReadLine();
 
+            var cl = scsmClient.Types().GetTypeProjectionByName("BMI.Rolle.Manager");
+            var crit = scsmClient.Criteria()
+                .CreateCriteriaXmlFromFilterString("@G:BMI.Person!Id -eq 'ba8abf73-de4d-9d09-b18c-4f5931f3d603'", cl);
 
             var stammportalRollen =
-                scsmClient.ScsmObject().GetObjectsByTypeName("BMI.Rolle.Stammportal", null).ToList();
+                scsmClient.ScsmObject().GetObjectsByTypeName("BMI.Rolle.Manager", "@G:BMI.Person!Id -eq 'ba8abf73-de4d-9d09-b18c-4f5931f3d603'").ToList();
 
-            var benutzer = scsmClient.ScsmObject().GetObjectsByTypeName("BMI.Benutzer.Stammportal.Projection",
-                $"@G:Id -eq '1f5fdf8f-f42b-5f26-4f76-c4fa78cd991f'").FirstOrDefault();
+            //var benutzer = scsmClient.ScsmObject().GetObjectsByTypeName("BMI.Benutzer.Stammportal.Projection",
+            //    $"@G:Id -eq '1f5fdf8f-f42b-5f26-4f76-c4fa78cd991f'").FirstOrDefault();
+
+
             return;
 
 

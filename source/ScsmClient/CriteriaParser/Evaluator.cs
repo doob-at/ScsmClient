@@ -332,33 +332,33 @@ namespace ScsmClient.CriteriaParser
             switch (type)
             {
                 case "":
-                    {
-                        StringBuilder propertyElement = new StringBuilder();
-                        propertyElement.Append("<Property>$Context");
-                        
-                        if (!String.IsNullOrWhiteSpace(pClass))
-                        {
-                            var projectionPart = BuildProjectionPathPart(pClass);
-                            propertyElement.Append(projectionPart.path);
-                            managementPackClass = projectionPart.properyClass;
-                        }
+                //{
+                //    StringBuilder propertyElement = new StringBuilder();
+                //    propertyElement.Append("<Property>$Context");
 
-                        var propertyPart = BuildPropertyPathPart(property, managementPackClass);
-                        if (propertyPart != null)
-                        {
-                            propertyElement.Append(propertyPart.Path);
-                            propertyElement.Append("</Property>");
-                            return new EvaluatorPropertyInfo(propertyElement.ToString(), propertyPart.Property);
-                        }
+                //    if (!String.IsNullOrWhiteSpace(pClass))
+                //    {
+                //        var projectionPart = BuildProjectionPathPart(pClass);
+                //        propertyElement.Append(projectionPart.path);
+                //        managementPackClass = projectionPart.properyClass;
+                //    }
 
-                        var prop = GenericProperty.GetGenericProperties().FirstOrDefault(p => p.PropertyName.Equals(property, StringComparison.OrdinalIgnoreCase));
-                        if (prop != null)
-                        {
-                            return new EvaluatorPropertyInfo($"<GenericProperty>{property}</GenericProperty>", prop);
-                        }
+                //    var propertyPart = BuildPropertyPathPart(property, managementPackClass);
+                //    if (propertyPart != null)
+                //    {
+                //        propertyElement.Append(propertyPart.Path);
+                //        propertyElement.Append("</Property>");
+                //        return new EvaluatorPropertyInfo(propertyElement.ToString(), propertyPart.Property);
+                //    }
 
-                        throw new Exception($"Can't find property '{property}' for type '{managementPackClass?.Name}', nor a GenericProperty named '{property}'");
-                    }
+                //    var prop = GenericProperty.GetGenericProperties().FirstOrDefault(p => p.PropertyName.Equals(property, StringComparison.OrdinalIgnoreCase));
+                //    if (prop != null)
+                //    {
+                //        return new EvaluatorPropertyInfo($"<GenericProperty>{property}</GenericProperty>", prop);
+                //    }
+
+                //    throw new Exception($"Can't find property '{property}' for type '{managementPackClass?.Name}', nor a GenericProperty named '{property}'");
+                //}
                 case "P":
                     {
                         StringBuilder propertyElement = new StringBuilder();
@@ -382,7 +382,30 @@ namespace ScsmClient.CriteriaParser
                 case "G":
                     {
                         var prop = GenericProperty.GetGenericProperties().FirstOrDefault(p => p.PropertyName.Equals(property, StringComparison.OrdinalIgnoreCase));
-                        return new EvaluatorPropertyInfo($"<GenericProperty>{property}</GenericProperty>", prop);
+                        if (prop == null)
+                        {
+                            throw new Exception($"Can't find GenericProperty '{property}'");
+                        }
+                        if (string.IsNullOrWhiteSpace(pClass))
+                        {
+                            
+                            return new EvaluatorPropertyInfo($"<GenericProperty>{property}</GenericProperty>", prop);
+                        }
+                        else
+                        {
+                            //StringBuilder propertyElement = new StringBuilder();
+                            //propertyElement.Append("<GenericProperty Path=\"$Context");
+
+                            var projectionPart = BuildProjectionPathPart(pClass);
+                            //propertyElement.Append(projectionPart.path);
+                            //managementPackClass = projectionPart.properyClass;
+
+                            //propertyElement.Append($"$\">{property}</GenericProperty>");
+                            var genpro =
+                                $"<GenericProperty Path=\"$Context{projectionPart.path}$\">{property}</GenericProperty>";
+                            return new EvaluatorPropertyInfo(genpro, prop);
+                        }
+
                     }
 
                 default:
