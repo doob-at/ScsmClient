@@ -45,6 +45,13 @@ namespace ScsmClient
             Init();
         }
 
+        public SCSMClient(EnterpriseManagementGroup enterpriseManagementGroup)
+        {
+            ServerName = enterpriseManagementGroup.ConnectionSettings.ServerName;
+            Json.Converter.RegisterJsonConverter<ManagementGroupConverter>();
+            ManagementGroup = enterpriseManagementGroup;
+        }
+
         private void Init()
         {
             Json.Converter.RegisterJsonConverter<ManagementGroupConverter>();
