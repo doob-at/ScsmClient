@@ -6,6 +6,7 @@ namespace ScsmClient.SharedModels.Models
 {
     public class WorkItem: ScsmObject
     {
+        private string _id;
         private string _title;
         private string _description;
         private string _contactMethod;
@@ -28,6 +29,12 @@ namespace ScsmClient.SharedModels.Models
         private UserInput _userInput;
         private DateTime? _firstAssignedDate;
         private DateTime? _firstResponseDate;
+
+        public string Id
+        {
+            get => _id;
+            set => SetPropertyChanged(ref _id, value);
+        }
 
         public string Title
         {
