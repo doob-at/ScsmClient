@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.EnterpriseManagement.Configuration;
+using ScsmClient.ExtensionMethods;
 using ScsmClient.SharedModels.Models;
 
 namespace ScsmClient.Model
@@ -23,7 +24,7 @@ namespace ScsmClient.Model
             DisplayName = managementPackClass.DisplayName;
             
 
-            Properties = managementPackClass.PropertyCollection.Select(p => new ScsmClassProperty(p)).ToArray();
+            Properties = managementPackClass.PropertyCollection.ToScsmClassProperties().ToArray();
         }
 
         
