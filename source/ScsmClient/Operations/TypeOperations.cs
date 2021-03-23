@@ -82,7 +82,12 @@ namespace ScsmClient.Operations
             });
 
         }
-        
+
+        public IList<ManagementPackClass> GetClasses()
+        {
+            return _client.ManagementGroup.EntityTypes.GetClasses();
+        }
+
         public IList<ManagementPackClass> GetClassesByCriteria(ManagementPackClassCriteria criteria)
         {
             return _client.ManagementGroup.EntityTypes.GetClasses(criteria);
@@ -139,6 +144,7 @@ namespace ScsmClient.Operations
             });
         }
 
+       
         public IList<ManagementPackTypeProjection> GetTypeProjectionsByCriteria(string criteria)
         {
             var crit = new ManagementPackTypeProjectionCriteria(criteria);
@@ -202,6 +208,11 @@ namespace ScsmClient.Operations
         }
 
         public IList<ManagementPackRelationship> GetRelationshipByCriteria(ManagementPackRelationshipCriteria criteria)
+        {
+            return _client.ManagementGroup.EntityTypes.GetRelationshipClasses(criteria);
+        }
+
+        public IList<ManagementPackRelationship> GetRelationships()
         {
             return _client.ManagementGroup.EntityTypes.GetRelationshipClasses();
         }
