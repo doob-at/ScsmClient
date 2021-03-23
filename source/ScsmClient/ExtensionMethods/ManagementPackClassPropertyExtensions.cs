@@ -11,32 +11,32 @@ namespace ScsmClient.ExtensionMethods
 {
     public static class ManagementPackClassPropertyExtensions
     {
-        public static ScsmClassProperty ToScsmClassProperty(this ManagementPackClassProperty managementPackClassProperty)
+        public static ScsmClassProperty ToScsmClassProperty(this ManagementPackProperty managementPackProperty)
         {
             var p = new ScsmClassProperty();
-            p.Id = managementPackClassProperty.Id;
-            p.Name = managementPackClassProperty.Name;
-            p.DisplayName = managementPackClassProperty.DisplayName;
+            p.Id = managementPackProperty.Id;
+            p.Name = managementPackProperty.Name;
+            p.DisplayName = managementPackProperty.DisplayName;
 
-            p.AutoIncrement = managementPackClassProperty.AutoIncrement;
-            p.CaseSensitive = managementPackClassProperty.CaseSensitive;
-            p.DefaultValue = managementPackClassProperty.DefaultValue;
-            p.Key = managementPackClassProperty.Key;
-            p.MaxLength = managementPackClassProperty.MaxLength;
-            p.MaxValue = managementPackClassProperty.MaxValue;
-            p.MinLength = managementPackClassProperty.MinLength;
-            p.MinValue = managementPackClassProperty.MinValue;
+            p.AutoIncrement = managementPackProperty.AutoIncrement;
+            p.CaseSensitive = managementPackProperty.CaseSensitive;
+            p.DefaultValue = managementPackProperty.DefaultValue;
+            p.Key = managementPackProperty.Key;
+            p.MaxLength = managementPackProperty.MaxLength;
+            p.MaxValue = managementPackProperty.MaxValue;
+            p.MinLength = managementPackProperty.MinLength;
+            p.MinValue = managementPackProperty.MinValue;
 
-            p.Required = managementPackClassProperty.Required;
+            p.Required = managementPackProperty.Required;
 
-            p.Type = managementPackClassProperty.Type.GetName();
+            p.Type = managementPackProperty.Type.GetName();
 
             return p;
         }
 
-        public static IEnumerable<ScsmClassProperty> ToScsmClassProperties(this IEnumerable<ManagementPackClassProperty> managementPackClassProperties)
+        public static IEnumerable<ScsmClassProperty> ToScsmClassProperties(this IEnumerable<ManagementPackProperty> managementPackProperties)
         {
-            return managementPackClassProperties.Select(p => p.ToScsmClassProperty());
+            return managementPackProperties.Select(p => p.ToScsmClassProperty());
         }
     }
 }
