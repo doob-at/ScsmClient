@@ -19,7 +19,7 @@ namespace ScsmClient.ExtensionMethods
             c.DisplayName = managementPackClass.DisplayName;
             c.BaseClassName = managementPackClass.Base?.GetElement()?.Name;
 
-            c.Properties = managementPackClass.PropertyCollection.ToScsmClassProperties().ToArray();
+            c.Properties = managementPackClass.GetProperties(BaseClassTraversalDepth.Recursive).ToScsmClassProperties().ToArray();
 
             return c;
         }
