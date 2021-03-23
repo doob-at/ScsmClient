@@ -87,6 +87,11 @@ namespace ScsmClient.Operations
         {
             return _client.ManagementGroup.EntityTypes.GetClasses(criteria);
         }
+
+        public IList<ManagementPackClass> GetClassesByCriteria(string criteria)
+        {
+            return _client.ManagementGroup.EntityTypes.GetClasses(new ManagementPackClassCriteria(criteria));
+        }
         #endregion
 
 
