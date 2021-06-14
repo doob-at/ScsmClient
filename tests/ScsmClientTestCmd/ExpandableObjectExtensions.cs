@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Reflectensions.ExtensionMethods;
-using Reflectensions.HelperClasses;
+using doob.Reflectensions;
+
 
 namespace ScsmClientTestCmd
 {

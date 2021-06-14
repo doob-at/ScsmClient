@@ -9,13 +9,14 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using doob.Reflectensions;
+using doob.Reflectensions.Common;
+using doob.Reflectensions.ExtensionMethods;
 using Microsoft.EnterpriseManagement;
 using Microsoft.EnterpriseManagement.Common;
 using Microsoft.EnterpriseManagement.Configuration;
 using Microsoft.EnterpriseManagement.ConnectorFramework;
 using Newtonsoft.Json.Linq;
-using Reflectensions;
-using Reflectensions.ExtensionMethods;
 using ScsmClient.Attributes;
 using ScsmClient.ExtensionMethods;
 using ScsmClient.Helper;
@@ -717,7 +718,7 @@ namespace ScsmClient.Operations
                         propertyName = splittedName[1]?.Trim().ToNull();
                     }
 
-                    if (value?.GetType().IsEnumerableType(false) != true)
+                    if (value?.GetType().IsEnumerableType() != true)
                     {
                         value = new List<object> { value };
                     }
@@ -955,7 +956,7 @@ namespace ScsmClient.Operations
                         propertyName = splittedName[1]?.Trim().ToNull();
                     }
 
-                    if (value?.GetType().IsEnumerableType(false) != true)
+                    if (value?.GetType().IsEnumerableType() != true)
                     {
                         value = new List<object> { value };
                     }

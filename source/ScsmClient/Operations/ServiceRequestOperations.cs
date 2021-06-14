@@ -5,7 +5,6 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EnterpriseManagement.Configuration;
-using Reflectensions.ExtensionMethods;
 using ScsmClient.ExtensionMethods;
 using ScsmClient.Model;
 using ScsmClient.SharedModels;
@@ -23,7 +22,7 @@ namespace ScsmClient.Operations
         {
             if (levels.HasValue && levels.Value == 0)
             {
-                return _client.ScsmObject().GetObjectById(id).SwitchType<ServiceRequest>();
+                return _client.ScsmObject().GetObjectById(id).To<ServiceRequest>();
             }
             var retOptions = new RetrievalOptions();
             retOptions.ReferenceLevels = levels;
@@ -42,7 +41,7 @@ namespace ScsmClient.Operations
         public List<ServiceRequest> GetByCriteria(string criteria, RetrievalOptions retrievalOptions = null)
         {
             var srObjs = _client.ScsmObject().GetObjectsByTypeId(WellKnown.ServiceRequest.ProjectionType, criteria, retrievalOptions);
-            return srObjs.SwitchType<ServiceRequest>().ToList();
+            return srObjs.Select(o => o.To<ServiceRequest>()).ToList();
         }
 
         public Guid Create(ServiceRequest serviceRequest)

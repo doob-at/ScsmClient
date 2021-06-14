@@ -2,9 +2,10 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using doob.Reflectensions.Common;
+using doob.Reflectensions.Common.Helper;
 using Microsoft.EnterpriseManagement.Configuration;
-using Reflectensions.ExtensionMethods;
-using Reflectensions.HelperClasses;
+
 
 namespace ScsmClient.Operations
 {

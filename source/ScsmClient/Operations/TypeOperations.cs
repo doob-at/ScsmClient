@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using doob.Reflectensions.Common;
 using Microsoft.EnterpriseManagement.Configuration;
-using Reflectensions.ExtensionMethods;
+
 using ScsmClient.Caches;
 
 namespace ScsmClient.Operations

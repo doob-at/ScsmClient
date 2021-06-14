@@ -5,7 +5,6 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EnterpriseManagement.Configuration;
-using Reflectensions.ExtensionMethods;
 using ScsmClient.ExtensionMethods;
 using ScsmClient.Model;
 using ScsmClient.SharedModels;
@@ -24,7 +23,7 @@ namespace ScsmClient.Operations
         {
             if (levels.HasValue && levels.Value == 0)
             {
-                return _client.ScsmObject().GetObjectById(id).SwitchType<Incident>();
+                return _client.ScsmObject().GetObjectById(id).To<Incident>();
             }
             var retOptions = new RetrievalOptions();
             retOptions.ReferenceLevels = levels;

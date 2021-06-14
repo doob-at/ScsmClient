@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using doob.Reflectensions.Common;
 using Microsoft.EnterpriseManagement;
 using Microsoft.EnterpriseManagement.Configuration;
-using Reflectensions.ExtensionMethods;
+
 using ScsmClient.CriteriaParser.Binding;
 using ScsmClient.Helper;
 

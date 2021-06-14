@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EnterpriseManagement.Configuration;
-using Reflectensions.ExtensionMethods;
 using ScsmClient.Model;
 using ScsmClient.SharedModels;
 using ScsmClient.SharedModels.Models;
@@ -19,7 +18,7 @@ namespace ScsmClient.Operations
         {
             if (levels.HasValue && levels.Value == 0)
             {
-                return _client.ScsmObject().GetObjectById(id).SwitchType<ChangeRequest>();
+                return _client.ScsmObject().GetObjectById(id).To<ChangeRequest>();
             }
             var retOptions = new RetrievalOptions();
             retOptions.ReferenceLevels = levels;
@@ -38,7 +37,7 @@ namespace ScsmClient.Operations
         public List<ChangeRequest> GetByCriteria(string criteria, RetrievalOptions retrievalOptions = null)
         {
             var srObjs = _client.ScsmObject().GetObjectsByTypeId(WellKnown.ChangeRequest.ProjectionType, criteria, retrievalOptions);
-            return srObjs.SwitchType<ChangeRequest>().ToList();
+            return srObjs.Select(o => o.To<ChangeRequest>()).ToList();
         }
 
         public Guid Create(ChangeRequest changeReuest)
