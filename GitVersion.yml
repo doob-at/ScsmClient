@@ -1,7 +1,6 @@
-mode: Mainline
-branches:
-  master:
-    regex: master
-    tag: ''
-    increment: Patch
-  
+mode: ContinuousDeployment
+continuous-delivery-fallback-tag: beta
+branches: {}
+ignore:
+  sha: []
+merge-message-formats: {}
