@@ -4,7 +4,7 @@
     <TargetFrameworks>net462;net472;net48</TargetFrameworks>
     <Version>0.0.1</Version>
     <AssemblyName>doob.ScsmClient.SharedModels</AssemblyName>
-    <RootNamespace>doob.SharedModels</RootNamespace>
+    <RootNamespace>doob.ScsmClient.SharedModels</RootNamespace>
     <LangVersion>9</LangVersion>
   </PropertyGroup>
 
@@ -16,8 +16,8 @@
     <PackageProjectUrl>https://github.com/doob-at/ScsmClient</PackageProjectUrl>
     <RepositoryUrl>https://github.com/doob-at/ScsmClient</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageId>doob.SharedModels</PackageId>
-    <Product>doob.SharedModels</Product>
+    <PackageId>doob.ScsmClient.SharedModels</PackageId>
+    <Product>doob.ScsmClient.SharedModels</Product>
   </PropertyGroup>
 
   <ItemGroup>
