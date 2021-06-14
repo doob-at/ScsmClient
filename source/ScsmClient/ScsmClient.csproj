@@ -2,7 +2,22 @@
 
   <PropertyGroup>
     <TargetFrameworks>net462;net472;net48</TargetFrameworks>
-    <Version>0.1.0</Version>
+    <Version>0.0.1</Version>
+    <AssemblyName>doob.ScsmClient</AssemblyName>
+    <RootNamespace>doob.ScsmClient</RootNamespace>
+    <LangVersion>9</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Authors>Bernhard Windisch</Authors>
+    <Company>-</Company>
+    <Description></Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/doob-at/ScsmClient</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/doob-at/ScsmClient</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageId>doob.ScsmClient</PackageId>
+    <Product>doob.ScsmClient</Product>
   </PropertyGroup>
 
   <ItemGroup>
