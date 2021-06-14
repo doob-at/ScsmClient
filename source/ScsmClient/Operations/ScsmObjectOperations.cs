@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using Microsoft.EnterpriseManagement.Common;
 using Microsoft.EnterpriseManagement.Configuration;
 using Microsoft.EnterpriseManagement.ConnectorFramework;
-using Reflectensions.ExtensionMethods;
 using ScsmClient.Caches;
 using ScsmClient.ExtensionMethods;
 using ScsmClient.Helper;

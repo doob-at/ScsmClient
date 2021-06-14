@@ -5,7 +5,8 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using Reflectensions.ExtensionMethods;
+using doob.Reflectensions.ExtensionMethods;
+
 
 namespace ScsmClient.Helper
 {
@@ -168,7 +169,7 @@ namespace ScsmClient.Helper
             if (el == null)
                 return null;
 
-            return el.To<bool>();
+            return el.Reflect().To<bool>();
         }
 
         public SimpleXmlElement[] SelectElements()

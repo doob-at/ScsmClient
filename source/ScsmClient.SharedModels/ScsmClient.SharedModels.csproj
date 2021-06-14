@@ -5,7 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Reflectensions" Version="4.12.5" />
+	  <PackageReference Include="doob.Reflectensions.ExpandableObject" Version="6.3.0" />
+	  <PackageReference Include="doob.Reflectensions.CommonExtensions" Version="6.3.0" />
   </ItemGroup>
 
 </Project>

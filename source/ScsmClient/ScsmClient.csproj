@@ -6,8 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="doob.Reflectensions.ExpandableObject" Version="6.3.0" />
+    <PackageReference Include="doob.Reflectensions.Json" Version="6.3.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="Reflectensions.Json" Version="4.12.5" />
     <PackageReference Include="SCSM-Microsoft.EnterpriseManagement.Core" Version="10.19.1035" />
     <PackageReference Include="System.Collections.Immutable" Version="5.0.0" />
   </ItemGroup>

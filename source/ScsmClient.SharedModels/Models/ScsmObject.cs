@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Reflectensions.HelperClasses;
+using doob.Reflectensions;
 
 namespace ScsmClient.SharedModels.Models
 {
