@@ -650,7 +650,7 @@ namespace ScsmClient.Operations
             var objectClass = enterpriseManagementObject.GetManagementPackClass();
             var result = new EnterpriseManagementObjectWithRelations(enterpriseManagementObject);
 
-            AddProperties(result, objectClass, properties);
+            AddProperties(result, objectClass, properties, true);
 
             return result;
         }
