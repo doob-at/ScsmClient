@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EnterpriseManagement.Common;
+using Microsoft.EnterpriseManagement.Configuration;
 
 namespace ScsmClient.Model
 {
@@ -24,6 +25,7 @@ namespace ScsmClient.Model
         public List<EnterpriseManagementObjectWithRelations> RelatedObjects { get; set; } = new List<EnterpriseManagementObjectWithRelations>();
         public List<EnterpriseManagementObject> RemoveRelatedObjects { get; set; } = new List<EnterpriseManagementObject>();
         public List<EnterpriseManagementRelationshipObject<EnterpriseManagementObject>> RemoveRelationShip { get; set; } = new List<EnterpriseManagementRelationshipObject<EnterpriseManagementObject>>();
+        public ManagementPackRelationship Relationship { get; set; }
 
         public EnterpriseManagementObjectWithRelations(EnterpriseManagementObject enterpriseManagementObject)
         {

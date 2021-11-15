@@ -256,8 +256,12 @@ namespace ScsmClient.CriteriaParser.Syntax
         {
             _position++;
 
-            while (char.IsLetter(Current) ||char.IsNumber(Current) || Current == '.' || Current == ':' || Current == '!')
+            while (!char.IsWhiteSpace(Current))
+            {
                 _position++;
+            }
+            //while (char.IsLetter(Current) ||char.IsNumber(Current) || Current == '.' || Current == ':' || Current == '!' || Current == '_')
+            //    _position++;
 
             var length = _position - _start;
             var text = _text.ToString(_start, length);

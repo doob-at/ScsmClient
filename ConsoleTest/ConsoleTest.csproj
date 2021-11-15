@@ -36,9 +36,11 @@
     <Reference Include="doob.Reflectensions.Common, Version=6.3.5.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\doob.Reflectensions.Common.6.3.5\lib\net472\doob.Reflectensions.Common.dll</HintPath>
     </Reference>
+    <Reference Include="doob.Reflectensions.ExpandableObject, Version=6.3.5.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="doob.Reflectensions.Json, Version=6.3.5.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\doob.Reflectensions.Json.6.3.5\lib\net472\doob.Reflectensions.Json.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.EnterpriseManagement.Core, Version=7.0.5000.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
