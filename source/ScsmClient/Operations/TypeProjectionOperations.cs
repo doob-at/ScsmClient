@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using doob.Reflectensions.Common.Helper;
+using Microsoft.EnterpriseManagement;
 using Microsoft.EnterpriseManagement.Common;
 using Microsoft.EnterpriseManagement.Configuration;
 using Microsoft.EnterpriseManagement.ConnectorFramework;
@@ -53,15 +55,21 @@ namespace ScsmClient.Operations
                 critOptions.DefaultPropertyRetrievalBehavior = ObjectPropertyRetrievalBehavior.None;
                 if (retrievalOptions.PropertiesToLoad.Any())
                 {
-                    var objectClassProperties = typeProjection.TargetType.GetProperties(BaseClassTraversalDepth.Recursive);
+                    var objectClassProperties = GetAllProperties(typeProjection, null);
                     foreach (var s in retrievalOptions.PropertiesToLoad)
                     {
-                        var prop = objectClassProperties.FirstOrDefault(ocp => ocp.Name.Equals(s));
-                        if (prop != null)
-                        {
-                            critOptions.AddPropertyToRetrieve(typeProjection.TargetType, prop);
 
+                        var propsToLoad = objectClassProperties.Where(op => WildcardHelper.Match(op.FullName, s));
+
+                        foreach (var propToLoad in propsToLoad)
+                        {
+                            if (propToLoad != null)
+                            {
+                                critOptions.AddPropertyToRetrieve(propToLoad.TargetType, propToLoad.Property);
+
+                            }
                         }
+                       
                     }
                 }
             }
@@ -89,8 +97,58 @@ namespace ScsmClient.Operations
         }
 
 
-        
+        private List<PropertyMap> GetAllProperties(ITypeProjectionComponent managementPackTypeProjection, ManagementPackClass parentClass)
+        {
+            var properties = GetAllProperties(managementPackTypeProjection.TargetType, parentClass);
+            var nextParentClass = managementPackTypeProjection.TargetType;
 
-       
+            foreach (var keyValuePair in managementPackTypeProjection)
+            {
+                var props = GetAllProperties(keyValuePair.Value, nextParentClass);
+                properties.AddRange(props);
+            }
+
+            return properties;
+        }
+
+
+        private List<PropertyMap> GetAllProperties(ManagementPackClass managementPackClass, ManagementPackClass parentClass)
+        {
+
+            if (managementPackClass.Abstract)
+            {
+                return new List<PropertyMap>();
+            }
+            return managementPackClass
+                .GetProperties(BaseClassTraversalDepth.Recursive)
+                .Select(p =>
+                {
+                    var pm = new PropertyMap();
+                    if (parentClass != null)
+                    {
+                        pm.FullName = $"{parentClass.Name}!{p.Name}";
+                    }
+                    else
+                    {
+                        pm.FullName = p.Name;
+                    }
+
+                    pm.TargetType = managementPackClass;
+                    pm.Property = p;
+                    return pm;
+                }).ToList();
+
+        }
+
+    }
+
+    internal class PropertyMap
+    {
+        public string FullName { get; set; }
+
+        public ManagementPackProperty Property { get; set; }
+
+        public ManagementPackClass TargetType { get; set; }
+
     }
 }
