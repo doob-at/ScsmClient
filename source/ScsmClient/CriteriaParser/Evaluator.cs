@@ -323,7 +323,7 @@ namespace ScsmClient.CriteriaParser
             {
                 throw new Exception("Can't parse PropertyName!");
             }
-
+            
             var type = regMatch.Groups["type"]?.Value?.ToNull()?.ToUpper() ?? "";
             var pClass = regMatch.Groups["class"]?.Value;
             var property = regMatch.Groups["property"].Value;
@@ -422,13 +422,57 @@ namespace ScsmClient.CriteriaParser
             StringBuilder relationshipPath = new StringBuilder();
             ManagementPackClass propertyClass = null;
 
+            //ManagementPackRelationshipEndpoint currentManagementPackRelationshipEndpoint = null;
+            KeyValuePair<ManagementPackRelationshipEndpoint, ITypeProjectionComponent>? relation = null;
             for (var i = 0; i < parts.Count; i++)
             {
                 var part = parts[i];
                 var isLast = i == parts.Count - 1;
 
                 var mClass = _scsmClient.Types().GetClassByName(part);
-                var relation = FindRelationEndpoint(_managementPackTypeProjection, mClass);
+                
+                
+                if (mClass == null)
+                {
+
+                    if (relation == null)
+                    {
+                        var trel = _managementPackTypeProjection.FirstOrDefault(p => p.Value.Alias == part);
+                        if (trel.Value == null)
+                        {
+                            trel = _managementPackTypeProjection.FirstOrDefault(p => p.Key.ParentElement.Name == part);
+                        }
+
+                        relation = trel;
+                    }
+                    else
+                    {
+                        var trel = relation.Value.Value.FirstOrDefault(p => p.Value.Alias == part);
+                        if (trel.Value == null)
+                        {
+                            trel = relation.Value.Value.FirstOrDefault(p => p.Key.ParentElement.Name == part);
+                        }
+                        //relation = relation.Value.Value.FirstOrDefault(p => p.Value.Alias == part) ??
+                        //           relation.Value.Value.FirstOrDefault(p => p.Key.ParentElement.Name == part);
+
+                        relation = trel;
+                    }
+
+                    if (relation.Value.Value == null)
+                    {
+                        throw new Exception(
+                            $"Can't find a TypeProjection with Alias '{part}' or Relationship with Id '{part}'");
+                    }
+                    //relation = currentManagementPackeTypeProjection.FirstOrDefault(p => p.Key.ParentElement.Name == part);
+                    mClass = relation.Value.Value.TargetType;
+
+                }
+                else
+                {
+                    relation = FindRelationEndpoint(_managementPackTypeProjection, mClass);
+                }
+                
+               
                 if (relation == null)
                 {
                     throw new Exception($"Relation for Types '{part}' not found!");
@@ -442,6 +486,7 @@ namespace ScsmClient.CriteriaParser
 
 
                 var managementPack = rel.Key.GetManagementPack();
+               
 
                 string mpAlias = null;
                 if (_references.ContainsKey(managementPack.Name))
@@ -455,6 +500,19 @@ namespace ScsmClient.CriteriaParser
                     _references.Add(managementPack.Name, (mpAlias, refString));
                 }
 
+                var valueMP = rel.Value.TargetType.GetManagementPack();
+                string valueMpAlias = null;
+                if (_references.ContainsKey(valueMP.Name))
+                {
+                    valueMpAlias = _references[valueMP.Name].alias;
+                }
+                else
+                {
+                    valueMpAlias = $"A{Guid.NewGuid():N}";
+                    var refString = $"<Reference Id=\"{valueMP.Name}\" PublicKeyToken=\"{valueMP.KeyToken}\" Version=\"{valueMP.Version}\" Alias=\"{valueMpAlias}\" />";
+                    _references.Add(valueMP.Name, (valueMpAlias, refString));
+                }
+
                 string seedRole = null;
                 if (rel.Value is ManagementPackTypeProjectionComponent managementPackTypeProjectionComponent)
                 {
@@ -466,7 +524,7 @@ namespace ScsmClient.CriteriaParser
 
                 }
 
-                relationshipPath.Append($"/Path[Relationship='{mpAlias}!{rel.Key.ParentElement.Name}' {seedRole}TypeConstraint='{mpAlias}!{part}']");
+                relationshipPath.Append($"/Path[Relationship='{mpAlias}!{rel.Key.ParentElement.Name}' {seedRole}TypeConstraint='{valueMpAlias}!{mClass.Name}']");
 
             }
 

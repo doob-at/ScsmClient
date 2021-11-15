@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using doob.Reflectensions.Common;
+using Microsoft.EnterpriseManagement;
 using Microsoft.EnterpriseManagement.Common;
 using Microsoft.EnterpriseManagement.Configuration;
 using Microsoft.EnterpriseManagement.ConnectorFramework;
@@ -173,6 +175,13 @@ namespace ScsmClient.Operations
             return GetRelationshipObjectsByClassId(sourceId, managementPackClass.Id);
         }
 
+        public IEnumerable<EnterpriseManagementRelationshipObject<EnterpriseManagementObject>> GetRelationshipObjectsByPropertyName(Guid sourceId, ManagementPackRelationship managementPackRelationship)
+        {
+            var id = _client.Object().GetEnterpriseManagementObjectById(sourceId).LeastDerivedNonAbstractManagementPackClassId;
+            //var managementPackClass = _client.Types().GetClassByName(className);
+            return GetRelationshipObjectsByClassId(sourceId, managementPackRelationship);
+        }
+
         public IEnumerable<EnterpriseManagementRelationshipObject<EnterpriseManagementObject>> GetRelationshipObjectsByClass(Guid sourceId,
             ManagementPackClass managementPackClass)
         {
@@ -197,6 +206,86 @@ namespace ScsmClient.Operations
             return query;
         }
 
+        public IEnumerable<EnterpriseManagementRelationshipObject<EnterpriseManagementObject>> GetRelationshipObjectsByClassId(Guid sourceId, ManagementPackRelationship managementPackRelationship)
+        {
+
+            var query = _client.ManagementGroup.EntityObjects
+                .GetRelationshipObjects<EnterpriseManagementObject>(sourceId, ObjectQueryOptions.Default)
+                .OrderBy(ro => ro.LastModified)
+                .Where(ro =>
+                {
+                    return ro.RelationshipId == managementPackRelationship.Id;
+                })
+                .ToList();
+
+
+            
+            
+            
+
+            //if (managementPackClassId != Guid.Empty)
+            //{
+            //    query = query.Where(ro =>
+            //    {
+            //        var isTargetClass = ro.TargetObject.GetManagementPackClass().Id == managementPackClassId;
+            //        var isSourceClass = ro.SourceObject.GetManagementPackClass().Id == managementPackClassId;
+            //        return isSourceClass || isTargetClass;
+            //    }).ToList();
+            //}
+
+            return query;
+        }
+
+
+        private static string FindAlias(ITypeProjectionComponent managementPackTypeProjection, Guid n)
+        {
+
+            foreach (var keyValuePair in managementPackTypeProjection)
+            {
+                var g = n;
+
+                if (keyValuePair.Key.Id == n)
+                {
+                    return keyValuePair.Value.Alias;
+                }
+
+                if (keyValuePair.Value.Count() > 0)
+                {
+                    foreach (var valuePair in keyValuePair.Value)
+                    {
+                        var alias = FindAlias(valuePair, n);
+                        if (!String.IsNullOrWhiteSpace(alias))
+                        {
+                            return alias;
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private static string FindAlias(KeyValuePair<ManagementPackRelationshipEndpoint, ITypeProjectionComponent> keyValuePair, Guid guid)
+        {
+            if (keyValuePair.Key.Id == guid)
+            {
+                return keyValuePair.Value.Alias.ToNull() ?? keyValuePair.Key.ParentElement.Name;
+            }
+
+            if (keyValuePair.Value.Count() > 0)
+            {
+                foreach (var valuePair in keyValuePair.Value)
+                {
+                    var alias = FindAlias(valuePair, guid);
+                    if (!String.IsNullOrWhiteSpace(alias))
+                    {
+                        return alias;
+                    }
+                }
+            }
+
+            return null;
+        }
 
 
         internal CreatableEnterpriseManagementRelationshipObject buildCreatableEnterpriseManagementRelationshipObject(EnterpriseManagementObject first, EnterpriseManagementObject second)

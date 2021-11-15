@@ -73,7 +73,10 @@ namespace ScsmClient.Operations
 
         public IEnumerable<ScsmObject> GetObjectsByType(ManagementPackTypeProjection typeProjection, string criteria, RetrievalOptions retrievalOptions = null)
         {
-            return _client.TypeProjection().GetTypeProjectionObjects(typeProjection, criteria, retrievalOptions).Select(obj => obj.ToScsmObject(retrievalOptions?.ReferenceLevels));
+            return _client.TypeProjection().GetTypeProjectionObjects(typeProjection, criteria, retrievalOptions).Select(obj =>
+            {
+                return obj.ToScsmObject(typeProjection, retrievalOptions?.ReferenceLevels);
+            });
 
         }
         #endregion

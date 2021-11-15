@@ -41,9 +41,14 @@ namespace ScsmClient.Operations
                 xmlCriteria = CreateCriteriaXmlFromFilterString(criteria, typeProjection);
             }
 
-            return xmlCriteria == null ?
-                new ObjectProjectionCriteria(typeProjection) :
-                new ObjectProjectionCriteria(xmlCriteria.ToString(), typeProjection, _client.ManagementGroup);
+            if (xmlCriteria == null)
+            {
+                return new ObjectProjectionCriteria(typeProjection);
+            }
+
+
+
+            return new ObjectProjectionCriteria(xmlCriteria.ToString(), typeProjection, _client.ManagementGroup);
         }
 
 

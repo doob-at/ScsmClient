@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using doob.Reflectensions.Common;
+using Microsoft.EnterpriseManagement;
 using Microsoft.EnterpriseManagement.Common;
 using Microsoft.EnterpriseManagement.Configuration;
 using ScsmClient.SharedModels;
@@ -115,7 +117,8 @@ namespace ScsmClient.ExtensionMethods
         //}
 
         
-        public static ScsmObject ToScsmObject(this IComposableProjection composableProjection, int? levels = null)
+        public static ScsmObject ToScsmObject(this IComposableProjection composableProjection,
+            ManagementPackTypeProjection managementPackTypeProjection, int? levels = null)
         {
             var dto = new ScsmObject()
             {
@@ -138,24 +141,93 @@ namespace ScsmClient.ExtensionMethods
 
             Dictionary<string, List<ScsmObject>> related = new Dictionary<string, List<ScsmObject>>();
 
+
+            
             foreach (var keyValuePair in composableProjection)
             {
-                var name = keyValuePair.Value.Object.GetManagementPackClassName();
-                if (!related.ContainsKey(name))
+
+                
+                var k = keyValuePair.Key;
+                //var hasName = !String.IsNullOrWhiteSpace(k.ParentElement?.Name);
+
+                var name = FindAlias(managementPackTypeProjection, k.Id);
+                //var name = hasName ? k.ParentElement.Name : $"{keyValuePair.Value.Object.GetManagementPackClassName()}!";
+
+                var isArray = k.MaxCardinality > 1;
+
+                if (!isArray)
                 {
-                    related.Add(name, new List<ScsmObject>());
+                    dto[$"{name}"] = ToScsmObject(keyValuePair.Value, managementPackTypeProjection, levels);
+                }
+                else
+                {
+                    if (!related.ContainsKey(name))
+                    {
+                        related.Add(name, new List<ScsmObject>());
+                    }
+
+                    var relatedValue = ToScsmObject(keyValuePair.Value,managementPackTypeProjection,  levels);
+                    related[name].Add(relatedValue);
                 }
 
-                var relatedValue = ToScsmObject(keyValuePair.Value, levels);
-                related[name].Add(relatedValue);
             }
 
             foreach (var pair in related)
             {
-                dto[$"{pair.Key}!"] = pair.Value;
+                dto[$"{pair.Key}"] = pair.Value;
             }
 
             return dto;
+        }
+
+        private static string FindAlias(ITypeProjectionComponent managementPackTypeProjection, Guid n)
+        {
+
+            foreach (var keyValuePair in managementPackTypeProjection)
+            {
+                var g = n;
+
+                if (keyValuePair.Key.Id == n)
+                {
+                    return keyValuePair.Value.Alias;
+                }
+
+                if (keyValuePair.Value.Count() > 0)
+                {
+                    foreach (var valuePair in keyValuePair.Value)
+                    {
+                        var alias = FindAlias(valuePair, n);
+                        if (!String.IsNullOrWhiteSpace(alias))
+                        {
+                            return alias;
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private static string FindAlias(KeyValuePair<ManagementPackRelationshipEndpoint, ITypeProjectionComponent> keyValuePair, Guid guid)
+        {
+            if (keyValuePair.Key.Id == guid)
+            {
+                return keyValuePair.Value.Alias.ToNull() ?? keyValuePair.Key.ParentElement.Name;
+            }
+
+            if (keyValuePair.Value.Count() > 0)
+            {
+                foreach (var valuePair in keyValuePair.Value)
+                {
+                    var alias = FindAlias(valuePair, guid);
+                    if (!String.IsNullOrWhiteSpace(alias))
+                    {
+                        return alias;
+                    }
+                }
+            }
+
+            return null;
         }
 
         public static ScsmObject ToScsmObject(this EnterpriseManagementObject enterpriseManagementObject)
