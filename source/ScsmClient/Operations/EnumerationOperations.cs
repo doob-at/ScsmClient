@@ -51,7 +51,6 @@ namespace ScsmClient.Operations
                 .GetChildEnumerations(id, TraversalDepth.Recursive)
                 .FirstOrDefault(m => m.Name.Equals(name, stringComparsion));
         }
-
-
+        
     }
 }

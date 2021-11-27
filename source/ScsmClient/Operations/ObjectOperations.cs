@@ -736,8 +736,19 @@ namespace ScsmClient.Operations
             {
 
                 AddIncremental(child, ref incrementalDiscoveryData);
-                incrementalDiscoveryData.Add(_client.Relations().buildCreatableEnterpriseManagementRelationshipObject(
-                    obj.EnterpriseManagementObject, child.EnterpriseManagementObject));
+                if (child.Relationship != null)
+                {
+                    incrementalDiscoveryData.Add(_client.Relations().buildCreatableEnterpriseManagementRelationshipObject(child.Relationship,
+                        obj.GetCoreEnterpriseManagementObject(), child.EnterpriseManagementObject));
+                }
+                else
+                {
+                    incrementalDiscoveryData.Add(_client.Relations().buildCreatableEnterpriseManagementRelationshipObject(
+                        obj.GetCoreEnterpriseManagementObject(), child.EnterpriseManagementObject));
+                }
+
+                //incrementalDiscoveryData.Add(_client.Relations().buildCreatableEnterpriseManagementRelationshipObject( obj.Relationship,
+                //    obj.EnterpriseManagementObject, child.EnterpriseManagementObject));
             }
 
 
