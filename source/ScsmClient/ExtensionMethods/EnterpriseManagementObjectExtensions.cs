@@ -128,6 +128,7 @@ namespace ScsmClient.ExtensionMethods
             };
 
             dto.SetEnterpriseManagementSimpleObjectValues(composableProjection.Object.Values);
+            dto["@class"] = composableProjection.Object.GetManagementPackClassName();
 
             if (levels.HasValue)
             {
@@ -240,7 +241,7 @@ namespace ScsmClient.ExtensionMethods
             };
             
             dto.SetEnterpriseManagementSimpleObjectValues(enterpriseManagementObject.Values);
-
+            dto["@class"] = enterpriseManagementObject.GetManagementPackClassName();
             return dto;
         }
 

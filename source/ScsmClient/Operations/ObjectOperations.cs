@@ -968,9 +968,9 @@ namespace ScsmClient.Operations
                                         throw new NotSupportedException("Object for Removing is not supported!");
                                     }
 
-                                    if (dict.ContainsKey("~type"))
+                                    if (dict.ContainsKey("@class"))
                                     {
-                                        itemClassName = dict["~type"].ToString();
+                                        itemClassName = dict["@class"].ToString();
                                     }
 
 
@@ -1243,9 +1243,9 @@ namespace ScsmClient.Operations
                                         throw new NotSupportedException("Object for Removing is not supported!");
                                     }
 
-                                    if (dict.ContainsKey("~type"))
+                                    if (dict.ContainsKey("@class"))
                                     {
-                                        itemClassName = dict["~type"].ToString();
+                                        itemClassName = dict["@class"].ToString();
                                     }
 
 
@@ -1469,9 +1469,9 @@ namespace ScsmClient.Operations
 
                             case Dictionary<string, object> dict:
                                 {
-                                    if (dict.ContainsKey("~type"))
+                                    if (dict.ContainsKey("@class"))
                                     {
-                                        itemClassName = dict["~type"].ToString();
+                                        itemClassName = dict["@class"].ToString();
                                     }
 
 
@@ -1621,9 +1621,9 @@ namespace ScsmClient.Operations
 
                             case Dictionary<string, object> dict:
                                 {
-                                    if (dict.ContainsKey("~type"))
+                                    if (dict.ContainsKey("@class"))
                                     {
-                                        itemClassName = dict["~type"].ToString();
+                                        itemClassName = dict["@class"].ToString();
                                     }
 
 
