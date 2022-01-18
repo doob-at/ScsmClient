@@ -5,6 +5,7 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 using doob.Reflectensions.Common;
+using doob.Reflectensions.ExtensionMethods;
 using Microsoft.EnterpriseManagement;
 using Microsoft.EnterpriseManagement.Common;
 using Microsoft.EnterpriseManagement.Configuration;
@@ -84,6 +85,25 @@ namespace ScsmClient.Operations
             return result.Value;
         }
 
+
+        public SimpleXml GetCriteriaFromTypeNameAsXml(string typeName, string criteria)
+        {
+            var objectClass = _client.Types().GetClassByName(typeName);
+            if (objectClass != null)
+            {
+                var xmlstr = _client.Criteria().BuildObjectCriteria(criteria, objectClass).CriteriaXml;
+                return SimpleXml.Parse(xmlstr);
+            }
+            var typeProjectionClass = _client.Types().GetTypeProjectionByName(typeName);
+            if (typeProjectionClass != null)
+            {
+                var c = _client.Criteria().BuildObjectProjectionCriteria(criteria, typeProjectionClass);
+                var xmlstr = c.Reflect().GetPropertyValue<string>("Criteria", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+                return SimpleXml.Parse(xmlstr);
+            }
+
+            throw new Exception($"Type '{typeName}' not found");
+        }
 
         public string CreateSortCriteriaXmlFrom(string sortProperty, ManagementPackClass managementPackClass)
         {

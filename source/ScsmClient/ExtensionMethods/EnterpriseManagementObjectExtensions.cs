@@ -124,9 +124,11 @@ namespace ScsmClient.ExtensionMethods
             {
                 ObjectId = composableProjection.Object.Id,
                 TimeAdded = composableProjection.Object.TimeAdded,
-                LastModified = composableProjection.Object.LastModified
+                LastModified = composableProjection.Object.LastModified,
+                DisplayName = composableProjection.Object.DisplayName
+                
             };
-
+            
             dto.SetEnterpriseManagementSimpleObjectValues(composableProjection.Object.Values);
             dto["@class"] = composableProjection.Object.GetManagementPackClassName();
 
@@ -237,7 +239,8 @@ namespace ScsmClient.ExtensionMethods
             {
                 ObjectId = enterpriseManagementObject.Id,
                 TimeAdded = enterpriseManagementObject.TimeAdded,
-                LastModified = enterpriseManagementObject.LastModified
+                LastModified = enterpriseManagementObject.LastModified,
+                DisplayName = enterpriseManagementObject.DisplayName
             };
             
             dto.SetEnterpriseManagementSimpleObjectValues(enterpriseManagementObject.Values);
