@@ -38,6 +38,8 @@ namespace ScsmClient.Operations
             foreach (var transaction in transactions)
             {
                 var trans = new HistoryTransaction();
+                trans.TimeStamp = transaction.DateOccurred;
+                trans.Username = transaction.UserName;
                 var classChanges = new List<PropertyChangeEntry>();
                 var relationShipChanges = new List<RelationshipChangeEntry>();
 
@@ -70,7 +72,11 @@ namespace ScsmClient.Operations
                             ? relationshipHistory.SourceObjectId
                             : relationshipHistory.TargetObjectId;
 
-                        entry.RelatedObject = _client.ScsmObject().GetObjectById(relId);
+                        var related = _client.ScsmObject().GetObjectById(relId);
+                        var r = new Dictionary<string, string>();
+                        r["Id"] = related.ObjectId.ToString();
+                        r["DisplayName"] = related.DisplayName;
+                        entry.RelatedObject = r;
                         relationShipChanges.Add(entry);
                     }
                 }

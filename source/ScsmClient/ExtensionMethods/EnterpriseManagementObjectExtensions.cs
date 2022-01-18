@@ -128,6 +128,7 @@ namespace ScsmClient.ExtensionMethods
                 DisplayName = composableProjection.Object.DisplayName
                 
             };
+
             
             dto.SetEnterpriseManagementSimpleObjectValues(composableProjection.Object.Values);
             dto["@class"] = composableProjection.Object.GetManagementPackClassName();
