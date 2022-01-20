@@ -299,17 +299,19 @@ namespace ScsmClient.Operations
             var targetClass = relationship.Target.Type.GetElement();
             var sourceClass = relationship.Source.Type.GetElement();
 
-            //var firstObjectClass = first.GetClasses(BaseClassTraversalDepth.None).FirstOrDefault();
-            //var secondObjectClass = second.GetClasses(BaseClassTraversalDepth.None).FirstOrDefault();
+            var targetObject = first;
+            var sourceObject = second;
 
-            var targetObject = first.IsInstanceOf(targetClass) ? first : (second.IsInstanceOf(targetClass) ? second : null);
-            var sourceObject = second.IsInstanceOf(sourceClass) ? second : (first.IsInstanceOf(sourceClass) ? first : null);
-
-            if (targetObject == null || sourceObject == null)
+            if (targetClass.Id != sourceClass.Id)
             {
-                throw new Exception($"Types doesn't match, valid Types are '{targetClass.Name}' and '{sourceClass.Name}'");
-            }
+                targetObject = first.IsInstanceOf(targetClass) ? first : (second.IsInstanceOf(targetClass) ? second : null);
+                sourceObject = second.IsInstanceOf(sourceClass) ? second : (first.IsInstanceOf(sourceClass) ? first : null);
 
+                if (targetObject == null || sourceObject == null)
+                {
+                    throw new Exception($"Types doesn't match, valid Types are '{targetClass.Name}' and '{sourceClass.Name}'");
+                }
+            }
 
             var relationshipObject = new CreatableEnterpriseManagementRelationshipObject(_client.ManagementGroup, relationship);
 

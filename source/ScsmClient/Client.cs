@@ -122,5 +122,8 @@ namespace ScsmClient
         private AttachmentOperations _attachmentOperations;
         public AttachmentOperations Attachment() => _attachmentOperations = _attachmentOperations ?? new AttachmentOperations(this);
 
+        private AttachmentOperations _historyOperations;
+        public AttachmentOperations History() => _historyOperations = _historyOperations ?? new (this);
+
     }
 }
