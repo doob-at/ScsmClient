@@ -136,9 +136,9 @@ namespace ScsmClient.Operations
             return CreateRelation(relClass, sourceObj, targetObj);
         }
 
-        public Guid CreateRelation(ManagementPackRelationship relationship, EnterpriseManagementObject first, EnterpriseManagementObject second)
+        public Guid CreateRelation(ManagementPackRelationship relationship, EnterpriseManagementObject source, EnterpriseManagementObject target)
         {
-            var relationshipObject = buildCreatableEnterpriseManagementRelationshipObject(relationship, first, second);
+            var relationshipObject = buildCreatableEnterpriseManagementRelationshipObject(relationship, source, target);
 
             relationshipObject.Commit();
 
@@ -288,24 +288,24 @@ namespace ScsmClient.Operations
         }
 
 
-        internal CreatableEnterpriseManagementRelationshipObject buildCreatableEnterpriseManagementRelationshipObject(EnterpriseManagementObject first, EnterpriseManagementObject second)
+        internal CreatableEnterpriseManagementRelationshipObject buildCreatableEnterpriseManagementRelationshipObject(EnterpriseManagementObject source, EnterpriseManagementObject target)
         {
-            var relationshipClass = FindRelationship(first.GetManagementPackClass(), second.GetManagementPackClass());
-            return buildCreatableEnterpriseManagementRelationshipObject(relationshipClass, first, second);
+            var relationshipClass = FindRelationship(source.GetManagementPackClass(), target.GetManagementPackClass());
+            return buildCreatableEnterpriseManagementRelationshipObject(relationshipClass, source, target);
         }
 
-        internal CreatableEnterpriseManagementRelationshipObject buildCreatableEnterpriseManagementRelationshipObject(ManagementPackRelationship relationship, EnterpriseManagementObject first, EnterpriseManagementObject second)
+        internal CreatableEnterpriseManagementRelationshipObject buildCreatableEnterpriseManagementRelationshipObject(ManagementPackRelationship relationship, EnterpriseManagementObject source, EnterpriseManagementObject target)
         {
             var targetClass = relationship.Target.Type.GetElement();
             var sourceClass = relationship.Source.Type.GetElement();
 
-            var targetObject = first;
-            var sourceObject = second;
+            var targetObject = source;
+            var sourceObject = target;
 
             if (targetClass.Id != sourceClass.Id)
             {
-                targetObject = first.IsInstanceOf(targetClass) ? first : (second.IsInstanceOf(targetClass) ? second : null);
-                sourceObject = second.IsInstanceOf(sourceClass) ? second : (first.IsInstanceOf(sourceClass) ? first : null);
+                targetObject = source.IsInstanceOf(targetClass) ? source : (target.IsInstanceOf(targetClass) ? target : null);
+                sourceObject = target.IsInstanceOf(sourceClass) ? target : (source.IsInstanceOf(sourceClass) ? source : null);
 
                 if (targetObject == null || sourceObject == null)
                 {
