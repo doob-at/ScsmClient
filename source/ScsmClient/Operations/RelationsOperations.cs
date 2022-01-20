@@ -299,8 +299,8 @@ namespace ScsmClient.Operations
             var targetClass = relationship.Target.Type.GetElement();
             var sourceClass = relationship.Source.Type.GetElement();
 
-            var targetObject = source;
-            var sourceObject = target;
+            var sourceObject = source;
+            var targetObject = target;
 
             if (targetClass.Id != sourceClass.Id)
             {
