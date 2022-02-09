@@ -126,7 +126,7 @@ namespace ScsmClient.Operations
                     var pm = new PropertyMap();
                     if (parentClass != null)
                     {
-                        pm.FullName = $"{parentClass.Name}!{p.Name}";
+                        pm.FullName = $"{managementPackClass.Name}!{p.Name}";
                     }
                     else
                     {
