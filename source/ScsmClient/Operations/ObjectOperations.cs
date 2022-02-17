@@ -509,6 +509,30 @@ namespace ScsmClient.Operations
             return count;
         }
 
+
+
+
+        public void SetObject(Guid id, Dictionary<string, object> properties)
+        {
+            var updDict = new Dictionary<Guid, Dictionary<string, object>>
+            {
+                [id] = properties
+            };
+            SetObjects(updDict);
+        }
+
+        public int SetObjects(Dictionary<Guid, Dictionary<string, object>> updateObjects,
+            CancellationToken cancellationToken = default)
+        {
+            return SetObjects(updateObjects, 1000, cancellationToken);
+        }
+
+        public int SetObjects(Dictionary<Guid, Dictionary<string, object>> updateObjects, int maxItemsPerTransaction,
+            CancellationToken cancellationToken = default)
+        {
+            return _UpdateObjects(updateObjects, maxItemsPerTransaction, false, cancellationToken);
+        }
+
         public void UpdateObject(Guid id, Dictionary<string, object> properties)
         {
             var updDict = new Dictionary<Guid, Dictionary<string, object>>
@@ -518,82 +542,42 @@ namespace ScsmClient.Operations
             UpdateObjects(updDict);
         }
 
-        public void UpdateObject(string typeProjectionName, Guid id,
-            Dictionary<string, object> properties)
-        {
-            var typePro = _client.Types().GetTypeProjectionByName(typeProjectionName);
-            UpdateObject(typePro, id, properties);
-        }
-
-        public void UpdateObject(ManagementPackTypeProjection managementPackTypeProjection, Guid id, Dictionary<string, object> properties)
-        {
-
-            var updDict = new Dictionary<Guid, Dictionary<string, object>>
-            {
-                [id] = properties
-            };
-            UpdateObjects(managementPackTypeProjection, updDict);
-        }
-
-        //public void UpdateObjects(EnterpriseManagementObject enterpriseManagementObject, Dictionary<string, object> properties)
-        //{
-        //    UpdateObjects(new[] { enterpriseManagementObject }, properties);
-        //}
-        //public void UpdateObjects(IEnumerable<EnterpriseManagementObject> enterpriseManagementObjects, Dictionary<string, object> properties, CancellationToken cancellationToken = default)
-        //{
-
-        //    var groups = GroupIn10(enterpriseManagementObjects);
-
-        //    foreach (var enumerable in groups)
-        //    {
-        //        cancellationToken.ThrowIfCancellationRequested();
-        //        var idd = new IncrementalDiscoveryData();
-        //        foreach (var dictionary in enumerable)
-        //        {
-        //            var obj = UpdateEnterpriseManagementObjectWithRelations(dictionary, properties);
-        //            obj.EnterpriseManagementObject.Overwrite();
-        //            var rootId = AddRelatedObjects(obj, ref idd);
-        //            RemoveRelatedObjects(obj, ref idd);
-        //            RemoveRelationship(obj, ref idd);
-        //        }
-        //        idd.Commit(_client.ManagementGroup);
-        //    }
-
-        //}
-
         public int UpdateObjects(Dictionary<Guid, Dictionary<string, object>> updateObjects, CancellationToken cancellationToken = default)
         {
             return UpdateObjects(updateObjects, 1000, cancellationToken);
         }
-
-        public int UpdateObjects(string typeProjectionName, Dictionary<Guid, Dictionary<string, object>> updateObjects, CancellationToken cancellationToken = default)
-        {
-            var typePro = _client.Types().GetTypeProjectionByName(typeProjectionName);
-            return UpdateObjects(typePro, updateObjects, 1000, cancellationToken);
-        }
-
-        public int UpdateObjects(ManagementPackTypeProjection managementPackTypeProjection, Dictionary<Guid, Dictionary<string, object>> updateObjects, CancellationToken cancellationToken = default)
-        {
-            return UpdateObjects(managementPackTypeProjection, updateObjects, 1000, cancellationToken);
-        }
-
-
+        
         public int UpdateObjects(Dictionary<Guid, Dictionary<string, object>> updateObjects, int maxItemsPerTransaction, CancellationToken cancellationToken = default)
+        {
+            return _UpdateObjects(updateObjects, maxItemsPerTransaction, true, cancellationToken);
+        }
+        
+        private int _UpdateObjects(Dictionary<Guid, Dictionary<string, object>> updateObjects, int maxItemsPerTransaction, bool checkETag, CancellationToken cancellationToken = default)
         {
 
 
             var enterpriseObjects = GetEnterpriseManagementObjectsByIds(updateObjects.Keys.ToList())
                 .ToDictionary(o => o, o => updateObjects[o.Id]);
 
-
-
-
-
             IncrementalDiscoveryData idd = null;
             int currentCount = 0;
             var allCount = 0;
             foreach (var dictionary in enterpriseObjects)
             {
+                if (checkETag)
+                {
+                    if (!dictionary.Value.TryGetValue("ETag", out var updateETag))
+                    {
+                        throw new Exception("[ETag_missing]:ETag value is needed for Update!");
+                    }
+                    
+                    var eTag = dictionary.Key.CalculateETag();
+                    if (eTag != $"{updateETag}")
+                    {
+                        throw new Exception("[ETag_mismatch]:ETag value is different, looks like there was an update in between");
+                    }
+                }
+
                 cancellationToken.ThrowIfCancellationRequested();
                 if (idd == null)
                 {
@@ -621,7 +605,85 @@ namespace ScsmClient.Operations
             return allCount;
         }
 
+
+
+
+
+
+        public void SetObject(string typeProjectionName, Guid id, Dictionary<string, object> properties)
+        {
+            var typePro = _client.Types().GetTypeProjectionByName(typeProjectionName);
+            SetObject(typePro, id, properties);
+        }
+
+        public void SetObject(ManagementPackTypeProjection managementPackTypeProjection, Guid id, Dictionary<string, object> properties)
+        {
+
+            var updDict = new Dictionary<Guid, Dictionary<string, object>>
+            {
+                [id] = properties
+            };
+            SetObjects(managementPackTypeProjection, updDict);
+        }
+
+
+        public int SetObjects(string typeProjectionName, Dictionary<Guid, Dictionary<string, object>> updateObjects, CancellationToken cancellationToken = default)
+        {
+            var typePro = _client.Types().GetTypeProjectionByName(typeProjectionName);
+            return SetObjects(typePro, updateObjects, 1000, cancellationToken);
+        }
+
+        public int SetObjects(ManagementPackTypeProjection managementPackTypeProjection, Dictionary<Guid, Dictionary<string, object>> updateObjects, CancellationToken cancellationToken = default)
+        {
+            return SetObjects(managementPackTypeProjection, updateObjects, 1000, cancellationToken);
+        }
+
+        public int SetObjects(ManagementPackTypeProjection managementPackTypeProjection, Dictionary<Guid, Dictionary<string, object>> updateObjects, int maxItemsPerTransaction, CancellationToken cancellationToken = default)
+        {
+            return _UpdateObjects(managementPackTypeProjection, updateObjects, maxItemsPerTransaction, false, cancellationToken);
+        }
+
+
+
+
+
+
+        public void UpdateObject(string typeProjectionName, Guid id,  Dictionary<string, object> properties)
+        {
+            var typePro = _client.Types().GetTypeProjectionByName(typeProjectionName);
+            UpdateObject(typePro, id, properties);
+        }
+
+        public void UpdateObject(ManagementPackTypeProjection managementPackTypeProjection, Guid id, Dictionary<string, object> properties)
+        {
+
+            var updDict = new Dictionary<Guid, Dictionary<string, object>>
+            {
+                [id] = properties
+            };
+            UpdateObjects(managementPackTypeProjection, updDict);
+        }
+
+
+        public int UpdateObjects(string typeProjectionName, Dictionary<Guid, Dictionary<string, object>> updateObjects, CancellationToken cancellationToken = default)
+        {
+            var typePro = _client.Types().GetTypeProjectionByName(typeProjectionName);
+            return UpdateObjects(typePro, updateObjects, 1000, cancellationToken);
+        }
+
+        public int UpdateObjects(ManagementPackTypeProjection managementPackTypeProjection, Dictionary<Guid, Dictionary<string, object>> updateObjects, CancellationToken cancellationToken = default)
+        {
+            return UpdateObjects(managementPackTypeProjection, updateObjects, 1000, cancellationToken);
+        }
+
         public int UpdateObjects(ManagementPackTypeProjection managementPackTypeProjection, Dictionary<Guid, Dictionary<string, object>> updateObjects, int maxItemsPerTransaction, CancellationToken cancellationToken = default)
+        {
+            return _UpdateObjects(managementPackTypeProjection, updateObjects, maxItemsPerTransaction, true,
+                cancellationToken);
+        }
+
+
+        private int _UpdateObjects(ManagementPackTypeProjection managementPackTypeProjection, Dictionary<Guid, Dictionary<string, object>> updateObjects, int maxItemsPerTransaction, bool checkETag, CancellationToken cancellationToken = default)
         {
 
 
@@ -634,6 +696,20 @@ namespace ScsmClient.Operations
             var allCount = 0;
             foreach (var dictionary in enterpriseObjects)
             {
+                if (checkETag)
+                {
+                    if (!dictionary.Value.TryGetValue("ETag", out var updateETag))
+                    {
+                        throw new Exception("[ETag_missing]:ETag value is needed for Update!");
+                    }
+
+                    var eTag = dictionary.Key.CalculateETag();
+                    if (eTag != $"{updateETag}")
+                    {
+                        throw new Exception("[ETag_mismatch]:ETag value is different, looks like there was an update in between");
+                    }
+                }
+
                 cancellationToken.ThrowIfCancellationRequested();
                 if (idd == null)
                 {

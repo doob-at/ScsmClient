@@ -35,6 +35,15 @@ namespace ScsmClient.SharedModels.Models
             set => SetPropertyChanged(ref _displayName, value);
         }
 
+        private string _eTag;
+
+        public string ETag
+        {
+            get => _eTag;
+            set => SetPropertyChanged(ref _eTag, value);
+        }
+
+
         public ScsmObject(): base()
         {
             
