@@ -188,15 +188,12 @@ namespace ScsmClient.ExtensionMethods
 
         internal static string CalculateETag(this EnterpriseManagementObject enterpriseManagementObject)
         {
-            return CalculateETag(enterpriseManagementObject.LastModified);
-        }
-
-        internal static string CalculateETag(DateTime dt)
-        {
-            var dtOffset = new DateTimeOffset(dt.SetIsUtc());
-            var ticksString = dtOffset.UtcTicks.ToString();
-            var hash = SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(ticksString));
+            var dtOffset = new DateTimeOffset(enterpriseManagementObject.LastModified.SetIsUtc());
+            var combinedIdWithTicks = $"{enterpriseManagementObject.Id}|{dtOffset.UtcTicks}";
+            var hash = MD5.Create().ComputeHash(Encoding.UTF8.GetBytes(combinedIdWithTicks));
             return Convert.ToBase64String(hash);
         }
+
+
     }
 }
